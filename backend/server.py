@@ -268,6 +268,256 @@ class FileUpload(BaseModel):
     file_type: str  # image/jpeg, image/png, video/mp4, etc.
     file_name: str
 
+# New HR Module Models
+
+# Employee Onboarding Models
+class OnboardingStage(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    description: str
+    required_documents: List[str] = []
+    required_training: List[str] = []
+    order: int
+    employee_type: str = "all"  # "all", "w2", "1099"
+    is_active: bool = True
+
+class OnboardingProgress(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    employee_id: str
+    stage_id: str
+    status: str = "pending"  # pending, in_progress, completed, skipped
+    started_at: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
+    notes: Optional[str] = None
+    documents_uploaded: List[str] = []
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class OnboardingTemplate(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    description: str
+    employee_type: str  # "w2", "1099"
+    stages: List[str] = []  # List of stage IDs
+    is_active: bool = True
+    created_by: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+# PTO Models (W2 employees only)
+class PTORequest(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    employee_id: str
+    start_date: datetime
+    end_date: datetime
+    days_requested: float
+    reason: str
+    status: str = "pending"  # pending, approved, denied
+    approved_by: Optional[str] = None
+    approved_at: Optional[datetime] = None
+    notes: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class PTOBalance(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    employee_id: str
+    year: int
+    accrued_days: float = 0.0
+    used_days: float = 0.0
+    pending_days: float = 0.0
+    available_days: float = 0.0
+    carry_over_days: float = 0.0
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+# Safety & Compliance Models
+class SafetyTraining(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    description: str
+    required_for: str = "1099"  # "all", "w2", "1099"
+    duration_hours: float
+    certification_required: bool = False
+    renewal_months: Optional[int] = None
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class SafetyTrainingProgress(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    employee_id: str
+    training_id: str
+    status: str = "not_started"  # not_started, in_progress, completed, expired
+    started_at: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
+    expires_at: Optional[datetime] = None
+    score: Optional[float] = None
+    certificate_url: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class WorkersCompSubmission(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    employee_id: str
+    submission_date: datetime
+    submission_deadline: datetime
+    status: str = "pending"  # pending, submitted, approved, rejected
+    document_url: Optional[str] = None
+    submitted_by: str
+    notes: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class IncidentReport(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    employee_id: str
+    incident_date: datetime
+    location: str
+    description: str
+    injury_type: str
+    severity: str = "minor"  # minor, moderate, severe
+    witnesses: List[str] = []
+    actions_taken: str
+    reported_by: str
+    status: str = "open"  # open, investigating, resolved
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+# Project Assignment Models
+class ProjectAssignment(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    lead_id: str
+    assigned_rep_id: str
+    assigned_by: str
+    assignment_date: datetime = Field(default_factory=datetime.utcnow)
+    priority: str = "medium"  # low, medium, high, urgent
+    status: str = "assigned"  # assigned, accepted, in_progress, completed
+    notes: Optional[str] = None
+    due_date: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
+
+class QRCodeScan(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    rep_id: str
+    scanned_at: datetime = Field(default_factory=datetime.utcnow)
+    location: Optional[str] = None
+    ip_address: Optional[str] = None
+    user_agent: Optional[str] = None
+    lead_generated: bool = False
+    lead_id: Optional[str] = None
+
+class AppointmentRequest(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    rep_id: str
+    customer_name: str
+    customer_email: str
+    customer_phone: str
+    customer_address: str
+    preferred_date: datetime
+    preferred_time: str
+    service_type: str
+    message: Optional[str] = None
+    status: str = "pending"  # pending, confirmed, cancelled
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+# Employee Self-Service Models
+class EmployeeDocument(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    employee_id: str
+    document_type: str  # "contract", "tax_forms", "handbook", "certification", "other"
+    document_name: str
+    document_url: str
+    uploaded_by: str
+    is_required: bool = False
+    expires_at: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class EmployeeRequest(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    employee_id: str
+    request_type: str  # "document", "info_change", "equipment", "other"
+    title: str
+    description: str
+    priority: str = "medium"  # low, medium, high
+    status: str = "open"  # open, in_progress, resolved, closed
+    assigned_to: Optional[str] = None
+    resolution: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+# Create Models for API requests
+class OnboardingStageCreate(BaseModel):
+    name: str
+    description: str
+    required_documents: List[str] = []
+    required_training: List[str] = []
+    order: int
+    employee_type: str = "all"
+
+class OnboardingStageUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    required_documents: Optional[List[str]] = None
+    required_training: Optional[List[str]] = None
+    order: Optional[int] = None
+    employee_type: Optional[str] = None
+    is_active: Optional[bool] = None
+
+class PTORequestCreate(BaseModel):
+    start_date: datetime
+    end_date: datetime
+    reason: str
+
+class PTORequestUpdate(BaseModel):
+    status: Optional[str] = None
+    notes: Optional[str] = None
+
+class SafetyTrainingCreate(BaseModel):
+    name: str
+    description: str
+    required_for: str = "1099"
+    duration_hours: float
+    certification_required: bool = False
+    renewal_months: Optional[int] = None
+
+class IncidentReportCreate(BaseModel):
+    incident_date: datetime
+    location: str
+    description: str
+    injury_type: str
+    severity: str = "minor"
+    witnesses: List[str] = []
+    actions_taken: str
+
+class ProjectAssignmentCreate(BaseModel):
+    lead_id: str
+    assigned_rep_id: str
+    priority: str = "medium"
+    notes: Optional[str] = None
+    due_date: Optional[datetime] = None
+
+class AppointmentRequestCreate(BaseModel):
+    rep_id: str
+    customer_name: str
+    customer_email: str
+    customer_phone: str
+    customer_address: str
+    preferred_date: datetime
+    preferred_time: str
+    service_type: str
+    message: Optional[str] = None
+
+class EmployeeRequestCreate(BaseModel):
+    request_type: str
+    title: str
+    description: str
+    priority: str = "medium"
+
+# Update existing Employee model to include employee type
+class EmployeeUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    role: Optional[str] = None
+    territory: Optional[str] = None
+    commission_rate: Optional[float] = None
+    phone: Optional[str] = None
+    hire_date: Optional[datetime] = None
+    employee_type: Optional[str] = None  # "w2", "1099"
+    is_active: Optional[bool] = None
+
 # Email Templates
 EMAIL_TEMPLATE = """
 <!DOCTYPE html>
