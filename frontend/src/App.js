@@ -1167,7 +1167,7 @@ const QRGeneratorApp = () => {
     );
   };
 
-  const OverviewTab = () => {
+  const LeadsTab = () => {
     const totalConversions = leads.filter(lead => lead.status === 'converted').length;
     const totalLeads = leads.length;
     const conversionRate = totalLeads > 0 ? ((totalConversions / totalLeads) * 100).toFixed(1) : 0;
