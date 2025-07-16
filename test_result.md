@@ -304,6 +304,54 @@ frontend:
         agent: "testing"
         comment: "✅ PASSED: Admin dashboard with analytics fully implemented including role-based metric cards (employees/jobs/commissions), proper data visualization, loading states, and backend API integration. Different analytics views for different user roles working correctly."
 
+  - task: "QR Code Generator Frontend Integration"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Need to integrate QR code frontend with real backend APIs, replace mock data with API calls"
+
+  - task: "File Upload UI for Pictures/Videos"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implement file upload interface for sales rep pictures and welcome videos with preview functionality"
+
+  - task: "Lead Form Submission"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implement functional lead capture form on landing pages with backend submission"
+
+  - task: "Real QR Code Generation"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Replace mock QR code SVG with real QR code generation functionality"
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
