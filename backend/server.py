@@ -684,6 +684,198 @@ async def send_lead_notification(lead: Lead, rep_email: str, background_tasks: B
         background_tasks
     )
 
+# HR Module Helper Functions
+async def calculate_pto_days(start_date: datetime, end_date: datetime) -> float:
+    """Calculate number of PTO days between two dates (excluding weekends)"""
+    delta = end_date - start_date
+    total_days = delta.days + 1
+    
+    # Count weekdays only
+    weekdays = 0
+    current_date = start_date
+    while current_date <= end_date:
+        if current_date.weekday() < 5:  # Monday = 0, Sunday = 6
+            weekdays += 1
+        current_date += timedelta(days=1)
+    
+    return float(weekdays)
+
+async def update_pto_balance(employee_id: str, days_used: float, year: int):
+    """Update PTO balance for an employee"""
+    balance = await db.pto_balances.find_one({"employee_id": employee_id, "year": year})
+    
+    if balance:
+        balance["used_days"] += days_used
+        balance["available_days"] = balance["accrued_days"] + balance["carry_over_days"] - balance["used_days"] - balance["pending_days"]
+        balance["updated_at"] = datetime.utcnow()
+        await db.pto_balances.update_one(
+            {"employee_id": employee_id, "year": year},
+            {"$set": balance}
+        )
+    else:
+        # Create new balance record
+        new_balance = PTOBalance(
+            employee_id=employee_id,
+            year=year,
+            accrued_days=15.0,  # Default annual PTO
+            used_days=days_used,
+            pending_days=0.0,
+            available_days=15.0 - days_used,
+            carry_over_days=0.0
+        )
+        await db.pto_balances.insert_one(new_balance.model_dump())
+
+async def check_workers_comp_deadline(employee_id: str) -> bool:
+    """Check if workers comp submission is approaching deadline"""
+    employee = await db.employees.find_one({"id": employee_id})
+    if not employee or employee.get("employee_type") != "1099":
+        return False
+    
+    hire_date = employee.get("hire_date")
+    if not hire_date:
+        return False
+    
+    deadline = hire_date + timedelta(days=14)
+    days_remaining = (deadline - datetime.utcnow()).days
+    
+    return days_remaining <= 3  # Alert if 3 days or less remaining
+
+async def get_employee_onboarding_progress(employee_id: str) -> dict:
+    """Get onboarding progress for an employee"""
+    employee = await db.employees.find_one({"id": employee_id})
+    if not employee:
+        return {}
+    
+    employee_type = employee.get("employee_type", "w2")
+    
+    # Get onboarding stages for this employee type
+    stages = await db.onboarding_stages.find({
+        "$or": [
+            {"employee_type": "all"},
+            {"employee_type": employee_type}
+        ]
+    }).sort("order", 1).to_list(100)
+    
+    # Get progress for each stage
+    progress_list = []
+    for stage in stages:
+        progress = await db.onboarding_progress.find_one({
+            "employee_id": employee_id,
+            "stage_id": stage["id"]
+        })
+        
+        if not progress:
+            # Create initial progress record
+            progress = OnboardingProgress(
+                employee_id=employee_id,
+                stage_id=stage["id"],
+                status="pending"
+            )
+            await db.onboarding_progress.insert_one(progress.model_dump())
+        
+        progress_list.append({
+            "stage": stage,
+            "progress": progress
+        })
+    
+    return {
+        "employee_id": employee_id,
+        "employee_type": employee_type,
+        "stages": progress_list,
+        "total_stages": len(stages),
+        "completed_stages": len([p for p in progress_list if p["progress"]["status"] == "completed"])
+    }
+
+async def send_onboarding_notification(employee_id: str, stage_name: str, background_tasks: BackgroundTasks):
+    """Send notification about onboarding stage completion"""
+    employee = await db.employees.find_one({"id": employee_id})
+    if not employee:
+        return
+    
+    template_data = {
+        "recipient_name": employee["name"],
+        "message": f"You have completed the {stage_name} onboarding stage.",
+        "job_id": employee_id,
+        "job_title": f"Onboarding Progress - {stage_name}",
+        "job_status": "Completed",
+        "job_value": "N/A",
+        "action_url": f"https://theroofdocs.com/onboarding/{employee_id}"
+    }
+    
+    await send_email(
+        employee["email"],
+        f"Onboarding Update - {stage_name} Completed",
+        template_data,
+        background_tasks
+    )
+
+async def send_workers_comp_reminder(employee_id: str, background_tasks: BackgroundTasks):
+    """Send reminder about workers comp submission deadline"""
+    employee = await db.employees.find_one({"id": employee_id})
+    if not employee:
+        return
+    
+    hire_date = employee.get("hire_date")
+    if not hire_date:
+        return
+    
+    deadline = hire_date + timedelta(days=14)
+    days_remaining = (deadline - datetime.utcnow()).days
+    
+    template_data = {
+        "recipient_name": employee["name"],
+        "message": f"Your workers compensation submission is due in {days_remaining} days. Please complete it as soon as possible.",
+        "job_id": employee_id,
+        "job_title": "Workers Compensation Submission",
+        "job_status": "Due Soon",
+        "job_value": "N/A",
+        "action_url": f"https://theroofdocs.com/compliance/{employee_id}"
+    }
+    
+    await send_email(
+        employee["email"],
+        "Workers Compensation Submission Reminder",
+        template_data,
+        background_tasks
+    )
+
+async def send_assignment_notification(assignment: ProjectAssignment, background_tasks: BackgroundTasks):
+    """Send notification to sales rep about new assignment"""
+    rep = await db.employees.find_one({"id": assignment.assigned_rep_id})
+    lead = await db.leads.find_one({"id": assignment.lead_id})
+    
+    if not rep or not lead:
+        return
+    
+    template_data = {
+        "recipient_name": rep["name"],
+        "message": f"You have been assigned a new lead: {lead['name']}.",
+        "job_id": assignment.id,
+        "job_title": f"New Assignment - {lead['name']}",
+        "job_status": assignment.status,
+        "job_value": "TBD",
+        "action_url": f"https://theroofdocs.com/assignments/{assignment.id}"
+    }
+    
+    await send_email(
+        rep["email"],
+        f"New Assignment - {lead['name']}",
+        template_data,
+        background_tasks
+    )
+
+async def log_qr_scan(rep_id: str, request_info: dict) -> QRCodeScan:
+    """Log QR code scan event"""
+    scan = QRCodeScan(
+        rep_id=rep_id,
+        location=request_info.get("location"),
+        ip_address=request_info.get("ip_address"),
+        user_agent=request_info.get("user_agent")
+    )
+    
+    await db.qr_scans.insert_one(scan.model_dump())
+    return scan
+
 async def initialize_sample_data():
     """Initialize sample data for QR Generator"""
     try:
