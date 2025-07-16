@@ -2681,6 +2681,13 @@ class RoofHRTester:
         # Hiring Flow Management System tests
         self.test_hiring_flow_management_system()
         
+        # Sales Leaderboard comprehensive tests
+        self.test_sales_leaderboard_endpoints()
+        self.test_leaderboard_authentication_requirements()
+        self.test_leaderboard_data_models()
+        self.test_leaderboard_role_based_access()
+        self.test_leaderboard_goal_assignment_restrictions()
+        
         return self.test_results
 
     def print_summary(self):
