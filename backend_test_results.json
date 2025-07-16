@@ -4,93 +4,93 @@
       "success": true,
       "message": "API documentation accessible",
       "response_data": null,
-      "timestamp": "2025-07-16T07:03:18.373583"
+      "timestamp": "2025-07-16T07:04:55.390801"
     },
     "invalid_login": {
       "success": false,
-      "message": "Expected 401/422, got No response",
+      "message": "No response received",
       "response_data": null,
-      "timestamp": "2025-07-16T07:03:18.477361"
+      "timestamp": "2025-07-16T07:04:55.494752"
     },
     "unauthorized_access": {
       "success": false,
-      "message": "Expected 401/403, got No response",
+      "message": "No response received",
       "response_data": null,
-      "timestamp": "2025-07-16T07:03:18.479799"
+      "timestamp": "2025-07-16T07:04:55.497224"
     },
     "oauth_integration": {
       "success": true,
       "message": "OAuth integration implemented (requires valid session for full testing)",
       "response_data": null,
-      "timestamp": "2025-07-16T07:03:18.479823"
+      "timestamp": "2025-07-16T07:04:55.497249"
     },
     "endpoint_structure": {
       "success": true,
       "message": "All expected endpoints are properly structured",
       "response_data": null,
-      "timestamp": "2025-07-16T07:03:18.582685"
+      "timestamp": "2025-07-16T07:04:55.606689"
     },
     "cors_configuration": {
       "success": false,
       "message": "CORS headers missing",
       "response_data": null,
-      "timestamp": "2025-07-16T07:03:18.586339"
+      "timestamp": "2025-07-16T07:04:55.610378"
     }
   },
   "employee_management": {
     "get_employees_no_auth": {
       "success": false,
-      "message": "Expected 401/403, got No response",
+      "message": "No response received",
       "response_data": null,
-      "timestamp": "2025-07-16T07:03:18.481796"
+      "timestamp": "2025-07-16T07:04:55.499411"
     },
     "create_employee_no_auth": {
       "success": false,
-      "message": "Expected 401/403, got No response",
+      "message": "No response received",
       "response_data": null,
-      "timestamp": "2025-07-16T07:03:18.483829"
+      "timestamp": "2025-07-16T07:04:55.501541"
     },
     "google_sheets_import_no_auth": {
       "success": false,
-      "message": "Expected 401/403, got No response",
+      "message": "No response received",
       "response_data": null,
-      "timestamp": "2025-07-16T07:03:18.493436"
+      "timestamp": "2025-07-16T07:04:55.511973"
     },
     "json_response_structure": {
       "success": false,
       "message": "No response received",
       "response_data": null,
-      "timestamp": "2025-07-16T07:03:18.584446"
+      "timestamp": "2025-07-16T07:04:55.608524"
     }
   },
   "job_management": {
     "get_jobs_no_auth": {
       "success": false,
-      "message": "Expected 401/403, got No response",
+      "message": "No response received",
       "response_data": null,
-      "timestamp": "2025-07-16T07:03:18.485737"
+      "timestamp": "2025-07-16T07:04:55.503603"
     },
     "create_job_no_auth": {
       "success": false,
-      "message": "Expected 401/403, got No response",
+      "message": "No response received",
       "response_data": null,
-      "timestamp": "2025-07-16T07:03:18.487766"
+      "timestamp": "2025-07-16T07:04:55.505702"
     }
   },
   "commission_system": {
     "get_commissions_no_auth": {
       "success": false,
-      "message": "Expected 401/403, got No response",
+      "message": "No response received",
       "response_data": null,
-      "timestamp": "2025-07-16T07:03:18.489707"
+      "timestamp": "2025-07-16T07:04:55.507838"
     }
   },
   "analytics": {
     "get_dashboard_no_auth": {
       "success": false,
-      "message": "Expected 401/403, got No response",
+      "message": "No response received",
       "response_data": null,
-      "timestamp": "2025-07-16T07:03:18.491562"
+      "timestamp": "2025-07-16T07:04:55.509868"
     }
   },
   "email_notifications": {}
