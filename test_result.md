@@ -142,7 +142,7 @@ backend:
         comment: "Implemented job management with status tracking and workflow stages - needs testing"
 
   - task: "Commission Calculation Engine"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "server.py"
     stuck_count: 0
@@ -151,7 +151,7 @@ backend:
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Automated commission calculations based on job completion"
+        comment: "Implemented commission calculations triggered by job completion - needs testing"
 
   - task: "Gmail SMTP Email Notifications"
     implemented: false
