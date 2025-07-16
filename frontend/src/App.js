@@ -1258,7 +1258,32 @@ const QRGeneratorApp = () => {
           </div>
         </div>
 
-        {/* Search and Filters */}
+          {/* Bulk Actions */}
+          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+            <h3 className="text-lg font-semibold text-white mb-4">Bulk Actions</h3>
+            <div className="flex flex-wrap gap-4">
+              <button
+                onClick={() => handleBulkQRGeneration()}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+              >
+                Generate All QR Codes
+              </button>
+              <button
+                onClick={() => handleBulkExport()}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+              >
+                Export All QR Codes
+              </button>
+              <button
+                onClick={() => handleBulkLandingPagePreview()}
+                className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+              >
+                Preview All Landing Pages
+              </button>
+            </div>
+          </div>
+
+          {/* Search and Filters */}
         <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
           <div className="mb-6">
             <h2 className="text-xl font-semibold text-white mb-2">Sales Representatives</h2>
