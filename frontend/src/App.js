@@ -1565,16 +1565,8 @@ const QRGeneratorApp = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   placeholder="Tell potential customers about yourself..."
                 />
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">About Me</label>
-                <textarea
-                  value={currentRep.about_me || ''}
-                  onChange={(e) => handleUpdateProfile({ about_me: e.target.value })}
-                  rows="4"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                  placeholder="Tell customers about yourself..."
-                />
               </div>
+              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
                 <input
