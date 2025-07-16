@@ -26,7 +26,11 @@ class RoofHRTester:
             "job_management": {},
             "commission_system": {},
             "analytics": {},
-            "email_notifications": {}
+            "email_notifications": {},
+            "qr_generator": {},
+            "sales_rep_management": {},
+            "lead_capture": {},
+            "file_upload": {}
         }
         
     def log_result(self, category, test_name, success, message, response_data=None):
