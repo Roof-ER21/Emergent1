@@ -990,6 +990,14 @@ class RoofHRTester:
         self.test_data_models()
         self.test_cors_configuration()
         
+        # QR Generator comprehensive tests
+        self.test_qr_generator_apis()
+        self.test_sales_rep_management()
+        self.test_file_upload_endpoints()
+        self.test_lead_capture_system()
+        self.test_public_landing_page()
+        self.test_qr_analytics()
+        
         # Additional comprehensive tests
         self.test_commission_calculation_logic()
         self.test_email_template_structure()
@@ -999,6 +1007,14 @@ class RoofHRTester:
         self.test_smtp_email_configuration()
         self.test_job_status_workflow()
         self.test_emergent_oauth_integration()
+        
+        # QR Generator implementation tests
+        self.test_qr_generator_models()
+        self.test_qr_generator_functions()
+        self.test_file_validation_logic()
+        self.test_lead_notification_system()
+        self.test_conversion_tracking()
+        self.test_role_based_qr_access()
         
         return self.test_results
 
