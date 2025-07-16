@@ -1556,19 +1556,15 @@ const QRGeneratorApp = () => {
             {/* Profile Form */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-gray-900 mb-4">Profile Information</h3>
-                  accept="video/*"
-                  onChange={(e) => handleFileUpload(e, 'video')}
-                  className="hidden"
-                  disabled={uploading}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">About Me</label>
+                <textarea
+                  value={currentRep.about_me || ''}
+                  onChange={(e) => handleUpdateProfile({ about_me: e.target.value })}
+                  rows={4}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  placeholder="Tell potential customers about yourself..."
                 />
-                {uploading && uploadType === 'video' ? 'Uploading...' : 'Upload Video'}
-              </label>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Profile Form */}
-            <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">About Me</label>
                 <textarea
