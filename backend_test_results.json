@@ -1,146 +1,19 @@
 {
   "authentication": {
     "api_availability": {
-      "success": true,
-      "message": "API documentation accessible",
+      "success": false,
+      "message": "API not accessible: HTTPSConnectionPool(host='7ab1f68f-edb0-48cf-bd70-f41e00798cc2.preview.emergentagent.com', port=443): Read timed out. (read timeout=10)",
       "response_data": null,
-      "timestamp": "2025-07-16T07:08:42.626615"
-    },
-    "invalid_login": {
-      "success": true,
-      "message": "Correctly rejected invalid session",
-      "response_data": null,
-      "timestamp": "2025-07-16T07:08:42.724209"
-    },
-    "unauthorized_access": {
-      "success": true,
-      "message": "Correctly rejected unauthorized access",
-      "response_data": null,
-      "timestamp": "2025-07-16T07:08:42.726691"
-    },
-    "oauth_integration": {
-      "success": true,
-      "message": "OAuth integration implemented (requires valid session for full testing)",
-      "response_data": null,
-      "timestamp": "2025-07-16T07:08:42.726727"
-    },
-    "endpoint_structure": {
-      "success": true,
-      "message": "All expected endpoints are properly structured",
-      "response_data": null,
-      "timestamp": "2025-07-16T07:08:42.812769"
-    },
-    "cors_configuration": {
-      "success": true,
-      "message": "CORS properly configured",
-      "response_data": null,
-      "timestamp": "2025-07-16T07:08:42.816505"
-    },
-    "role_based_access": {
-      "success": true,
-      "message": "Role-based access control properly implemented",
-      "response_data": null,
-      "timestamp": "2025-07-16T07:08:42.816967"
-    },
-    "emergent_oauth_integration": {
-      "success": true,
-      "message": "Emergent OAuth integration properly implemented",
-      "response_data": null,
-      "timestamp": "2025-07-16T07:08:42.817179"
+      "timestamp": "2025-07-16T08:50:09.066602"
     }
   },
-  "employee_management": {
-    "get_employees_no_auth": {
-      "success": true,
-      "message": "Correctly requires authentication",
-      "response_data": null,
-      "timestamp": "2025-07-16T07:08:42.728751"
-    },
-    "create_employee_no_auth": {
-      "success": true,
-      "message": "Correctly requires authentication",
-      "response_data": null,
-      "timestamp": "2025-07-16T07:08:42.730821"
-    },
-    "google_sheets_import_no_auth": {
-      "success": true,
-      "message": "Correctly requires authentication",
-      "response_data": null,
-      "timestamp": "2025-07-16T07:08:42.740815"
-    },
-    "json_response_structure": {
-      "success": true,
-      "message": "API returns properly structured JSON responses",
-      "response_data": null,
-      "timestamp": "2025-07-16T07:08:42.814675"
-    },
-    "database_models": {
-      "success": true,
-      "message": "All required models found: User, Employee, Job, Commission, UserSession",
-      "response_data": null,
-      "timestamp": "2025-07-16T07:08:42.816900"
-    },
-    "google_sheets_integration": {
-      "success": true,
-      "message": "Google Sheets integration properly implemented",
-      "response_data": null,
-      "timestamp": "2025-07-16T07:08:42.817017"
-    }
-  },
-  "job_management": {
-    "get_jobs_no_auth": {
-      "success": true,
-      "message": "Correctly requires authentication",
-      "response_data": null,
-      "timestamp": "2025-07-16T07:08:42.732689"
-    },
-    "create_job_no_auth": {
-      "success": true,
-      "message": "Correctly requires authentication",
-      "response_data": null,
-      "timestamp": "2025-07-16T07:08:42.734813"
-    },
-    "job_status_workflow": {
-      "success": true,
-      "message": "Job status workflow properly implemented",
-      "response_data": null,
-      "timestamp": "2025-07-16T07:08:42.817125"
-    }
-  },
-  "commission_system": {
-    "get_commissions_no_auth": {
-      "success": true,
-      "message": "Correctly requires authentication",
-      "response_data": null,
-      "timestamp": "2025-07-16T07:08:42.736920"
-    },
-    "commission_calculation_logic": {
-      "success": true,
-      "message": "Commission calculation logic correct: 10000.0 * 0.05 = 500.0",
-      "response_data": null,
-      "timestamp": "2025-07-16T07:08:42.816623"
-    }
-  },
-  "analytics": {
-    "get_dashboard_no_auth": {
-      "success": true,
-      "message": "Correctly requires authentication",
-      "response_data": null,
-      "timestamp": "2025-07-16T07:08:42.738802"
-    }
-  },
-  "email_notifications": {
-    "email_template_structure": {
-      "success": true,
-      "message": "Email template contains all required placeholders",
-      "response_data": null,
-      "timestamp": "2025-07-16T07:08:42.816806"
-    },
-    "smtp_configuration": {
-      "success": true,
-      "message": "SMTP email configuration properly implemented",
-      "response_data": null,
-      "timestamp": "2025-07-16T07:08:42.817068"
-    }
-  }
+  "employee_management": {},
+  "job_management": {},
+  "commission_system": {},
+  "analytics": {},
+  "email_notifications": {},
+  "qr_generator": {},
+  "sales_rep_management": {},
+  "lead_capture": {},
+  "file_upload": {}
 }
