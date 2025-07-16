@@ -238,6 +238,46 @@ EMAIL_TEMPLATE = """
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> User:
     """Verify session token and return current user"""
     try:
+        # Check if it's a development token
+        if credentials.credentials.startswith("dev-token-"):
+            # For development mode, return a mock user based on the token
+            dev_users = {
+                'super_admin': User(
+                    id='admin-123',
+                    email='admin@theroofdocs.com',
+                    name='Admin User',
+                    role='super_admin',
+                    picture='https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+                    territory='All Regions'
+                ),
+                'sales_manager': User(
+                    id='manager-456',
+                    email='manager@theroofdocs.com',
+                    name='Sales Manager',
+                    role='sales_manager',
+                    picture='https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+                    territory='Mid-Atlantic'
+                ),
+                'sales_rep': User(
+                    id='rep-789',
+                    email='john.smith@theroofdocs.com',
+                    name='John Smith',
+                    role='sales_rep',
+                    picture='https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+                    territory='Northern Virginia'
+                ),
+                'hr_manager': User(
+                    id='hr-101',
+                    email='hr@theroofdocs.com',
+                    name='HR Manager',
+                    role='hr_manager',
+                    picture='https://images.unsplash.com/photo-1494790108755-2616b9cf1d1e?w=150&h=150&fit=crop&crop=face',
+                    territory='Corporate'
+                )
+            }
+            return dev_users['super_admin']  # Default to super admin for development
+        
+        # Normal authentication flow
         session = await db.user_sessions.find_one({"session_token": credentials.credentials})
         if not session or datetime.utcnow() > session["expires_at"]:
             raise HTTPException(status_code=401, detail="Invalid or expired session")
