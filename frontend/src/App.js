@@ -361,105 +361,10 @@ const HRRecruitmentApp = () => {
 const QRGeneratorApp = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
-  const [salesReps, setSalesReps] = useState([
-    {
-      id: 'rep-789',
-      name: 'John Smith',
-      email: 'john.smith@theroofdocs.com',
-      phone: '(555) 345-6789',
-      territory: 'Northern Virginia',
-      department: 'Sales',
-      picture: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
-      qrCode: 'QR123456',
-      landingPageUrl: 'https://theroofdocs.com/rep/john-smith',
-      welcomeVideo: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-      aboutMe: 'Hi! I\'m John Smith, your local roofing expert with over 10 years of experience. I specialize in residential roofing solutions and pride myself on honest, quality work.',
-      leads: 25,
-      conversions: 8,
-      isActive: true
-    },
-    {
-      id: 'rep-890',
-      name: 'Sarah Johnson',
-      email: 'sarah.johnson@theroofdocs.com',
-      phone: '(555) 456-7890',
-      territory: 'Southern Virginia',
-      department: 'Sales',
-      picture: 'https://images.unsplash.com/photo-1494790108755-2616b9cf1d1e?w=150&h=150&fit=crop&crop=face',
-      qrCode: 'QR234567',
-      landingPageUrl: 'https://theroofdocs.com/rep/sarah-johnson',
-      welcomeVideo: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-      aboutMe: 'Hello! I\'m Sarah Johnson, dedicated to providing exceptional roofing services. With 8 years in the industry, I focus on storm damage restoration and preventive maintenance.',
-      leads: 32,
-      conversions: 12,
-      isActive: true
-    },
-    {
-      id: 'rep-901',
-      name: 'Mike Wilson',
-      email: 'mike.wilson@theroofdocs.com',
-      phone: '(555) 567-8901',
-      territory: 'Maryland',
-      department: 'Sales',
-      picture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-      qrCode: 'QR345678',
-      landingPageUrl: 'https://theroofdocs.com/rep/mike-wilson',
-      welcomeVideo: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-      aboutMe: 'I\'m Mike Wilson, your trusted roofing professional in Maryland. I specialize in commercial and residential projects, ensuring every job meets the highest standards.',
-      leads: 18,
-      conversions: 5,
-      isActive: true
-    }
-  ]);
-
-  const [leads, setLeads] = useState([
-    {
-      id: 'lead-001',
-      name: 'Robert Davis',
-      email: 'robert.davis@email.com',
-      phone: '(555) 111-2222',
-      address: '123 Main St, Richmond, VA',
-      repId: 'rep-789',
-      repName: 'John Smith',
-      status: 'new',
-      priority: 'high',
-      source: 'QR Code',
-      message: 'Need roof inspection after storm damage',
-      createdAt: '2025-01-16T10:30:00Z',
-      assignedTo: null
-    },
-    {
-      id: 'lead-002',
-      name: 'Emily Brown',
-      email: 'emily.brown@email.com',
-      phone: '(555) 222-3333',
-      address: '456 Oak Ave, Norfolk, VA',
-      repId: 'rep-890',
-      repName: 'Sarah Johnson',
-      status: 'assigned',
-      priority: 'medium',
-      source: 'QR Code',
-      message: 'Interested in solar roof installation',
-      createdAt: '2025-01-15T14:15:00Z',
-      assignedTo: 'rep-890'
-    },
-    {
-      id: 'lead-003',
-      name: 'David Miller',
-      email: 'david.miller@email.com',
-      phone: '(555) 333-4444',
-      address: '789 Pine Rd, Baltimore, MD',
-      repId: 'rep-901',
-      repName: 'Mike Wilson',
-      status: 'contacted',
-      priority: 'low',
-      source: 'QR Code',
-      message: 'Routine maintenance and gutter cleaning',
-      createdAt: '2025-01-14T09:45:00Z',
-      assignedTo: 'rep-901'
-    }
-  ]);
-
+  const [salesReps, setSalesReps] = useState([]);
+  const [leads, setLeads] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterDepartment, setFilterDepartment] = useState('all');
   const [filterTerritory, setFilterTerritory] = useState('all');
@@ -467,6 +372,118 @@ const QRGeneratorApp = () => {
 
   const isAdmin = user?.role === 'super_admin' || user?.role === 'sales_manager';
   const currentRep = salesReps.find(rep => rep.id === user?.id);
+
+  // Fetch sales reps from API
+  const fetchSalesReps = async () => {
+    try {
+      const response = await axios.get(`${API}/qr-generator/reps`);
+      setSalesReps(response.data);
+    } catch (error) {
+      console.error('Error fetching sales reps:', error);
+      setError('Failed to load sales reps');
+    }
+  };
+
+  // Fetch leads from API
+  const fetchLeads = async () => {
+    try {
+      const response = await axios.get(`${API}/qr-generator/leads`);
+      setLeads(response.data);
+    } catch (error) {
+      console.error('Error fetching leads:', error);
+      setError('Failed to load leads');
+    }
+  };
+
+  // Initialize data on component mount
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        await Promise.all([fetchSalesReps(), fetchLeads()]);
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, []);
+
+  // Create new sales rep
+  const createSalesRep = async (repData) => {
+    try {
+      const response = await axios.post(`${API}/qr-generator/reps`, repData);
+      setSalesReps([...salesReps, response.data]);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating sales rep:', error);
+      throw error;
+    }
+  };
+
+  // Update sales rep
+  const updateSalesRep = async (repId, updateData) => {
+    try {
+      const response = await axios.put(`${API}/qr-generator/reps/${repId}`, updateData);
+      setSalesReps(salesReps.map(rep => rep.id === repId ? response.data : rep));
+      return response.data;
+    } catch (error) {
+      console.error('Error updating sales rep:', error);
+      throw error;
+    }
+  };
+
+  // Upload file for sales rep
+  const uploadFile = async (repId, fileData, type) => {
+    try {
+      const endpoint = type === 'picture' ? 'upload-picture' : 'upload-video';
+      await axios.post(`${API}/qr-generator/reps/${repId}/${endpoint}`, fileData);
+      // Refresh the sales rep data
+      await fetchSalesReps();
+    } catch (error) {
+      console.error(`Error uploading ${type}:`, error);
+      throw error;
+    }
+  };
+
+  // Update lead status
+  const updateLead = async (leadId, updateData) => {
+    try {
+      const response = await axios.put(`${API}/qr-generator/leads/${leadId}`, updateData);
+      setLeads(leads.map(lead => lead.id === leadId ? response.data : lead));
+      return response.data;
+    } catch (error) {
+      console.error('Error updating lead:', error);
+      throw error;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading QR Code Generator...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="text-red-800 font-medium">Error</div>
+        <div className="text-red-600 mt-1">{error}</div>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-2 px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   const filteredReps = salesReps.filter(rep => {
     const matchesSearch = rep.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
