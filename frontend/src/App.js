@@ -368,6 +368,7 @@ const QRGeneratorApp = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterDepartment, setFilterDepartment] = useState('all');
   const [filterTerritory, setFilterTerritory] = useState('all');
+  const [selectedRep, setSelectedRep] = useState(null);
   const [submittingLead, setSubmittingLead] = useState(false);
   const [leadSuccess, setLeadSuccess] = useState(false);
   const [leadData, setLeadData] = useState({
@@ -377,7 +378,6 @@ const QRGeneratorApp = () => {
     address: '',
     message: ''
   });
-  const [selectedRep, setSelectedRep] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploadType, setUploadType] = useState('');
 
