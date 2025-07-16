@@ -1422,6 +1422,264 @@ class RoofHRTester:
         except Exception as e:
             self.log_result("authentication", "cors_configuration", False, f"CORS test failed: {str(e)}")
 
+    def test_hr_modules_comprehensive(self):
+        """Test all HR modules comprehensively"""
+        print("\n🏢 Testing HR Modules Comprehensively...")
+        
+        # Set development token
+        self.auth_token = "dev-token-super_admin"
+        
+        # Test HR Onboarding Management
+        print("\n👋 Testing HR Onboarding Management...")
+        
+        # Test onboarding stages
+        response = self.make_request("GET", "/onboarding/stages", auth_required=True)
+        if response is not None and response.status_code == 200:
+            self.log_result("hr_onboarding", "get_onboarding_stages", True, f"Retrieved onboarding stages")
+        else:
+            self.log_result("hr_onboarding", "get_onboarding_stages", False, f"Failed to get onboarding stages: {response.status_code if response else 'No response'}")
+        
+        # Test create onboarding stage
+        stage_data = {
+            "name": "Document Collection",
+            "description": "Collect all required employment documents",
+            "required_documents": ["ID", "Tax Forms"],
+            "required_training": ["Safety Basics"],
+            "order": 1,
+            "employee_type": "all"
+        }
+        response = self.make_request("POST", "/onboarding/stages", stage_data, auth_required=True)
+        if response is not None and response.status_code in [200, 201]:
+            self.log_result("hr_onboarding", "create_onboarding_stage", True, "Created onboarding stage")
+        else:
+            self.log_result("hr_onboarding", "create_onboarding_stage", False, f"Failed to create stage: {response.status_code if response else 'No response'}")
+        
+        # Test employee onboarding progress
+        response = self.make_request("GET", "/onboarding/employee/admin-123", auth_required=True)
+        if response is not None and response.status_code in [200, 404]:
+            self.log_result("hr_onboarding", "get_employee_progress", True, "Employee progress endpoint accessible")
+        else:
+            self.log_result("hr_onboarding", "get_employee_progress", False, f"Failed to get progress: {response.status_code if response else 'No response'}")
+        
+        # Test HR PTO Management
+        print("\n🏖️ Testing HR PTO Management...")
+        
+        # Test PTO requests
+        response = self.make_request("GET", "/pto/requests", auth_required=True)
+        if response is not None and response.status_code == 200:
+            self.log_result("hr_pto", "get_pto_requests", True, "Retrieved PTO requests")
+        else:
+            self.log_result("hr_pto", "get_pto_requests", False, f"Failed to get PTO requests: {response.status_code if response else 'No response'}")
+        
+        # Test create PTO request
+        start_date = datetime.now() + timedelta(days=30)
+        end_date = start_date + timedelta(days=5)
+        pto_data = {
+            "start_date": start_date.isoformat(),
+            "end_date": end_date.isoformat(),
+            "reason": "Family vacation"
+        }
+        response = self.make_request("POST", "/pto/requests", pto_data, auth_required=True)
+        if response is not None and response.status_code in [200, 201]:
+            self.log_result("hr_pto", "create_pto_request", True, "Created PTO request")
+        else:
+            self.log_result("hr_pto", "create_pto_request", False, f"Failed to create PTO request: {response.status_code if response else 'No response'}")
+        
+        # Test PTO balance
+        response = self.make_request("GET", "/pto/balance/admin-123", auth_required=True)
+        if response is not None and response.status_code in [200, 404]:
+            self.log_result("hr_pto", "get_pto_balance", True, "PTO balance endpoint accessible")
+        else:
+            self.log_result("hr_pto", "get_pto_balance", False, f"Failed to get PTO balance: {response.status_code if response else 'No response'}")
+        
+        # Test HR Safety & Compliance
+        print("\n🦺 Testing HR Safety & Compliance...")
+        
+        # Test safety trainings
+        response = self.make_request("GET", "/safety/trainings", auth_required=True)
+        if response is not None and response.status_code == 200:
+            self.log_result("hr_safety", "get_safety_trainings", True, "Retrieved safety trainings")
+        else:
+            self.log_result("hr_safety", "get_safety_trainings", False, f"Failed to get safety trainings: {response.status_code if response else 'No response'}")
+        
+        # Test create safety training
+        training_data = {
+            "name": "Fall Protection Training",
+            "description": "Comprehensive training on fall protection",
+            "required_for": "1099",
+            "duration_hours": 4.0,
+            "certification_required": True,
+            "renewal_months": 12
+        }
+        response = self.make_request("POST", "/safety/trainings", training_data, auth_required=True)
+        if response is not None and response.status_code in [200, 201]:
+            self.log_result("hr_safety", "create_safety_training", True, "Created safety training")
+        else:
+            self.log_result("hr_safety", "create_safety_training", False, f"Failed to create training: {response.status_code if response else 'No response'}")
+        
+        # Test employee safety progress
+        response = self.make_request("GET", "/safety/employee/admin-123/progress", auth_required=True)
+        if response is not None and response.status_code in [200, 404]:
+            self.log_result("hr_safety", "get_employee_safety_progress", True, "Safety progress endpoint accessible")
+        else:
+            self.log_result("hr_safety", "get_employee_safety_progress", False, f"Failed to get safety progress: {response.status_code if response else 'No response'}")
+        
+        # Test HR Workers Compensation
+        print("\n🏥 Testing HR Workers Compensation...")
+        
+        # Test workers comp submissions
+        response = self.make_request("GET", "/compliance/workers-comp", auth_required=True)
+        if response is not None and response.status_code == 200:
+            self.log_result("hr_compliance", "get_workers_comp_submissions", True, "Retrieved workers comp submissions")
+        else:
+            self.log_result("hr_compliance", "get_workers_comp_submissions", False, f"Failed to get submissions: {response.status_code if response else 'No response'}")
+        
+        # Test create workers comp submission
+        submission_data = {
+            "employee_id": "admin-123",
+            "submission_date": datetime.now().isoformat(),
+            "submission_deadline": (datetime.now() + timedelta(days=14)).isoformat(),
+            "document_url": "https://example.com/workers-comp-doc.pdf",
+            "notes": "Initial workers compensation submission"
+        }
+        response = self.make_request("POST", "/compliance/workers-comp", submission_data, auth_required=True)
+        if response is not None and response.status_code in [200, 201]:
+            self.log_result("hr_compliance", "create_workers_comp_submission", True, "Created workers comp submission")
+        else:
+            self.log_result("hr_compliance", "create_workers_comp_submission", False, f"Failed to create submission: {response.status_code if response else 'No response'}")
+        
+        # Test overdue workers comp
+        response = self.make_request("GET", "/compliance/workers-comp/overdue", auth_required=True)
+        if response is not None and response.status_code == 200:
+            self.log_result("hr_compliance", "get_overdue_workers_comp", True, "Retrieved overdue workers comp")
+        else:
+            self.log_result("hr_compliance", "get_overdue_workers_comp", False, f"Failed to get overdue: {response.status_code if response else 'No response'}")
+        
+        # Test HR Project Assignments
+        print("\n📋 Testing HR Project Assignments...")
+        
+        # Test project assignments
+        response = self.make_request("GET", "/assignments", auth_required=True)
+        if response is not None and response.status_code == 200:
+            self.log_result("hr_assignments", "get_project_assignments", True, "Retrieved project assignments")
+        else:
+            self.log_result("hr_assignments", "get_project_assignments", False, f"Failed to get assignments: {response.status_code if response else 'No response'}")
+        
+        # Test create project assignment
+        assignment_data = {
+            "lead_id": "lead-001",
+            "assigned_rep_id": "rep-789",
+            "priority": "high",
+            "notes": "High priority lead",
+            "due_date": (datetime.now() + timedelta(days=1)).isoformat()
+        }
+        response = self.make_request("POST", "/assignments", assignment_data, auth_required=True)
+        if response is not None and response.status_code in [200, 201, 404]:
+            self.log_result("hr_assignments", "create_project_assignment", True, "Assignment creation endpoint accessible")
+        else:
+            self.log_result("hr_assignments", "create_project_assignment", False, f"Failed to create assignment: {response.status_code if response else 'No response'}")
+        
+        # Test QR scan analytics
+        response = self.make_request("GET", "/assignments/qr-scans", auth_required=True)
+        if response is not None and response.status_code == 200:
+            self.log_result("hr_assignments", "get_qr_scan_analytics", True, "Retrieved QR scan analytics")
+        else:
+            self.log_result("hr_assignments", "get_qr_scan_analytics", False, f"Failed to get QR scans: {response.status_code if response else 'No response'}")
+        
+        # Test log QR scan
+        scan_data = {"location": "Richmond, VA", "lead_generated": True}
+        response = self.make_request("POST", "/assignments/qr-scan/rep-789", scan_data, auth_required=True)
+        if response is not None and response.status_code in [200, 201, 404]:
+            self.log_result("hr_assignments", "log_qr_scan", True, "QR scan logging endpoint accessible")
+        else:
+            self.log_result("hr_assignments", "log_qr_scan", False, f"Failed to log QR scan: {response.status_code if response else 'No response'}")
+        
+        # Test HR Employee Self-Service
+        print("\n🙋 Testing HR Employee Self-Service...")
+        
+        # Test employee dashboard
+        response = self.make_request("GET", "/self-service/dashboard", auth_required=True)
+        if response is not None and response.status_code == 200:
+            self.log_result("hr_self_service", "get_employee_dashboard", True, "Retrieved employee dashboard")
+        else:
+            self.log_result("hr_self_service", "get_employee_dashboard", False, f"Failed to get dashboard: {response.status_code if response else 'No response'}")
+        
+        # Test employee documents
+        response = self.make_request("GET", "/self-service/documents", auth_required=True)
+        if response is not None and response.status_code == 200:
+            self.log_result("hr_self_service", "get_employee_documents", True, "Retrieved employee documents")
+        else:
+            self.log_result("hr_self_service", "get_employee_documents", False, f"Failed to get documents: {response.status_code if response else 'No response'}")
+        
+        # Test create employee request
+        request_data = {
+            "request_type": "info_change",
+            "title": "Update Emergency Contact",
+            "description": "Need to update emergency contact information",
+            "priority": "medium"
+        }
+        response = self.make_request("POST", "/self-service/requests", request_data, auth_required=True)
+        if response is not None and response.status_code in [200, 201]:
+            self.log_result("hr_self_service", "create_employee_request", True, "Created employee request")
+        else:
+            self.log_result("hr_self_service", "create_employee_request", False, f"Failed to create request: {response.status_code if response else 'No response'}")
+        
+        # Test get employee requests
+        response = self.make_request("GET", "/self-service/requests", auth_required=True)
+        if response is not None and response.status_code == 200:
+            self.log_result("hr_self_service", "get_employee_requests", True, "Retrieved employee requests")
+        else:
+            self.log_result("hr_self_service", "get_employee_requests", False, f"Failed to get requests: {response.status_code if response else 'No response'}")
+        
+        # Test HR Sample Data Initialization
+        print("\n🗄️ Testing HR Sample Data Initialization...")
+        
+        # Test initialize sample data
+        response = self.make_request("POST", "/hr/initialize-sample-data", {}, auth_required=True)
+        if response is not None and response.status_code in [200, 201]:
+            self.log_result("hr_sample_data", "initialize_sample_data", True, "Sample data initialization successful")
+        else:
+            self.log_result("hr_sample_data", "initialize_sample_data", False, f"Failed to initialize: {response.status_code if response else 'No response'}")
+
+    def test_hr_authentication_requirements(self):
+        """Test that all HR endpoints require authentication"""
+        print("\n🔐 Testing HR Authentication Requirements...")
+        
+        hr_endpoints = [
+            ("/onboarding/stages", "GET"),
+            ("/onboarding/stages", "POST"),
+            ("/pto/requests", "GET"),
+            ("/pto/requests", "POST"),
+            ("/safety/trainings", "GET"),
+            ("/safety/trainings", "POST"),
+            ("/compliance/workers-comp", "GET"),
+            ("/compliance/workers-comp", "POST"),
+            ("/assignments", "GET"),
+            ("/assignments", "POST"),
+            ("/self-service/dashboard", "GET"),
+            ("/self-service/documents", "GET"),
+            ("/self-service/requests", "GET"),
+            ("/self-service/requests", "POST"),
+            ("/hr/initialize-sample-data", "POST")
+        ]
+        
+        auth_protected_count = 0
+        for endpoint, method in hr_endpoints:
+            test_data = {} if method == "POST" else None
+            response = self.make_request(method, endpoint, test_data, auth_required=False)
+            
+            if response is not None and response.status_code in [401, 403]:
+                auth_protected_count += 1
+            elif response is None:
+                print(f"⚠️ No response for {method} {endpoint}")
+            else:
+                print(f"⚠️ {method} {endpoint} returned {response.status_code} (expected 401/403)")
+        
+        if auth_protected_count == len(hr_endpoints):
+            self.log_result("hr_sample_data", "hr_authentication_requirements", True, f"All {len(hr_endpoints)} HR endpoints properly require authentication")
+        else:
+            self.log_result("hr_sample_data", "hr_authentication_requirements", False, f"Only {auth_protected_count}/{len(hr_endpoints)} HR endpoints require authentication")
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Roof-HR Backend API Testing...")
