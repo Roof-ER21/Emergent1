@@ -691,7 +691,8 @@ const HRRecruitmentApp = () => {
     if (user?.role === 'super_admin' || user?.role === 'hr_manager') {
       fetchOnboardingStages();
       fetchPTORequests();
-      fetchSafetyTrainings();
+      fetchHiringFlows();
+      fetchHiringCandidates();
       fetchWorkersCompSubmissions();
       fetchProjectAssignments();
       fetchQRScanAnalytics();
