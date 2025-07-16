@@ -49,7 +49,6 @@ class RoofHRTester:
             headers["Authorization"] = f"Bearer {self.auth_token}"
             
         try:
-            print(f"Making {method} request to: {url}")
             if method == "GET":
                 response = requests.get(url, headers=headers, timeout=5)
             elif method == "POST":
@@ -61,7 +60,6 @@ class RoofHRTester:
             else:
                 raise ValueError(f"Unsupported method: {method}")
             
-            print(f"Response status: {response.status_code}")
             return response
         except requests.exceptions.Timeout as e:
             print(f"Request timeout: {str(e)}")
@@ -128,9 +126,9 @@ class RoofHRTester:
         print("Testing GET /employees...")
         response = self.make_request("GET", "/employees", auth_required=False)
         
-        if response and response.status_code in [401, 403]:
+        if response is not None and response.status_code in [401, 403]:
             self.log_result("employee_management", "get_employees_no_auth", True, "Correctly requires authentication")
-        elif response:
+        elif response is not None:
             self.log_result("employee_management", "get_employees_no_auth", False, f"Expected 401/403, got {response.status_code}")
         else:
             self.log_result("employee_management", "get_employees_no_auth", False, "No response received")
@@ -147,9 +145,9 @@ class RoofHRTester:
         }
         response = self.make_request("POST", "/employees", employee_data, auth_required=False)
         
-        if response and response.status_code in [401, 403]:
+        if response is not None and response.status_code in [401, 403]:
             self.log_result("employee_management", "create_employee_no_auth", True, "Correctly requires authentication")
-        elif response:
+        elif response is not None:
             self.log_result("employee_management", "create_employee_no_auth", False, f"Expected 401/403, got {response.status_code}")
         else:
             self.log_result("employee_management", "create_employee_no_auth", False, "No response received")
@@ -162,9 +160,9 @@ class RoofHRTester:
         print("Testing GET /jobs...")
         response = self.make_request("GET", "/jobs", auth_required=False)
         
-        if response and response.status_code in [401, 403]:
+        if response is not None and response.status_code in [401, 403]:
             self.log_result("job_management", "get_jobs_no_auth", True, "Correctly requires authentication")
-        elif response:
+        elif response is not None:
             self.log_result("job_management", "get_jobs_no_auth", False, f"Expected 401/403, got {response.status_code}")
         else:
             self.log_result("job_management", "get_jobs_no_auth", False, "No response received")
@@ -182,9 +180,9 @@ class RoofHRTester:
         }
         response = self.make_request("POST", "/jobs", job_data, auth_required=False)
         
-        if response and response.status_code in [401, 403]:
+        if response is not None and response.status_code in [401, 403]:
             self.log_result("job_management", "create_job_no_auth", True, "Correctly requires authentication")
-        elif response:
+        elif response is not None:
             self.log_result("job_management", "create_job_no_auth", False, f"Expected 401/403, got {response.status_code}")
         else:
             self.log_result("job_management", "create_job_no_auth", False, "No response received")
@@ -197,9 +195,9 @@ class RoofHRTester:
         print("Testing GET /commissions...")
         response = self.make_request("GET", "/commissions", auth_required=False)
         
-        if response and response.status_code in [401, 403]:
+        if response is not None and response.status_code in [401, 403]:
             self.log_result("commission_system", "get_commissions_no_auth", True, "Correctly requires authentication")
-        elif response:
+        elif response is not None:
             self.log_result("commission_system", "get_commissions_no_auth", False, f"Expected 401/403, got {response.status_code}")
         else:
             self.log_result("commission_system", "get_commissions_no_auth", False, "No response received")
@@ -212,9 +210,9 @@ class RoofHRTester:
         print("Testing GET /analytics/dashboard...")
         response = self.make_request("GET", "/analytics/dashboard", auth_required=False)
         
-        if response and response.status_code in [401, 403]:
+        if response is not None and response.status_code in [401, 403]:
             self.log_result("analytics", "get_dashboard_no_auth", True, "Correctly requires authentication")
-        elif response:
+        elif response is not None:
             self.log_result("analytics", "get_dashboard_no_auth", False, f"Expected 401/403, got {response.status_code}")
         else:
             self.log_result("analytics", "get_dashboard_no_auth", False, "No response received")
@@ -229,9 +227,9 @@ class RoofHRTester:
         }
         response = self.make_request("POST", "/employees/import", import_data, auth_required=False)
         
-        if response and response.status_code in [401, 403]:
+        if response is not None and response.status_code in [401, 403]:
             self.log_result("employee_management", "google_sheets_import_no_auth", True, "Correctly requires authentication")
-        elif response:
+        elif response is not None:
             self.log_result("employee_management", "google_sheets_import_no_auth", False, f"Expected 401/403, got {response.status_code}")
         else:
             self.log_result("employee_management", "google_sheets_import_no_auth", False, "No response received")
@@ -241,22 +239,21 @@ class RoofHRTester:
         print("\n🏗️ Testing API Endpoint Structure...")
         
         expected_endpoints = [
-            "/auth/login",
-            "/auth/logout", 
-            "/auth/me",
-            "/employees",
-            "/employees/import",
-            "/jobs",
-            "/commissions",
-            "/analytics/dashboard"
+            ("/auth/login", "POST"),
+            ("/auth/logout", "GET"), 
+            ("/auth/me", "GET"),
+            ("/employees", "GET"),
+            ("/employees/import", "GET"),
+            ("/jobs", "GET"),
+            ("/commissions", "GET"),
+            ("/analytics/dashboard", "GET")
         ]
         
         structure_valid = True
-        for endpoint in expected_endpoints:
+        for endpoint, method in expected_endpoints:
             # Test that endpoints exist (even if they return 403/401)
-            response = self.make_request("GET" if not endpoint.endswith("login") else "POST", endpoint, 
-                                       {"session_id": "test"} if endpoint.endswith("login") else None, 
-                                       auth_required=False)
+            test_data = {"session_id": "test"} if endpoint == "/auth/login" else None
+            response = self.make_request(method, endpoint, test_data, auth_required=False)
             
             if response is None:
                 structure_valid = False
@@ -266,6 +263,8 @@ class RoofHRTester:
             elif response.status_code == 404:
                 structure_valid = False
                 print(f"❌ Endpoint {endpoint} not found")
+            elif response.status_code == 405:
+                print(f"✅ Endpoint {endpoint} accessible (method not allowed - expected)")
             else:
                 print(f"✅ Endpoint {endpoint} accessible (status: {response.status_code})")
         
@@ -279,7 +278,7 @@ class RoofHRTester:
         # Since we can't authenticate, we'll test the error responses for proper structure
         response = self.make_request("GET", "/employees", auth_required=False)
         
-        if response:
+        if response is not None:
             content_type = response.headers.get('content-type', '')
             if 'application/json' in content_type:
                 try:
@@ -304,7 +303,7 @@ class RoofHRTester:
                                       headers={"Origin": "https://example.com"}, 
                                       timeout=10)
             
-            if response and 'access-control-allow-origin' in response.headers:
+            if response is not None and 'access-control-allow-origin' in response.headers:
                 self.log_result("authentication", "cors_configuration", True, "CORS properly configured")
             else:
                 self.log_result("authentication", "cors_configuration", False, "CORS headers missing")
