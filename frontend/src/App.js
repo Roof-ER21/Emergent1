@@ -452,6 +452,24 @@ const HRRecruitmentApp = () => {
     }
   };
 
+  const fetchHiringFlows = async () => {
+    try {
+      const response = await axios.get(`${API}/hiring/flows`);
+      setHiringFlows(response.data);
+    } catch (error) {
+      console.error('Error fetching hiring flows:', error);
+    }
+  };
+
+  const fetchHiringCandidates = async () => {
+    try {
+      const response = await axios.get(`${API}/hiring/candidates`);
+      setHiringCandidates(response.data);
+    } catch (error) {
+      console.error('Error fetching hiring candidates:', error);
+    }
+  };
+
   const fetchSafetyTrainings = async () => {
     try {
       const response = await axios.get(`${API}/safety/trainings`);
