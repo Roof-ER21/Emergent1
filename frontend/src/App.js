@@ -755,135 +755,53 @@ const SalesLeaderboardApp = () => {
     }
   ];
 
-  const mockBonusTiers = [
-    { tier: 1, name: 'Bronze', threshold: 15, description: 'Entry level performance' },
-    { tier: 2, name: 'Silver', threshold: 25, description: 'Solid performance' },
-    { tier: 3, name: 'Gold', threshold: 35, description: 'Strong performance' },
-    { tier: 4, name: 'Platinum', threshold: 50, description: 'Excellent performance' },
-    { tier: 5, name: 'Diamond', threshold: 75, description: 'Outstanding performance' },
-    { tier: 6, name: 'Elite', threshold: 100, description: 'Elite performance' }
-  ];
-
-  const mockCompetitions = [
-    {
-      id: '1',
-      name: 'Q1 Signup Challenge',
-      description: 'Race to the most signups this quarter',
-      competition_type: 'signups',
-      start_date: '2025-01-01',
-      end_date: '2025-03-31',
-      prize_description: 'Winner takes all bonus pool',
-      participants: ['1', '2', '3', '4', '5'],
-      leader: 'John Smith',
-      leader_score: 156,
-      status: 'active',
-      rules: 'Most signups converted to customers wins'
-    },
-    {
-      id: '2',
-      name: 'Monthly Revenue Sprint',
-      description: 'Hit your monthly revenue target',
-      competition_type: 'revenue',
-      start_date: '2025-01-01',
-      end_date: '2025-01-31',
-      prize_description: 'Monthly performance bonus',
-      participants: ['1', '2', '3', '4', '5'],
-      leader: 'John Smith',
-      leader_score: 125000,
-      status: 'active',
-      rules: 'First to exceed monthly goal wins'
-    }
-  ];
-
-  useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setCompetitions(mockCompetitions);
-      setBonusTiers(mockBonusTiers);
-      setLoading(false);
-    }, 1000);
-  }, []);
-
-  const currentUser = mockSalesData.find(rep => rep.email === user?.email) || mockSalesData[0];
-  const userTeamMembers = currentUser.role === 'team_lead' ? 
-    mockSalesData.filter(rep => rep.team_lead === currentUser.name) : [];
-
-  const getTrendIcon = (trend) => {
-    switch (trend) {
-      case 'up':
-        return <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
-        </svg>;
-      case 'down':
-        return <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 13l-5 5m0 0l-5-5m5 5V6" />
-        </svg>;
-      default:
-        return <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h8" />
-        </svg>;
+  const handleCreateCompetition = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API}/leaderboard/competitions`, newCompetition);
+      await fetchCompetitions();
+      setShowCompetitionModal(false);
+      setNewCompetition({
+        name: '',
+        description: '',
+        competition_type: 'signups',
+        start_date: '',
+        end_date: '',
+        prize_description: '',
+        rules: ''
+      });
+    } catch (error) {
+      console.error('Error creating competition:', error);
     }
   };
 
-  const getProgressColor = (current, goal) => {
-    const percentage = (current / goal) * 100;
-    if (percentage >= 100) return 'bg-green-500';
-    if (percentage >= 75) return 'bg-blue-500';
-    if (percentage >= 50) return 'bg-yellow-500';
-    return 'bg-red-500';
-  };
-
-  const getYearlyPaceColor = (current, goal, daysInMonth, dayOfMonth) => {
-    const expectedDaily = goal / daysInMonth;
-    const expectedToDate = expectedDaily * dayOfMonth;
-    const percentage = (current / expectedToDate) * 100;
-    if (percentage >= 100) return 'bg-green-300';
-    if (percentage >= 75) return 'bg-blue-300';
-    if (percentage >= 50) return 'bg-yellow-300';
-    return 'bg-red-300';
+  const handleAssignGoal = async (e) => {
+    e.preventDefault();
+    try {
+      const currentDate = new Date();
+      const goalData = {
+        ...newGoal,
+        year: currentDate.getFullYear(),
+        month: currentDate.getMonth() + 1,
+        rep_name: leaderboardData.find(rep => rep.id === newGoal.rep_id)?.name || 'Unknown'
+      };
+      await axios.post(`${API}/leaderboard/goals`, goalData);
+      await fetchGoals();
+      setShowGoalModal(false);
+      setNewGoal({
+        rep_id: '',
+        signup_goal: 0,
+        revenue_goal: 0
+      });
+    } catch (error) {
+      console.error('Error assigning goal:', error);
+    }
   };
 
   const canAssignGoals = () => {
     const today = new Date();
     const dayOfMonth = today.getDate();
     return (user?.role === 'team_lead' || user?.role === 'sales_manager' || user?.role === 'super_admin') && dayOfMonth <= 6;
-  };
-
-  const handleCreateCompetition = async (e) => {
-    e.preventDefault();
-    // Simulate API call
-    const competition = {
-      ...newCompetition,
-      id: Date.now().toString(),
-      participants: mockSalesData.map(rep => rep.id),
-      leader: mockSalesData[0].name,
-      leader_score: 0,
-      status: 'active',
-      created_at: new Date().toISOString()
-    };
-    
-    setCompetitions([...competitions, competition]);
-    setShowCompetitionModal(false);
-    setNewCompetition({
-      name: '',
-      description: '',
-      competition_type: 'signups',
-      start_date: '',
-      end_date: '',
-      prize_description: '',
-      rules: ''
-    });
-  };
-
-  const handleAssignGoal = async (e) => {
-    e.preventDefault();
-    // Simulate API call
-    setShowGoalModal(false);
-    setNewGoal({
-      rep_id: '',
-      signup_goal: 0,
-      revenue_goal: 0
-    });
   };
 
   if (loading) {
