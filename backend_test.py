@@ -1681,6 +1681,415 @@ class RoofHRTester:
         else:
             self.log_result("hr_sample_data", "hr_authentication_requirements", False, f"Only {auth_protected_count}/{len(hr_endpoints)} HR endpoints require authentication")
 
+    def test_hiring_flow_management_system(self):
+        """Test Hiring Flow Management System with Type-Specific Workflows"""
+        print("\n🎯 Testing Hiring Flow Management System...")
+        
+        # Set development token for super_admin access
+        self.auth_token = "dev-token-super_admin"
+        
+        # Test 1: Initialize sample hiring flows
+        print("Testing POST /hiring/initialize-sample-flows...")
+        response = self.make_request("POST", "/hiring/initialize-sample-flows", auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                result = response.json()
+                if "message" in result and ("initialized" in result["message"] or "already exist" in result["message"]):
+                    self.log_result("hiring_flows", "initialize_sample_flows", True, 
+                                   f"Sample flows initialization: {result['message']}")
+                else:
+                    self.log_result("hiring_flows", "initialize_sample_flows", False, 
+                                   f"Unexpected response format: {result}")
+            except json.JSONDecodeError:
+                self.log_result("hiring_flows", "initialize_sample_flows", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("hiring_flows", "initialize_sample_flows", False, f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("hiring_flows", "initialize_sample_flows", False, "No response received")
+        
+        # Test 2: Get all hiring flows
+        print("Testing GET /hiring/flows...")
+        response = self.make_request("GET", "/hiring/flows", auth_required=True)
+        
+        flows_data = []
+        if response is not None and response.status_code == 200:
+            try:
+                flows = response.json()
+                if isinstance(flows, list):
+                    flows_data = flows
+                    expected_types = ["insurance", "retail", "office", "production"]
+                    found_types = [flow.get("type") for flow in flows]
+                    
+                    if all(flow_type in found_types for flow_type in expected_types):
+                        self.log_result("hiring_flows", "get_all_flows", True, 
+                                       f"Retrieved {len(flows)} flows with all expected types: {found_types}")
+                    else:
+                        missing_types = [t for t in expected_types if t not in found_types]
+                        self.log_result("hiring_flows", "get_all_flows", False, 
+                                       f"Missing flow types: {missing_types}. Found: {found_types}")
+                else:
+                    self.log_result("hiring_flows", "get_all_flows", False, "Response is not a list")
+            except json.JSONDecodeError:
+                self.log_result("hiring_flows", "get_all_flows", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("hiring_flows", "get_all_flows", False, f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("hiring_flows", "get_all_flows", False, "No response received")
+        
+        # Test 3: Create a new hiring flow
+        print("Testing POST /hiring/flows...")
+        new_flow_data = {
+            "name": "Test Hiring Flow",
+            "type": "test",
+            "description": "Test hiring process",
+            "stages": ["application", "interview", "offer"],
+            "requirements": ["Test requirement"],
+            "timeline_days": 15,
+            "is_active": True
+        }
+        response = self.make_request("POST", "/hiring/flows", new_flow_data, auth_required=True)
+        
+        created_flow_id = None
+        if response is not None and response.status_code == 200:
+            try:
+                created_flow = response.json()
+                if "id" in created_flow and created_flow.get("name") == "Test Hiring Flow":
+                    created_flow_id = created_flow["id"]
+                    self.log_result("hiring_flows", "create_flow", True, 
+                                   f"Created flow with ID: {created_flow_id}")
+                else:
+                    self.log_result("hiring_flows", "create_flow", False, 
+                                   f"Unexpected response format: {created_flow}")
+            except json.JSONDecodeError:
+                self.log_result("hiring_flows", "create_flow", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("hiring_flows", "create_flow", False, f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("hiring_flows", "create_flow", False, "No response received")
+        
+        # Test 4: Get specific hiring flow
+        if created_flow_id:
+            print(f"Testing GET /hiring/flows/{created_flow_id}...")
+            response = self.make_request("GET", f"/hiring/flows/{created_flow_id}", auth_required=True)
+            
+            if response is not None and response.status_code == 200:
+                try:
+                    flow = response.json()
+                    if flow.get("id") == created_flow_id and flow.get("name") == "Test Hiring Flow":
+                        self.log_result("hiring_flows", "get_specific_flow", True, 
+                                       f"Retrieved specific flow: {flow['name']}")
+                    else:
+                        self.log_result("hiring_flows", "get_specific_flow", False, 
+                                       f"Flow data mismatch: {flow}")
+                except json.JSONDecodeError:
+                    self.log_result("hiring_flows", "get_specific_flow", False, "Invalid JSON response")
+            elif response is not None:
+                self.log_result("hiring_flows", "get_specific_flow", False, f"Expected 200, got {response.status_code}")
+            else:
+                self.log_result("hiring_flows", "get_specific_flow", False, "No response received")
+        
+        # Test 5: Update hiring flow
+        if created_flow_id:
+            print(f"Testing PUT /hiring/flows/{created_flow_id}...")
+            updated_flow_data = {
+                "name": "Updated Test Hiring Flow",
+                "type": "test",
+                "description": "Updated test hiring process",
+                "stages": ["application", "phone_screening", "interview", "offer"],
+                "requirements": ["Updated test requirement"],
+                "timeline_days": 20,
+                "is_active": True
+            }
+            response = self.make_request("PUT", f"/hiring/flows/{created_flow_id}", updated_flow_data, auth_required=True)
+            
+            if response is not None and response.status_code == 200:
+                try:
+                    updated_flow = response.json()
+                    if updated_flow.get("name") == "Updated Test Hiring Flow":
+                        self.log_result("hiring_flows", "update_flow", True, 
+                                       f"Updated flow successfully: {updated_flow['name']}")
+                    else:
+                        self.log_result("hiring_flows", "update_flow", False, 
+                                       f"Update failed: {updated_flow}")
+                except json.JSONDecodeError:
+                    self.log_result("hiring_flows", "update_flow", False, "Invalid JSON response")
+            elif response is not None:
+                self.log_result("hiring_flows", "update_flow", False, f"Expected 200, got {response.status_code}")
+            else:
+                self.log_result("hiring_flows", "update_flow", False, "No response received")
+        
+        # Test 6: Create hiring candidates
+        print("Testing POST /hiring/candidates...")
+        candidate_data = {
+            "name": "John Candidate",
+            "email": "john.candidate@email.com",
+            "phone": "555-0123",
+            "position": "Insurance Agent",
+            "hiring_type": "insurance",
+            "current_stage": "application",
+            "status": "active",
+            "notes": "Strong candidate with relevant experience"
+        }
+        response = self.make_request("POST", "/hiring/candidates", candidate_data, auth_required=True)
+        
+        created_candidate_id = None
+        if response is not None and response.status_code == 200:
+            try:
+                created_candidate = response.json()
+                if "id" in created_candidate and created_candidate.get("name") == "John Candidate":
+                    created_candidate_id = created_candidate["id"]
+                    self.log_result("hiring_flows", "create_candidate", True, 
+                                   f"Created candidate with ID: {created_candidate_id}")
+                else:
+                    self.log_result("hiring_flows", "create_candidate", False, 
+                                   f"Unexpected response format: {created_candidate}")
+            except json.JSONDecodeError:
+                self.log_result("hiring_flows", "create_candidate", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("hiring_flows", "create_candidate", False, f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("hiring_flows", "create_candidate", False, "No response received")
+        
+        # Test 7: Get all hiring candidates
+        print("Testing GET /hiring/candidates...")
+        response = self.make_request("GET", "/hiring/candidates", auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                candidates = response.json()
+                if isinstance(candidates, list):
+                    self.log_result("hiring_flows", "get_all_candidates", True, 
+                                   f"Retrieved {len(candidates)} candidates")
+                else:
+                    self.log_result("hiring_flows", "get_all_candidates", False, "Response is not a list")
+            except json.JSONDecodeError:
+                self.log_result("hiring_flows", "get_all_candidates", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("hiring_flows", "get_all_candidates", False, f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("hiring_flows", "get_all_candidates", False, "No response received")
+        
+        # Test 8: Get candidates by type
+        print("Testing GET /hiring/candidates/by-type/insurance...")
+        response = self.make_request("GET", "/hiring/candidates/by-type/insurance", auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                insurance_candidates = response.json()
+                if isinstance(insurance_candidates, list):
+                    # Check if all candidates are insurance type
+                    all_insurance = all(candidate.get("hiring_type") == "insurance" for candidate in insurance_candidates)
+                    if all_insurance:
+                        self.log_result("hiring_flows", "get_candidates_by_type", True, 
+                                       f"Retrieved {len(insurance_candidates)} insurance candidates")
+                    else:
+                        self.log_result("hiring_flows", "get_candidates_by_type", False, 
+                                       "Some candidates have wrong hiring type")
+                else:
+                    self.log_result("hiring_flows", "get_candidates_by_type", False, "Response is not a list")
+            except json.JSONDecodeError:
+                self.log_result("hiring_flows", "get_candidates_by_type", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("hiring_flows", "get_candidates_by_type", False, f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("hiring_flows", "get_candidates_by_type", False, "No response received")
+        
+        # Test 9: Get specific candidate
+        if created_candidate_id:
+            print(f"Testing GET /hiring/candidates/{created_candidate_id}...")
+            response = self.make_request("GET", f"/hiring/candidates/{created_candidate_id}", auth_required=True)
+            
+            if response is not None and response.status_code == 200:
+                try:
+                    candidate = response.json()
+                    if candidate.get("id") == created_candidate_id and candidate.get("name") == "John Candidate":
+                        self.log_result("hiring_flows", "get_specific_candidate", True, 
+                                       f"Retrieved specific candidate: {candidate['name']}")
+                    else:
+                        self.log_result("hiring_flows", "get_specific_candidate", False, 
+                                       f"Candidate data mismatch: {candidate}")
+                except json.JSONDecodeError:
+                    self.log_result("hiring_flows", "get_specific_candidate", False, "Invalid JSON response")
+            elif response is not None:
+                self.log_result("hiring_flows", "get_specific_candidate", False, f"Expected 200, got {response.status_code}")
+            else:
+                self.log_result("hiring_flows", "get_specific_candidate", False, "No response received")
+        
+        # Test 10: Update candidate
+        if created_candidate_id:
+            print(f"Testing PUT /hiring/candidates/{created_candidate_id}...")
+            updated_candidate_data = {
+                "name": "John Updated Candidate",
+                "email": "john.updated@email.com",
+                "phone": "555-9999",
+                "position": "Senior Insurance Agent",
+                "hiring_type": "insurance",
+                "current_stage": "phone_screening",
+                "status": "active",
+                "notes": "Updated candidate information"
+            }
+            response = self.make_request("PUT", f"/hiring/candidates/{created_candidate_id}", updated_candidate_data, auth_required=True)
+            
+            if response is not None and response.status_code == 200:
+                try:
+                    updated_candidate = response.json()
+                    if updated_candidate.get("name") == "John Updated Candidate":
+                        self.log_result("hiring_flows", "update_candidate", True, 
+                                       f"Updated candidate successfully: {updated_candidate['name']}")
+                    else:
+                        self.log_result("hiring_flows", "update_candidate", False, 
+                                       f"Update failed: {updated_candidate}")
+                except json.JSONDecodeError:
+                    self.log_result("hiring_flows", "update_candidate", False, "Invalid JSON response")
+            elif response is not None:
+                self.log_result("hiring_flows", "update_candidate", False, f"Expected 200, got {response.status_code}")
+            else:
+                self.log_result("hiring_flows", "update_candidate", False, "No response received")
+        
+        # Test 11: Advance candidate through stages
+        if created_candidate_id:
+            print(f"Testing POST /hiring/candidates/{created_candidate_id}/advance...")
+            response = self.make_request("POST", f"/hiring/candidates/{created_candidate_id}/advance", auth_required=True)
+            
+            if response is not None and response.status_code == 200:
+                try:
+                    advance_result = response.json()
+                    if "message" in advance_result and ("advanced" in advance_result["message"] or "hired" in advance_result["message"]):
+                        self.log_result("hiring_flows", "advance_candidate", True, 
+                                       f"Candidate advancement: {advance_result['message']}")
+                    else:
+                        self.log_result("hiring_flows", "advance_candidate", False, 
+                                       f"Unexpected response: {advance_result}")
+                except json.JSONDecodeError:
+                    self.log_result("hiring_flows", "advance_candidate", False, "Invalid JSON response")
+            elif response is not None:
+                self.log_result("hiring_flows", "advance_candidate", False, f"Expected 200, got {response.status_code}")
+            else:
+                self.log_result("hiring_flows", "advance_candidate", False, "No response received")
+        
+        # Test 12: Test role-based access control (HR Manager)
+        print("Testing role-based access with hr_manager token...")
+        self.auth_token = "dev-token-hr_manager"
+        response = self.make_request("GET", "/hiring/flows", auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            self.log_result("hiring_flows", "hr_manager_access", True, "HR Manager can access hiring flows")
+        elif response is not None:
+            self.log_result("hiring_flows", "hr_manager_access", False, f"HR Manager access denied: {response.status_code}")
+        else:
+            self.log_result("hiring_flows", "hr_manager_access", False, "No response received")
+        
+        # Test 13: Test unauthorized access (Sales Rep)
+        print("Testing unauthorized access with sales_rep token...")
+        self.auth_token = "dev-token-sales_rep"
+        response = self.make_request("GET", "/hiring/flows", auth_required=True)
+        
+        if response is not None and response.status_code == 403:
+            self.log_result("hiring_flows", "sales_rep_access_denied", True, "Sales rep correctly denied access")
+        elif response is not None:
+            self.log_result("hiring_flows", "sales_rep_access_denied", False, f"Expected 403, got {response.status_code}")
+        else:
+            self.log_result("hiring_flows", "sales_rep_access_denied", False, "No response received")
+        
+        # Test 14: Test without authentication
+        print("Testing hiring flows without authentication...")
+        response = self.make_request("GET", "/hiring/flows", auth_required=False)
+        
+        if response is not None and response.status_code in [401, 403]:
+            self.log_result("hiring_flows", "no_auth_access_denied", True, "Correctly requires authentication")
+        elif response is not None:
+            self.log_result("hiring_flows", "no_auth_access_denied", False, f"Expected 401/403, got {response.status_code}")
+        else:
+            self.log_result("hiring_flows", "no_auth_access_denied", False, "No response received")
+        
+        # Test 15: Delete candidate (cleanup)
+        if created_candidate_id:
+            print(f"Testing DELETE /hiring/candidates/{created_candidate_id}...")
+            self.auth_token = "dev-token-super_admin"  # Reset to super_admin for cleanup
+            response = self.make_request("DELETE", f"/hiring/candidates/{created_candidate_id}", auth_required=True)
+            
+            if response is not None and response.status_code == 200:
+                try:
+                    delete_result = response.json()
+                    if "message" in delete_result and "deleted" in delete_result["message"]:
+                        self.log_result("hiring_flows", "delete_candidate", True, 
+                                       f"Candidate deletion: {delete_result['message']}")
+                    else:
+                        self.log_result("hiring_flows", "delete_candidate", False, 
+                                       f"Unexpected response: {delete_result}")
+                except json.JSONDecodeError:
+                    self.log_result("hiring_flows", "delete_candidate", False, "Invalid JSON response")
+            elif response is not None:
+                self.log_result("hiring_flows", "delete_candidate", False, f"Expected 200, got {response.status_code}")
+            else:
+                self.log_result("hiring_flows", "delete_candidate", False, "No response received")
+        
+        # Test 16: Delete flow (cleanup)
+        if created_flow_id:
+            print(f"Testing DELETE /hiring/flows/{created_flow_id}...")
+            response = self.make_request("DELETE", f"/hiring/flows/{created_flow_id}", auth_required=True)
+            
+            if response is not None and response.status_code == 200:
+                try:
+                    delete_result = response.json()
+                    if "message" in delete_result and "deleted" in delete_result["message"]:
+                        self.log_result("hiring_flows", "delete_flow", True, 
+                                       f"Flow deletion: {delete_result['message']}")
+                    else:
+                        self.log_result("hiring_flows", "delete_flow", False, 
+                                       f"Unexpected response: {delete_result}")
+                except json.JSONDecodeError:
+                    self.log_result("hiring_flows", "delete_flow", False, "Invalid JSON response")
+            elif response is not None:
+                self.log_result("hiring_flows", "delete_flow", False, f"Expected 200, got {response.status_code}")
+            else:
+                self.log_result("hiring_flows", "delete_flow", False, "No response received")
+        
+        # Test 17: Validate sample flow data structure
+        print("Validating sample flow data structure...")
+        self.auth_token = "dev-token-super_admin"
+        response = self.make_request("GET", "/hiring/flows", auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                flows = response.json()
+                validation_passed = True
+                validation_messages = []
+                
+                for flow in flows:
+                    # Check required fields
+                    required_fields = ["id", "name", "type", "stages", "requirements", "timeline_days"]
+                    missing_fields = [field for field in required_fields if field not in flow]
+                    if missing_fields:
+                        validation_passed = False
+                        validation_messages.append(f"Flow {flow.get('name', 'Unknown')} missing fields: {missing_fields}")
+                    
+                    # Check specific flow types and their stages
+                    if flow.get("type") == "insurance":
+                        expected_stages = ["application", "phone_screening", "skills_assessment", "interview_round_1", "interview_round_2", "background_check", "offer"]
+                        if flow.get("stages") != expected_stages:
+                            validation_passed = False
+                            validation_messages.append(f"Insurance flow has incorrect stages")
+                    
+                    elif flow.get("type") == "retail":
+                        expected_stages = ["application", "phone_screening", "in_person_interview", "skills_assessment", "reference_check", "offer"]
+                        if flow.get("stages") != expected_stages:
+                            validation_passed = False
+                            validation_messages.append(f"Retail flow has incorrect stages")
+                
+                if validation_passed:
+                    self.log_result("hiring_flows", "sample_flow_validation", True, 
+                                   "All sample flows have correct structure and stages")
+                else:
+                    self.log_result("hiring_flows", "sample_flow_validation", False, 
+                                   f"Validation issues: {'; '.join(validation_messages)}")
+                    
+            except json.JSONDecodeError:
+                self.log_result("hiring_flows", "sample_flow_validation", False, "Invalid JSON response")
+        else:
+            self.log_result("hiring_flows", "sample_flow_validation", False, "Could not retrieve flows for validation")
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Roof-HR Backend API Testing...")
