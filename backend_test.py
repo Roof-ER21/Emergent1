@@ -97,11 +97,11 @@ class RoofHRTester:
         login_data = {"session_id": "invalid_session_123"}
         response = self.make_request("POST", "/auth/login", login_data, auth_required=False)
         
-        if response and response.status_code == 401:
+        if response is not None and response.status_code == 401:
             self.log_result("authentication", "invalid_login", True, "Correctly rejected invalid session")
-        elif response and response.status_code == 422:
+        elif response is not None and response.status_code == 422:
             self.log_result("authentication", "invalid_login", True, "Correctly rejected invalid session (validation error)")
-        elif response:
+        elif response is not None:
             self.log_result("authentication", "invalid_login", False, f"Expected 401/422, got {response.status_code}")
         else:
             self.log_result("authentication", "invalid_login", False, "No response received")
@@ -110,9 +110,9 @@ class RoofHRTester:
         print("Testing /auth/me without authentication...")
         response = self.make_request("GET", "/auth/me", auth_required=False)
         
-        if response and response.status_code in [401, 403]:
+        if response is not None and response.status_code in [401, 403]:
             self.log_result("authentication", "unauthorized_access", True, "Correctly rejected unauthorized access")
-        elif response:
+        elif response is not None:
             self.log_result("authentication", "unauthorized_access", False, f"Expected 401/403, got {response.status_code}")
         else:
             self.log_result("authentication", "unauthorized_access", False, "No response received")
