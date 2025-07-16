@@ -31,7 +31,14 @@ class RoofHRTester:
             "sales_rep_management": {},
             "lead_capture": {},
             "file_upload": {},
-            "google_sheets_integration": {}  # New category for Google Sheets tests
+            "google_sheets_integration": {},  # New category for Google Sheets tests
+            "hr_onboarding": {},  # New HR module tests
+            "hr_pto": {},
+            "hr_safety": {},
+            "hr_compliance": {},
+            "hr_assignments": {},
+            "hr_self_service": {},
+            "hr_sample_data": {}
         }
         
     def log_result(self, category, test_name, success, message, response_data=None):
