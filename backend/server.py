@@ -195,6 +195,89 @@ class Lead(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
+# Enhanced Sales Leaderboard Models
+class SalesGoal(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    rep_id: str
+    rep_name: str
+    year: int
+    month: int
+    signup_goal: int = 0
+    revenue_goal: float = 0.0
+    assigned_by: str  # user_id who assigned the goal
+    assigned_date: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class SalesSignup(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    rep_id: str
+    rep_name: str
+    customer_name: str
+    customer_email: str
+    customer_phone: Optional[str] = None
+    signup_type: str = "lead"  # lead, referral, direct, other
+    source: str = "QR Code"  # QR Code, Website, Referral, Cold Call, etc.
+    lead_id: Optional[str] = None  # reference to original lead if applicable
+    deal_value: float = 0.0
+    status: str = "pending"  # pending, confirmed, cancelled
+    signup_date: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class SalesCompetition(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    description: Optional[str] = None
+    competition_type: str = "signups"  # signups, revenue, leads, conversions
+    start_date: datetime
+    end_date: datetime
+    prize_description: str
+    participants: List[str] = []  # list of rep_ids
+    rules: Optional[str] = None
+    status: str = "active"  # active, completed, cancelled
+    created_by: str  # user_id who created the competition
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class BonusTier(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    tier_number: int
+    tier_name: str
+    signup_threshold: int
+    description: Optional[str] = None
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class SalesMetrics(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    rep_id: str
+    rep_name: str
+    year: int
+    month: int
+    signups: int = 0
+    qr_leads: int = 0
+    total_leads: int = 0
+    conversions: int = 0
+    revenue: float = 0.0
+    calls_made: int = 0
+    meetings_held: int = 0
+    proposals_sent: int = 0
+    current_tier: int = 0
+    calculated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class TeamAssignment(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    team_lead_id: str
+    team_lead_name: str
+    team_member_id: str
+    team_member_name: str
+    assignment_date: datetime = Field(default_factory=datetime.utcnow)
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
 class QRCode(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     rep_id: str
