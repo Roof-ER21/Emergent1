@@ -339,6 +339,35 @@ class SafetyTraining(BaseModel):
     is_active: bool = True
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+# Hiring Flow Models
+class HiringFlow(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    type: str  # insurance, retail, office, production
+    description: Optional[str] = None
+    stages: List[str] = []
+    requirements: List[str] = []
+    timeline_days: int = 30
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class HiringCandidate(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    email: str
+    phone: Optional[str] = None
+    position: str
+    hiring_type: str  # insurance, retail, office, production
+    current_stage: str = "application"
+    status: str = "active"  # active, hired, rejected, withdrawn
+    resume_url: Optional[str] = None
+    notes: Optional[str] = None
+    interview_date: Optional[datetime] = None
+    start_date: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
 class SafetyTrainingProgress(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     employee_id: str
