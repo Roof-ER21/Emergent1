@@ -249,11 +249,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "User Authentication System with Emergent OAuth"
-    - "Employee Management CRUD with Google Sheets Import"
-    - "Job Management System with Workflow Stages"
-    - "Commission Calculation Engine"
-    - "Gmail SMTP Email Notifications"
+    - "User Authentication UI with Login/Logout"
+    - "Employee Management Dashboard"
+    - "Job Management Dashboard"
+    - "Sales Rep Dashboard with Commission Tracking"
+    - "Admin Dashboard with Analytics"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
