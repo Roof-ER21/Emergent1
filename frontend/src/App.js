@@ -377,6 +377,7 @@ const QRGeneratorApp = () => {
     address: '',
     message: ''
   });
+  const [selectedRep, setSelectedRep] = useState(null);
 
   const isAdmin = user?.role === 'super_admin' || user?.role === 'sales_manager';
   const currentRep = salesReps.find(rep => rep.id === user?.id);
