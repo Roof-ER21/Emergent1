@@ -11,8 +11,8 @@ import uuid
 from datetime import datetime, timedelta
 import time
 
-# Configuration - Use internal URL for testing first, then external
-BASE_URL = "http://localhost:8001/api"
+# Configuration - Use external URL for testing
+BASE_URL = "https://33b33743-99df-44c4-98d4-d821875bb83a.preview.emergentagent.com/api"
 HEADERS = {"Content-Type": "application/json"}
 
 class RoofHRTester:
