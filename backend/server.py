@@ -18,6 +18,79 @@ from jinja2 import Template
 import json
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+
+# Google Sheets Service
+class GoogleSheetsService:
+    def __init__(self):
+        self.enabled = os.getenv("GOOGLE_SHEETS_ENABLED", "false").lower() == "true"
+        self.credentials_path = os.getenv("GOOGLE_SHEETS_CREDENTIALS_PATH", "/app/backend/service-account.json")
+        self.scopes = [os.getenv("GOOGLE_SHEETS_SCOPES", "https://www.googleapis.com/auth/spreadsheets.readonly")]
+        self.service = None
+        
+    async def get_service(self):
+        if not self.enabled:
+            raise HTTPException(status_code=400, detail="Google Sheets integration is disabled")
+            
+        if not os.path.exists(self.credentials_path):
+            raise HTTPException(status_code=400, detail="Google Sheets credentials file not found")
+            
+        try:
+            creds = service_account.Credentials.from_service_account_file(
+                self.credentials_path, scopes=self.scopes)
+            self.service = build('sheets', 'v4', credentials=creds)
+            return self.service
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to initialize Google Sheets service: {str(e)}")
+    
+    async def read_sheet_data(self, spreadsheet_id: str, range_name: str):
+        service = await self.get_service()
+        try:
+            result = service.spreadsheets().values().get(
+                spreadsheetId=spreadsheet_id,
+                range=range_name
+            ).execute()
+            return result.get('values', [])
+        except HttpError as e:
+            raise HTTPException(status_code=400, detail=f"Error reading Google Sheet: {str(e)}")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+
+# Initialize Google Sheets service
+google_sheets_service = GoogleSheetsService()
+
+# Additional models for Google Sheets import
+class GoogleSheetsImportRequest(BaseModel):
+    spreadsheet_id: str
+    range_name: str
+    data_type: str  # "employees" or "sales_reps"
+
+def parse_employee_row(row: List[str]) -> dict:
+    """Parse employee row from Google Sheets"""
+    try:
+        return {
+            "name": row[0] if len(row) > 0 else "",
+            "email": row[1] if len(row) > 1 else "",
+            "role": row[2] if len(row) > 2 else "employee",
+            "territory": row[3] if len(row) > 3 else None,
+            "commission_rate": float(row[4]) if len(row) > 4 and row[4] else 0.0
+        }
+    except (IndexError, ValueError) as e:
+        raise HTTPException(status_code=400, detail=f"Invalid row format: {str(e)}")
+
+def parse_sales_rep_row(row: List[str]) -> dict:
+    """Parse sales rep row from Google Sheets"""
+    try:
+        return {
+            "name": row[0] if len(row) > 0 else "",
+            "email": row[1] if len(row) > 1 else "",
+            "phone": row[2] if len(row) > 2 else "",
+            "territory": row[3] if len(row) > 3 else None,
+            "about_me": row[4] if len(row) > 4 else "",
+            "commission_rate": float(row[5]) if len(row) > 5 and row[5] else 0.05
+        }
+    except (IndexError, ValueError) as e:
+        raise HTTPException(status_code=400, detail=f"Invalid row format: {str(e)}")
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
