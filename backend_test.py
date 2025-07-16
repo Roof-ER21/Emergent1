@@ -1154,6 +1154,9 @@ class RoofHRTester:
         
         # Run all test suites
         self.test_authentication_system()
+        self.test_development_auth_bypass()
+        self.test_authenticated_endpoints_with_dev_token()
+        self.test_sample_data_initialization()
         self.test_employee_management_without_auth()
         self.test_job_management_without_auth()
         self.test_commission_system_without_auth()
