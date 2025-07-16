@@ -930,50 +930,50 @@ const QRGeneratorApp = () => {
 
     return (
       <div className="space-y-6">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">Lead Management</h2>
-            <p className="text-gray-600">Track and distribute leads from QR code landing pages</p>
+        <div className="bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+          <div className="px-6 py-4 border-b border-gray-700">
+            <h2 className="text-xl font-semibold text-white">Lead Management</h2>
+            <p className="text-gray-400">Track and distribute leads from QR code landing pages</p>
           </div>
           
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-750">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rep</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Customer</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Rep</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Priority</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Created</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-gray-800 divide-y divide-gray-700">
                 {leads.map((lead) => (
-                  <tr key={lead.id} className="hover:bg-gray-50">
+                  <tr key={lead.id} className="hover:bg-gray-750 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <div className="text-sm font-medium text-gray-900">{lead.name}</div>
-                        <div className="text-sm text-gray-500">{lead.email}</div>
-                        <div className="text-sm text-gray-500">{lead.phone}</div>
+                        <div className="text-sm font-medium text-white">{lead.name}</div>
+                        <div className="text-sm text-gray-400">{lead.email}</div>
+                        <div className="text-sm text-gray-400">{lead.phone}</div>
                         {lead.message && (
-                          <div className="text-sm text-gray-500 mt-1 italic">"{lead.message}"</div>
+                          <div className="text-sm text-gray-400 mt-1 italic max-w-xs truncate">"{lead.message}"</div>
                         )}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{lead.rep_name}</div>
+                      <div className="text-sm text-white">{lead.rep_name}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <select
                         value={lead.status}
                         onChange={(e) => handleLeadStatusChange(lead.id, e.target.value)}
-                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          lead.status === 'new' ? 'bg-blue-100 text-blue-800' :
-                          lead.status === 'assigned' ? 'bg-yellow-100 text-yellow-800' :
-                          lead.status === 'contacted' ? 'bg-green-100 text-green-800' :
-                          lead.status === 'converted' ? 'bg-green-100 text-green-800' :
-                          'bg-gray-100 text-gray-800'
+                        className={`px-3 py-1 text-xs font-semibold rounded-full border-0 ${
+                          lead.status === 'new' ? 'bg-blue-500/20 text-blue-400' :
+                          lead.status === 'assigned' ? 'bg-yellow-500/20 text-yellow-400' :
+                          lead.status === 'contacted' ? 'bg-green-500/20 text-green-400' :
+                          lead.status === 'converted' ? 'bg-green-500/20 text-green-400' :
+                          'bg-gray-500/20 text-gray-400'
                         }`}
                       >
                         <option value="new">New</option>
@@ -985,14 +985,14 @@ const QRGeneratorApp = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        lead.priority === 'high' ? 'bg-red-100 text-red-800' :
-                        lead.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-green-100 text-green-800'
+                        lead.priority === 'high' ? 'bg-red-500/20 text-red-400' :
+                        lead.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                        'bg-green-500/20 text-green-400'
                       }`}>
                         {lead.priority.charAt(0).toUpperCase() + lead.priority.slice(1)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                       {new Date(lead.created_at).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -1000,12 +1000,12 @@ const QRGeneratorApp = () => {
                         {isAdmin && (
                           <button 
                             onClick={() => handleLeadAssign(lead.id, lead.rep_id)}
-                            className="text-red-600 hover:text-red-900"
+                            className="text-red-400 hover:text-red-300 transition-colors"
                           >
                             Assign
                           </button>
                         )}
-                        <button className="text-gray-600 hover:text-gray-900">View</button>
+                        <button className="text-gray-400 hover:text-gray-300 transition-colors">View</button>
                       </div>
                     </td>
                   </tr>
