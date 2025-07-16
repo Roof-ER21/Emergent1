@@ -445,16 +445,83 @@ const QRGeneratorApp = () => {
     }
   };
 
-  // Upload file for sales rep
-  const uploadFile = async (repId, fileData, type) => {
+  // Enhanced file upload with drag & drop, progress, and chunked uploads
+  const uploadFile = async (repId, file, type, onProgress = null) => {
     try {
-      const endpoint = type === 'picture' ? 'upload-picture' : 'upload-video';
-      await axios.post(`${API}/qr-generator/reps/${repId}/${endpoint}`, fileData);
+      const CHUNK_SIZE = 1024 * 1024; // 1MB chunks
+      const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+      const fileName = `${type}_${repId}_${Date.now()}_${file.name}`;
+      
+      // Initialize upload
+      const initResponse = await axios.post(`${API}/qr-generator/reps/${repId}/upload-init`, {
+        file_name: fileName,
+        file_type: file.type,
+        file_size: file.size,
+        total_chunks: totalChunks,
+        upload_type: type
+      });
+      
+      const uploadId = initResponse.data.upload_id;
+      
+      // Upload chunks
+      for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+        const start = chunkIndex * CHUNK_SIZE;
+        const end = Math.min(start + CHUNK_SIZE, file.size);
+        const chunk = file.slice(start, end);
+        
+        // Convert chunk to base64
+        const base64Chunk = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(chunk);
+        });
+        
+        // Upload chunk
+        await axios.post(`${API}/qr-generator/reps/${repId}/upload-chunk`, {
+          upload_id: uploadId,
+          chunk_index: chunkIndex,
+          chunk_data: base64Chunk
+        });
+        
+        // Update progress
+        if (onProgress) {
+          const progress = ((chunkIndex + 1) / totalChunks) * 100;
+          onProgress(progress);
+        }
+      }
+      
+      // Finalize upload
+      const finalResponse = await axios.post(`${API}/qr-generator/reps/${repId}/upload-complete`, {
+        upload_id: uploadId
+      });
+      
       // Refresh the sales rep data
       await fetchSalesReps();
+      
+      return finalResponse.data;
     } catch (error) {
       console.error(`Error uploading ${type}:`, error);
-      throw error;
+      // Fallback to simple upload for compatibility
+      try {
+        const reader = new FileReader();
+        const base64Data = await new Promise((resolve) => {
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(file);
+        });
+        
+        const fileData = {
+          file_data: base64Data,
+          file_type: file.type,
+          file_name: file.name
+        };
+        
+        const endpoint = type === 'picture' ? 'upload-picture' : 'upload-video';
+        await axios.post(`${API}/qr-generator/reps/${repId}/${endpoint}`, fileData);
+        await fetchSalesReps();
+      } catch (fallbackError) {
+        console.error('Fallback upload also failed:', fallbackError);
+        throw fallbackError;
+      }
     }
   };
 
