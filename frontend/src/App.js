@@ -1,5 +1,7 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import axios from 'axios';
+import QRCode from 'qrcode';
+import JSZip from 'jszip';
 import './App.css';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
