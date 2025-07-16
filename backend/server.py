@@ -361,31 +361,138 @@ async def send_lead_notification(lead: Lead, rep_email: str, background_tasks: B
         background_tasks
     )
 
-async def import_from_google_sheets(spreadsheet_id: str, sheet_range: str):
-    """Import employee data from Google Sheets"""
+async def initialize_sample_data():
+    """Initialize sample data for QR Generator"""
     try:
-        # For now, we'll create sample data since we don't have service account credentials
-        # In production, this would use Google Sheets API
-        sample_employees = [
-            {"name": "John Smith", "email": "john.smith@theroofdocs.com", "role": "sales_rep", "territory": "North VA", "commission_rate": 0.05},
-            {"name": "Sarah Johnson", "email": "sarah.johnson@theroofdocs.com", "role": "sales_rep", "territory": "South VA", "commission_rate": 0.05},
-            {"name": "Mike Wilson", "email": "mike.wilson@theroofdocs.com", "role": "project_manager", "territory": "MD", "commission_rate": 0.03},
-            {"name": "Lisa Davis", "email": "lisa.davis@theroofdocs.com", "role": "field_worker", "territory": "PA", "commission_rate": 0.02},
-            {"name": "Ahmed Mahmoud", "email": "ahmed.mahmoud@theroofdocs.com", "role": "super_admin", "territory": "All", "commission_rate": 0.10}
+        # Check if sample data already exists
+        existing_reps = await db.sales_reps.count_documents({})
+        if existing_reps > 0:
+            return  # Data already exists
+        
+        # Add sample sales reps
+        sample_reps = [
+            {
+                "id": "rep-789",
+                "name": "John Smith",
+                "email": "john.smith@theroofdocs.com",
+                "phone": "(555) 345-6789",
+                "territory": "Northern Virginia",
+                "department": "Sales",
+                "picture": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+                "qr_code": "QR123456",
+                "landing_page_url": "https://theroofdocs.com/rep/john-smith",
+                "welcome_video": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                "about_me": "Hi! I'm John Smith, your local roofing expert with over 10 years of experience. I specialize in residential roofing solutions and pride myself on honest, quality work.",
+                "leads": 0,
+                "conversions": 0,
+                "is_active": True,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            },
+            {
+                "id": "rep-890",
+                "name": "Sarah Johnson",
+                "email": "sarah.johnson@theroofdocs.com",
+                "phone": "(555) 456-7890",
+                "territory": "Southern Virginia",
+                "department": "Sales",
+                "picture": "https://images.unsplash.com/photo-1494790108755-2616b9cf1d1e?w=150&h=150&fit=crop&crop=face",
+                "qr_code": "QR234567",
+                "landing_page_url": "https://theroofdocs.com/rep/sarah-johnson",
+                "welcome_video": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                "about_me": "Hello! I'm Sarah Johnson, dedicated to providing exceptional roofing services. With 8 years in the industry, I focus on storm damage restoration and preventive maintenance.",
+                "leads": 0,
+                "conversions": 0,
+                "is_active": True,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            },
+            {
+                "id": "rep-901",
+                "name": "Mike Wilson",
+                "email": "mike.wilson@theroofdocs.com",
+                "phone": "(555) 567-8901",
+                "territory": "Maryland",
+                "department": "Sales",
+                "picture": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+                "qr_code": "QR345678",
+                "landing_page_url": "https://theroofdocs.com/rep/mike-wilson",
+                "welcome_video": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                "about_me": "I'm Mike Wilson, your trusted roofing professional in Maryland. I specialize in commercial and residential projects, ensuring every job meets the highest standards.",
+                "leads": 0,
+                "conversions": 0,
+                "is_active": True,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
         ]
         
-        imported_count = 0
-        for emp_data in sample_employees:
-            employee = Employee(**emp_data)
-            existing = await db.employees.find_one({"email": employee.email})
-            if not existing:
-                await db.employees.insert_one(employee.model_dump())
-                imported_count += 1
+        # Insert sample data
+        await db.sales_reps.insert_many(sample_reps)
         
-        return imported_count
+        # Add sample leads
+        sample_leads = [
+            {
+                "id": "lead-001",
+                "name": "Robert Davis",
+                "email": "robert.davis@email.com",
+                "phone": "(555) 111-2222",
+                "address": "123 Main St, Richmond, VA",
+                "rep_id": "rep-789",
+                "rep_name": "John Smith",
+                "status": "new",
+                "priority": "high",
+                "source": "QR Code",
+                "message": "Need roof inspection after storm damage",
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+                "assigned_to": None
+            },
+            {
+                "id": "lead-002",
+                "name": "Emily Brown",
+                "email": "emily.brown@email.com",
+                "phone": "(555) 222-3333",
+                "address": "456 Oak Ave, Norfolk, VA",
+                "rep_id": "rep-890",
+                "rep_name": "Sarah Johnson",
+                "status": "assigned",
+                "priority": "medium",
+                "source": "QR Code",
+                "message": "Interested in solar roof installation",
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+                "assigned_to": "rep-890"
+            },
+            {
+                "id": "lead-003",
+                "name": "David Miller",
+                "email": "david.miller@email.com",
+                "phone": "(555) 333-4444",
+                "address": "789 Pine Rd, Baltimore, MD",
+                "rep_id": "rep-901",
+                "rep_name": "Mike Wilson",
+                "status": "contacted",
+                "priority": "low",
+                "source": "QR Code",
+                "message": "Routine maintenance and gutter cleaning",
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+                "assigned_to": "rep-901"
+            }
+        ]
+        
+        await db.leads.insert_many(sample_leads)
+        
+        print("Sample QR Generator data initialized successfully")
+        
     except Exception as e:
-        logging.error(f"Google Sheets import failed: {str(e)}")
-        raise HTTPException(status_code=500, detail="Import failed")
+        print(f"Error initializing sample data: {str(e)}")
+
+# Initialize sample data on startup
+@app.on_event("startup")
+async def startup_event():
+    await initialize_sample_data()
 
 # Authentication Routes
 @api_router.post("/auth/login")
