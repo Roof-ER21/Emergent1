@@ -793,7 +793,7 @@ const QRGeneratorApp = () => {
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Complete Project Solution</h3>
                 <p className="text-gray-600 text-sm mb-4">From tear-off to solar - we handle everything</p>
                 
-                <div className="space-y-3 mb-4">
+                <div className="grid grid-cols-3 gap-3 mb-4">
                   {[
                     { step: '1', title: 'Free Inspection', desc: 'Comprehensive roof and property assessment' },
                     { step: '2', title: 'Insurance Coordination', desc: 'We handle all insurance paperwork and claims' },
@@ -802,12 +802,12 @@ const QRGeneratorApp = () => {
                     { step: '5', title: 'Solar Integration', desc: 'Optional solar panel installation for energy savings' },
                     { step: '6', title: 'Final Walkthrough', desc: 'Quality check and lifetime warranty activation' }
                   ].map((step, index) => (
-                    <div key={index} className="flex items-start p-3 bg-gray-50 rounded-lg">
-                      <div className="w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3 flex-shrink-0">
+                    <div key={index} className="flex flex-col items-center p-3 bg-gray-50 rounded-lg">
+                      <div className="w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold mb-2 flex-shrink-0">
                         {step.step}
                       </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900 text-sm">{step.title}</h4>
+                      <div className="text-center">
+                        <h4 className="font-semibold text-gray-900 text-xs mb-1">{step.title}</h4>
                         <p className="text-xs text-gray-600">{step.desc}</p>
                       </div>
                     </div>
