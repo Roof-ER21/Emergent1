@@ -38,7 +38,8 @@ class RoofHRTester:
             "hr_compliance": {},
             "hr_assignments": {},
             "hr_self_service": {},
-            "hr_sample_data": {}
+            "hr_sample_data": {},
+            "hiring_flows": {}  # New hiring flow tests
         }
         
     def log_result(self, category, test_name, success, message, response_data=None):
