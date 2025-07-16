@@ -2091,6 +2091,530 @@ class RoofHRTester:
         else:
             self.log_result("hiring_flows", "sample_flow_validation", False, "Could not retrieve flows for validation")
 
+    def test_sales_leaderboard_endpoints(self):
+        """Test Sales Leaderboard API endpoints"""
+        print("\n🏆 Testing Sales Leaderboard API Endpoints...")
+        
+        # Set development token
+        self.auth_token = "dev-token-super_admin"
+        
+        # Test 1: Initialize sample leaderboard data
+        print("Testing POST /leaderboard/initialize-sample-data...")
+        response = self.make_request("POST", "/leaderboard/initialize-sample-data", auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                result = response.json()
+                if "message" in result and "leaderboard data initialized" in result["message"]:
+                    self.log_result("sales_leaderboard", "initialize_sample_data", True, 
+                                   "Sample leaderboard data initialized successfully")
+                else:
+                    self.log_result("sales_leaderboard", "initialize_sample_data", False, 
+                                   f"Unexpected response format: {result}")
+            except json.JSONDecodeError:
+                self.log_result("sales_leaderboard", "initialize_sample_data", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("sales_leaderboard", "initialize_sample_data", False, 
+                           f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("sales_leaderboard", "initialize_sample_data", False, "No response received")
+        
+        # Test 2: Get sales goals
+        print("Testing GET /leaderboard/goals...")
+        response = self.make_request("GET", "/leaderboard/goals", auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                goals = response.json()
+                if isinstance(goals, list):
+                    self.log_result("sales_leaderboard", "get_sales_goals", True, 
+                                   f"Retrieved {len(goals)} sales goals successfully")
+                else:
+                    self.log_result("sales_leaderboard", "get_sales_goals", False, "Response is not a list")
+            except json.JSONDecodeError:
+                self.log_result("sales_leaderboard", "get_sales_goals", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("sales_leaderboard", "get_sales_goals", False, 
+                           f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("sales_leaderboard", "get_sales_goals", False, "No response received")
+        
+        # Test 3: Create sales goal
+        print("Testing POST /leaderboard/goals...")
+        goal_data = {
+            "rep_id": "rep-789",
+            "rep_name": "John Smith",
+            "year": 2025,
+            "month": 1,
+            "signup_goal": 10,
+            "revenue_goal": 50000.0,
+            "assigned_by": "admin-123"
+        }
+        response = self.make_request("POST", "/leaderboard/goals", goal_data, auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                goal = response.json()
+                if "id" in goal and goal.get("rep_name") == "John Smith":
+                    self.log_result("sales_leaderboard", "create_sales_goal", True, 
+                                   "Sales goal created successfully")
+                else:
+                    self.log_result("sales_leaderboard", "create_sales_goal", False, 
+                                   f"Unexpected goal format: {goal}")
+            except json.JSONDecodeError:
+                self.log_result("sales_leaderboard", "create_sales_goal", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("sales_leaderboard", "create_sales_goal", False, 
+                           f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("sales_leaderboard", "create_sales_goal", False, "No response received")
+        
+        # Test 4: Get sales signups
+        print("Testing GET /leaderboard/signups...")
+        response = self.make_request("GET", "/leaderboard/signups", auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                signups = response.json()
+                if isinstance(signups, list):
+                    self.log_result("sales_leaderboard", "get_sales_signups", True, 
+                                   f"Retrieved {len(signups)} sales signups successfully")
+                else:
+                    self.log_result("sales_leaderboard", "get_sales_signups", False, "Response is not a list")
+            except json.JSONDecodeError:
+                self.log_result("sales_leaderboard", "get_sales_signups", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("sales_leaderboard", "get_sales_signups", False, 
+                           f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("sales_leaderboard", "get_sales_signups", False, "No response received")
+        
+        # Test 5: Create sales signup
+        print("Testing POST /leaderboard/signups...")
+        signup_data = {
+            "rep_id": "rep-789",
+            "rep_name": "John Smith",
+            "customer_name": "Test Customer",
+            "customer_email": "test@example.com",
+            "customer_phone": "555-0123",
+            "signup_type": "lead",
+            "source": "QR Code",
+            "deal_value": 5000.0,
+            "status": "pending"
+        }
+        response = self.make_request("POST", "/leaderboard/signups", signup_data, auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                signup = response.json()
+                if "id" in signup and signup.get("customer_name") == "Test Customer":
+                    self.log_result("sales_leaderboard", "create_sales_signup", True, 
+                                   "Sales signup created successfully")
+                else:
+                    self.log_result("sales_leaderboard", "create_sales_signup", False, 
+                                   f"Unexpected signup format: {signup}")
+            except json.JSONDecodeError:
+                self.log_result("sales_leaderboard", "create_sales_signup", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("sales_leaderboard", "create_sales_signup", False, 
+                           f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("sales_leaderboard", "create_sales_signup", False, "No response received")
+        
+        # Test 6: Get competitions
+        print("Testing GET /leaderboard/competitions...")
+        response = self.make_request("GET", "/leaderboard/competitions", auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                competitions = response.json()
+                if isinstance(competitions, list):
+                    self.log_result("sales_leaderboard", "get_competitions", True, 
+                                   f"Retrieved {len(competitions)} competitions successfully")
+                else:
+                    self.log_result("sales_leaderboard", "get_competitions", False, "Response is not a list")
+            except json.JSONDecodeError:
+                self.log_result("sales_leaderboard", "get_competitions", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("sales_leaderboard", "get_competitions", False, 
+                           f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("sales_leaderboard", "get_competitions", False, "No response received")
+        
+        # Test 7: Create competition
+        print("Testing POST /leaderboard/competitions...")
+        competition_data = {
+            "name": "Q1 Sales Challenge",
+            "description": "First quarter sales competition",
+            "competition_type": "signups",
+            "start_date": "2025-01-01T00:00:00",
+            "end_date": "2025-03-31T23:59:59",
+            "prize_description": "$1000 bonus for winner",
+            "participants": ["rep-789", "rep-890"],
+            "rules": "Most signups wins",
+            "status": "active",
+            "created_by": "admin-123"
+        }
+        response = self.make_request("POST", "/leaderboard/competitions", competition_data, auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                competition = response.json()
+                if "id" in competition and competition.get("name") == "Q1 Sales Challenge":
+                    self.log_result("sales_leaderboard", "create_competition", True, 
+                                   "Competition created successfully")
+                    
+                    # Test 8: Update competition
+                    competition_id = competition["id"]
+                    print(f"Testing PUT /leaderboard/competitions/{competition_id}...")
+                    update_data = competition.copy()
+                    update_data["status"] = "completed"
+                    
+                    response = self.make_request("PUT", f"/leaderboard/competitions/{competition_id}", 
+                                               update_data, auth_required=True)
+                    
+                    if response is not None and response.status_code == 200:
+                        try:
+                            updated_competition = response.json()
+                            if updated_competition.get("status") == "completed":
+                                self.log_result("sales_leaderboard", "update_competition", True, 
+                                               "Competition updated successfully")
+                            else:
+                                self.log_result("sales_leaderboard", "update_competition", False, 
+                                               "Competition status not updated")
+                        except json.JSONDecodeError:
+                            self.log_result("sales_leaderboard", "update_competition", False, "Invalid JSON response")
+                    elif response is not None:
+                        self.log_result("sales_leaderboard", "update_competition", False, 
+                                       f"Expected 200, got {response.status_code}")
+                    else:
+                        self.log_result("sales_leaderboard", "update_competition", False, "No response received")
+                        
+                else:
+                    self.log_result("sales_leaderboard", "create_competition", False, 
+                                   f"Unexpected competition format: {competition}")
+            except json.JSONDecodeError:
+                self.log_result("sales_leaderboard", "create_competition", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("sales_leaderboard", "create_competition", False, 
+                           f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("sales_leaderboard", "create_competition", False, "No response received")
+        
+        # Test 9: Get sales metrics
+        print("Testing GET /leaderboard/metrics...")
+        response = self.make_request("GET", "/leaderboard/metrics", auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                metrics = response.json()
+                if isinstance(metrics, list):
+                    self.log_result("sales_leaderboard", "get_sales_metrics", True, 
+                                   f"Retrieved {len(metrics)} sales metrics successfully")
+                else:
+                    self.log_result("sales_leaderboard", "get_sales_metrics", False, "Response is not a list")
+            except json.JSONDecodeError:
+                self.log_result("sales_leaderboard", "get_sales_metrics", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("sales_leaderboard", "get_sales_metrics", False, 
+                           f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("sales_leaderboard", "get_sales_metrics", False, "No response received")
+        
+        # Test 10: Create sales metrics
+        print("Testing POST /leaderboard/metrics...")
+        metrics_data = {
+            "rep_id": "rep-789",
+            "rep_name": "John Smith",
+            "year": 2025,
+            "month": 1,
+            "signups": 5,
+            "qr_leads": 10,
+            "total_leads": 15,
+            "conversions": 3,
+            "revenue": 15000.0,
+            "calls_made": 50,
+            "meetings_held": 8,
+            "proposals_sent": 5,
+            "current_tier": 1
+        }
+        response = self.make_request("POST", "/leaderboard/metrics", metrics_data, auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                metrics = response.json()
+                if "id" in metrics and metrics.get("rep_name") == "John Smith":
+                    self.log_result("sales_leaderboard", "create_sales_metrics", True, 
+                                   "Sales metrics created successfully")
+                else:
+                    self.log_result("sales_leaderboard", "create_sales_metrics", False, 
+                                   f"Unexpected metrics format: {metrics}")
+            except json.JSONDecodeError:
+                self.log_result("sales_leaderboard", "create_sales_metrics", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("sales_leaderboard", "create_sales_metrics", False, 
+                           f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("sales_leaderboard", "create_sales_metrics", False, "No response received")
+        
+        # Test 11: Get bonus tiers
+        print("Testing GET /leaderboard/bonus-tiers...")
+        response = self.make_request("GET", "/leaderboard/bonus-tiers", auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                tiers = response.json()
+                if isinstance(tiers, list):
+                    self.log_result("sales_leaderboard", "get_bonus_tiers", True, 
+                                   f"Retrieved {len(tiers)} bonus tiers successfully")
+                else:
+                    self.log_result("sales_leaderboard", "get_bonus_tiers", False, "Response is not a list")
+            except json.JSONDecodeError:
+                self.log_result("sales_leaderboard", "get_bonus_tiers", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("sales_leaderboard", "get_bonus_tiers", False, 
+                           f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("sales_leaderboard", "get_bonus_tiers", False, "No response received")
+        
+        # Test 12: Create bonus tier
+        print("Testing POST /leaderboard/bonus-tiers...")
+        tier_data = {
+            "tier_number": 1,
+            "tier_name": "Bronze",
+            "signup_threshold": 5,
+            "description": "Bronze tier for 5+ signups",
+            "is_active": True
+        }
+        response = self.make_request("POST", "/leaderboard/bonus-tiers", tier_data, auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                tier = response.json()
+                if "id" in tier and tier.get("tier_name") == "Bronze":
+                    self.log_result("sales_leaderboard", "create_bonus_tier", True, 
+                                   "Bonus tier created successfully")
+                else:
+                    self.log_result("sales_leaderboard", "create_bonus_tier", False, 
+                                   f"Unexpected tier format: {tier}")
+            except json.JSONDecodeError:
+                self.log_result("sales_leaderboard", "create_bonus_tier", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("sales_leaderboard", "create_bonus_tier", False, 
+                           f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("sales_leaderboard", "create_bonus_tier", False, "No response received")
+        
+        # Test 13: Get team assignments
+        print("Testing GET /leaderboard/team-assignments...")
+        response = self.make_request("GET", "/leaderboard/team-assignments", auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                assignments = response.json()
+                if isinstance(assignments, list):
+                    self.log_result("sales_leaderboard", "get_team_assignments", True, 
+                                   f"Retrieved {len(assignments)} team assignments successfully")
+                else:
+                    self.log_result("sales_leaderboard", "get_team_assignments", False, "Response is not a list")
+            except json.JSONDecodeError:
+                self.log_result("sales_leaderboard", "get_team_assignments", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("sales_leaderboard", "get_team_assignments", False, 
+                           f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("sales_leaderboard", "get_team_assignments", False, "No response received")
+        
+        # Test 14: Create team assignment
+        print("Testing POST /leaderboard/team-assignments...")
+        assignment_data = {
+            "team_lead_id": "manager-456",
+            "team_lead_name": "Sales Manager",
+            "team_member_id": "rep-789",
+            "team_member_name": "John Smith",
+            "is_active": True
+        }
+        response = self.make_request("POST", "/leaderboard/team-assignments", assignment_data, auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                assignment = response.json()
+                if "id" in assignment and assignment.get("team_member_name") == "John Smith":
+                    self.log_result("sales_leaderboard", "create_team_assignment", True, 
+                                   "Team assignment created successfully")
+                else:
+                    self.log_result("sales_leaderboard", "create_team_assignment", False, 
+                                   f"Unexpected assignment format: {assignment}")
+            except json.JSONDecodeError:
+                self.log_result("sales_leaderboard", "create_team_assignment", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("sales_leaderboard", "create_team_assignment", False, 
+                           f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("sales_leaderboard", "create_team_assignment", False, "No response received")
+        
+        # Test 15: Get rep dashboard
+        print("Testing GET /leaderboard/dashboard/rep-789...")
+        response = self.make_request("GET", "/leaderboard/dashboard/rep-789", auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                dashboard = response.json()
+                expected_fields = ["rep_info", "current_goals", "current_metrics", "competitions", 
+                                 "team_assignments", "bonus_tiers", "recent_signups", "analytics"]
+                
+                if all(field in dashboard for field in expected_fields):
+                    self.log_result("sales_leaderboard", "get_rep_dashboard", True, 
+                                   f"Dashboard retrieved with all expected fields: {list(dashboard.keys())}")
+                else:
+                    missing_fields = [field for field in expected_fields if field not in dashboard]
+                    self.log_result("sales_leaderboard", "get_rep_dashboard", False, 
+                                   f"Missing dashboard fields: {missing_fields}")
+            except json.JSONDecodeError:
+                self.log_result("sales_leaderboard", "get_rep_dashboard", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("sales_leaderboard", "get_rep_dashboard", False, 
+                           f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("sales_leaderboard", "get_rep_dashboard", False, "No response received")
+
+    def test_leaderboard_authentication_requirements(self):
+        """Test that leaderboard endpoints require authentication"""
+        print("\n🔐 Testing Leaderboard Authentication Requirements...")
+        
+        leaderboard_endpoints = [
+            ("GET", "/leaderboard/goals"),
+            ("POST", "/leaderboard/goals"),
+            ("GET", "/leaderboard/signups"),
+            ("POST", "/leaderboard/signups"),
+            ("GET", "/leaderboard/competitions"),
+            ("POST", "/leaderboard/competitions"),
+            ("GET", "/leaderboard/metrics"),
+            ("POST", "/leaderboard/metrics"),
+            ("GET", "/leaderboard/bonus-tiers"),
+            ("POST", "/leaderboard/bonus-tiers"),
+            ("GET", "/leaderboard/team-assignments"),
+            ("POST", "/leaderboard/team-assignments"),
+            ("GET", "/leaderboard/dashboard/test-rep"),
+            ("POST", "/leaderboard/initialize-sample-data")
+        ]
+        
+        auth_protected_count = 0
+        for method, endpoint in leaderboard_endpoints:
+            test_data = {"test": "data"} if method == "POST" else None
+            response = self.make_request(method, endpoint, test_data, auth_required=False)
+            
+            if response is not None and response.status_code in [401, 403]:
+                auth_protected_count += 1
+                print(f"✅ {method} {endpoint} correctly requires authentication")
+            elif response is not None:
+                print(f"❌ {method} {endpoint} returned {response.status_code} (expected 401/403)")
+            else:
+                print(f"❌ {method} {endpoint} no response received")
+        
+        if auth_protected_count == len(leaderboard_endpoints):
+            self.log_result("sales_leaderboard", "authentication_requirements", True, 
+                           f"All {len(leaderboard_endpoints)} leaderboard endpoints correctly require authentication")
+        else:
+            self.log_result("sales_leaderboard", "authentication_requirements", False, 
+                           f"Only {auth_protected_count}/{len(leaderboard_endpoints)} endpoints require authentication")
+
+    def test_leaderboard_data_models(self):
+        """Test leaderboard data models are properly defined"""
+        print("\n🗄️ Testing Leaderboard Data Models...")
+        
+        try:
+            # Read the server.py file to check leaderboard model definitions
+            with open('/app/backend/server.py', 'r') as f:
+                server_content = f.read()
+            
+            required_models = [
+                'SalesGoal', 'SalesSignup', 'SalesCompetition', 'SalesMetrics', 
+                'BonusTier', 'TeamAssignment'
+            ]
+            models_found = []
+            
+            for model in required_models:
+                if f'class {model}(BaseModel):' in server_content:
+                    models_found.append(model)
+            
+            if len(models_found) == len(required_models):
+                self.log_result("sales_leaderboard", "leaderboard_data_models", True, 
+                               f"All leaderboard models found: {', '.join(models_found)}")
+            else:
+                missing = set(required_models) - set(models_found)
+                self.log_result("sales_leaderboard", "leaderboard_data_models", False, 
+                               f"Missing leaderboard models: {', '.join(missing)}")
+                
+        except Exception as e:
+            self.log_result("sales_leaderboard", "leaderboard_data_models", False, 
+                           f"Could not verify leaderboard models: {str(e)}")
+
+    def test_leaderboard_role_based_access(self):
+        """Test role-based access control for leaderboard endpoints"""
+        print("\n🔐 Testing Leaderboard Role-Based Access Control...")
+        
+        try:
+            # Read the server.py file to check role-based access for leaderboard endpoints
+            with open('/app/backend/server.py', 'r') as f:
+                server_content = f.read()
+            
+            rbac_checks = [
+                'if current_user.role not in ["super_admin", "sales_manager", "team_lead"]',
+                'if current_user.role in ["super_admin", "sales_manager"]',
+                'if current_user.role not in ["super_admin", "sales_manager"]',
+                'if current_user.role not in ["super_admin"]'
+            ]
+            
+            rbac_implemented = True
+            for check in rbac_checks:
+                if check not in server_content:
+                    rbac_implemented = False
+                    break
+            
+            if rbac_implemented:
+                self.log_result("sales_leaderboard", "role_based_access_control", True, 
+                               "Role-based access control for leaderboard endpoints properly implemented")
+            else:
+                self.log_result("sales_leaderboard", "role_based_access_control", False, 
+                               "Role-based access control for leaderboard endpoints not properly implemented")
+                
+        except Exception as e:
+            self.log_result("sales_leaderboard", "role_based_access_control", False, 
+                           f"Could not verify leaderboard RBAC: {str(e)}")
+
+    def test_leaderboard_goal_assignment_restrictions(self):
+        """Test goal assignment restrictions (Team Leads can only assign 1st-6th of month)"""
+        print("\n📅 Testing Goal Assignment Restrictions...")
+        
+        try:
+            # Read the server.py file to check goal assignment restrictions
+            with open('/app/backend/server.py', 'r') as f:
+                server_content = f.read()
+            
+            # Check for date restriction logic
+            restriction_checks = [
+                'datetime.utcnow().day > 6',
+                'Team leads can only assign goals during the first 6 days of the month'
+            ]
+            
+            restrictions_implemented = True
+            for check in restriction_checks:
+                if check not in server_content:
+                    restrictions_implemented = False
+                    break
+            
+            if restrictions_implemented:
+                self.log_result("sales_leaderboard", "goal_assignment_restrictions", True, 
+                               "Goal assignment restrictions properly implemented (1st-6th of month)")
+            else:
+                self.log_result("sales_leaderboard", "goal_assignment_restrictions", False, 
+                               "Goal assignment restrictions not properly implemented")
+                
+        except Exception as e:
+            self.log_result("sales_leaderboard", "goal_assignment_restrictions", False, 
+                           f"Could not verify goal assignment restrictions: {str(e)}")
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Roof-HR Backend API Testing...")
