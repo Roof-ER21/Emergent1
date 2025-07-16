@@ -1143,7 +1143,169 @@ class RoofHRTester:
             self.log_result("lead_capture", "sample_leads_initialized", False, f"Expected 200, got {response.status_code}")
         else:
             self.log_result("lead_capture", "sample_leads_initialized", False, "No response received")
-        """Test CORS configuration"""
+
+    def test_google_sheets_import_status(self):
+        """Test Google Sheets import status endpoint"""
+        print("\n📊 Testing Google Sheets Import Status...")
+        
+        # Set development token
+        self.auth_token = "dev-token-super_admin"
+        
+        # Test 1: Get import status with authentication
+        print("Testing GET /import/status with dev token...")
+        response = self.make_request("GET", "/import/status", auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                status_data = response.json()
+                expected_fields = ["google_sheets_enabled", "credentials_configured", "supported_data_types", "sample_ranges"]
+                
+                if all(field in status_data for field in expected_fields):
+                    self.log_result("google_sheets_integration", "import_status_structure", True, 
+                                   f"Import status endpoint returns all expected fields: {list(status_data.keys())}")
+                    
+                    # Check specific values
+                    if status_data.get("google_sheets_enabled") == False:
+                        self.log_result("google_sheets_integration", "google_sheets_disabled", True, 
+                                       "Google Sheets integration correctly disabled by default")
+                    else:
+                        self.log_result("google_sheets_integration", "google_sheets_disabled", False, 
+                                       f"Expected Google Sheets to be disabled, got: {status_data.get('google_sheets_enabled')}")
+                    
+                    if status_data.get("credentials_configured") == False:
+                        self.log_result("google_sheets_integration", "credentials_not_configured", True, 
+                                       "Credentials correctly reported as not configured")
+                    else:
+                        self.log_result("google_sheets_integration", "credentials_not_configured", False, 
+                                       f"Expected credentials not configured, got: {status_data.get('credentials_configured')}")
+                    
+                    supported_types = status_data.get("supported_data_types", [])
+                    if "employees" in supported_types and "sales_reps" in supported_types:
+                        self.log_result("google_sheets_integration", "supported_data_types", True, 
+                                       f"Supported data types correct: {supported_types}")
+                    else:
+                        self.log_result("google_sheets_integration", "supported_data_types", False, 
+                                       f"Expected employees and sales_reps in supported types, got: {supported_types}")
+                        
+                else:
+                    missing_fields = [field for field in expected_fields if field not in status_data]
+                    self.log_result("google_sheets_integration", "import_status_structure", False, 
+                                   f"Missing fields in status response: {missing_fields}")
+                    
+            except json.JSONDecodeError:
+                self.log_result("google_sheets_integration", "import_status_structure", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("google_sheets_integration", "import_status_structure", False, f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("google_sheets_integration", "import_status_structure", False, "No response received")
+        
+        # Test 2: Test without authentication
+        print("Testing GET /import/status without auth...")
+        response = self.make_request("GET", "/import/status", auth_required=False)
+        
+        if response is not None and response.status_code in [401, 403]:
+            self.log_result("google_sheets_integration", "import_status_auth_required", True, "Import status correctly requires authentication")
+        elif response is not None:
+            self.log_result("google_sheets_integration", "import_status_auth_required", False, f"Expected 401/403, got {response.status_code}")
+        else:
+            self.log_result("google_sheets_integration", "import_status_auth_required", False, "No response received")
+
+    def test_traditional_employee_import(self):
+        """Test traditional employee import (fallback with sample data)"""
+        print("\n👥 Testing Traditional Employee Import...")
+        
+        # Set development token
+        self.auth_token = "dev-token-super_admin"
+        
+        # Test 1: Traditional import with valid data
+        print("Testing POST /employees/import with dev token...")
+        import_data = {
+            "spreadsheet_id": "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms",
+            "sheet_range": "Employees!A2:G"
+        }
+        response = self.make_request("POST", "/employees/import", import_data, auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                result = response.json()
+                if "message" in result and "Imported" in result["message"]:
+                    self.log_result("google_sheets_integration", "traditional_employee_import", True, 
+                                   f"Traditional employee import working: {result['message']}")
+                else:
+                    self.log_result("google_sheets_integration", "traditional_employee_import", False, 
+                                   f"Unexpected response format: {result}")
+            except json.JSONDecodeError:
+                self.log_result("google_sheets_integration", "traditional_employee_import", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("google_sheets_integration", "traditional_employee_import", False, f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("google_sheets_integration", "traditional_employee_import", False, "No response received")
+
+    def test_google_sheets_employee_import(self):
+        """Test Google Sheets employee import with mock data"""
+        print("\n📊 Testing Google Sheets Employee Import...")
+        
+        # Set development token
+        self.auth_token = "dev-token-super_admin"
+        
+        # Test 1: Google Sheets employee import (should fail due to disabled integration)
+        print("Testing POST /employees/import-from-sheets with dev token...")
+        import_data = {
+            "spreadsheet_id": "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms",
+            "range_name": "Employees!A2:E",
+            "data_type": "employees"
+        }
+        response = self.make_request("POST", "/employees/import-from-sheets", import_data, auth_required=True)
+        
+        if response is not None and response.status_code == 400:
+            try:
+                error_data = response.json()
+                if "Google Sheets integration is disabled" in error_data.get("detail", ""):
+                    self.log_result("google_sheets_integration", "employee_import_disabled_check", True, 
+                                   "Google Sheets employee import correctly reports disabled integration")
+                else:
+                    self.log_result("google_sheets_integration", "employee_import_disabled_check", False, 
+                                   f"Unexpected error message: {error_data.get('detail')}")
+            except json.JSONDecodeError:
+                self.log_result("google_sheets_integration", "employee_import_disabled_check", False, "Invalid JSON error response")
+        elif response is not None:
+            self.log_result("google_sheets_integration", "employee_import_disabled_check", False, f"Expected 400, got {response.status_code}")
+        else:
+            self.log_result("google_sheets_integration", "employee_import_disabled_check", False, "No response received")
+
+    def test_google_sheets_sales_rep_import(self):
+        """Test Google Sheets sales rep import with mock data"""
+        print("\n👤 Testing Google Sheets Sales Rep Import...")
+        
+        # Set development token
+        self.auth_token = "dev-token-super_admin"
+        
+        # Test 1: Google Sheets sales rep import (should fail due to disabled integration)
+        print("Testing POST /sales-reps/import-from-sheets with dev token...")
+        import_data = {
+            "spreadsheet_id": "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms",
+            "range_name": "Sales Reps!A2:F",
+            "data_type": "sales_reps"
+        }
+        response = self.make_request("POST", "/sales-reps/import-from-sheets", import_data, auth_required=True)
+        
+        if response is not None and response.status_code == 400:
+            try:
+                error_data = response.json()
+                if "Google Sheets integration is disabled" in error_data.get("detail", ""):
+                    self.log_result("google_sheets_integration", "sales_rep_import_disabled_check", True, 
+                                   "Google Sheets sales rep import correctly reports disabled integration")
+                else:
+                    self.log_result("google_sheets_integration", "sales_rep_import_disabled_check", False, 
+                                   f"Unexpected error message: {error_data.get('detail')}")
+            except json.JSONDecodeError:
+                self.log_result("google_sheets_integration", "sales_rep_import_disabled_check", False, "Invalid JSON error response")
+        elif response is not None:
+            self.log_result("google_sheets_integration", "sales_rep_import_disabled_check", False, f"Expected 400, got {response.status_code}")
+        else:
+            self.log_result("google_sheets_integration", "sales_rep_import_disabled_check", False, "No response received")
+
+    def test_cors_configuration(self):
         print("\n🌐 Testing CORS Configuration...")
         
         try:
