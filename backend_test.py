@@ -1739,6 +1739,10 @@ class RoofHRTester:
         self.test_google_sheets_error_handling()
         self.test_google_sheets_role_based_access()
         
+        # HR Modules comprehensive tests
+        self.test_hr_modules_comprehensive()
+        self.test_hr_authentication_requirements()
+        
         return self.test_results
 
     def print_summary(self):
