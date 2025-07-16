@@ -2383,6 +2383,57 @@ const QRGeneratorApp = () => {
       }
     };
 
+    const handleBulkStatusUpdate = async (leadIds, newStatus) => {
+      try {
+        await Promise.all(leadIds.map(id => updateLead(id, { status: newStatus })));
+      } catch (error) {
+        console.error('Error updating bulk lead status:', error);
+      }
+    };
+
+    // Filter and sort leads
+    const filteredLeads = leads.filter(lead => {
+      const matchesSearch = searchQuery === '' || 
+        lead.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        lead.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        lead.phone.includes(searchQuery);
+      
+      const matchesStatus = leadFilters.status === 'all' || lead.status === leadFilters.status;
+      const matchesPriority = leadFilters.priority === 'all' || lead.priority === leadFilters.priority;
+      const matchesRep = leadFilters.rep === 'all' || lead.rep_id === leadFilters.rep;
+      
+      const matchesDateRange = leadFilters.dateRange === 'all' || (() => {
+        const leadDate = new Date(lead.created_at);
+        const now = new Date();
+        switch (leadFilters.dateRange) {
+          case 'today':
+            return leadDate.toDateString() === now.toDateString();
+          case 'week':
+            return leadDate >= new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          case 'month':
+            return leadDate.getMonth() === now.getMonth() && leadDate.getFullYear() === now.getFullYear();
+          default:
+            return true;
+        }
+      })();
+
+      return matchesSearch && matchesStatus && matchesPriority && matchesRep && matchesDateRange;
+    }).sort((a, b) => {
+      const aValue = a[sortBy];
+      const bValue = b[sortBy];
+      const modifier = sortOrder === 'desc' ? -1 : 1;
+      return aValue > bValue ? modifier : -modifier;
+    });
+
+    const statusCounts = {
+      all: leads.length,
+      new: leads.filter(l => l.status === 'new').length,
+      assigned: leads.filter(l => l.status === 'assigned').length,
+      contacted: leads.filter(l => l.status === 'contacted').length,
+      converted: leads.filter(l => l.status === 'converted').length,
+      lost: leads.filter(l => l.status === 'lost').length
+    };
+
     return (
       <div className="space-y-6">
         <div className="bg-gray-800 rounded-lg shadow-lg border border-gray-700">
