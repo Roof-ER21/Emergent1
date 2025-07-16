@@ -49,18 +49,26 @@ class RoofHRTester:
             headers["Authorization"] = f"Bearer {self.auth_token}"
             
         try:
+            print(f"Making {method} request to: {url}")
             if method == "GET":
-                response = requests.get(url, headers=headers, timeout=10)
+                response = requests.get(url, headers=headers, timeout=5)
             elif method == "POST":
-                response = requests.post(url, headers=headers, json=data, timeout=10)
+                response = requests.post(url, headers=headers, json=data, timeout=5)
             elif method == "PUT":
-                response = requests.put(url, headers=headers, json=data, timeout=10)
+                response = requests.put(url, headers=headers, json=data, timeout=5)
             elif method == "DELETE":
-                response = requests.delete(url, headers=headers, timeout=10)
+                response = requests.delete(url, headers=headers, timeout=5)
             else:
                 raise ValueError(f"Unsupported method: {method}")
-                
+            
+            print(f"Response status: {response.status_code}")
             return response
+        except requests.exceptions.Timeout as e:
+            print(f"Request timeout: {str(e)}")
+            return None
+        except requests.exceptions.ConnectionError as e:
+            print(f"Connection error: {str(e)}")
+            return None
         except requests.exceptions.RequestException as e:
             print(f"Request failed: {str(e)}")
             return None
