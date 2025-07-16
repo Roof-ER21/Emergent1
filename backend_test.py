@@ -30,7 +30,8 @@ class RoofHRTester:
             "qr_generator": {},
             "sales_rep_management": {},
             "lead_capture": {},
-            "file_upload": {}
+            "file_upload": {},
+            "google_sheets_integration": {}  # New category for Google Sheets tests
         }
         
     def log_result(self, category, test_name, success, message, response_data=None):
