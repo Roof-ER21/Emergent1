@@ -1371,6 +1371,12 @@ class RoofHRTester:
         self.test_conversion_tracking()
         self.test_role_based_qr_access()
         
+        # Google Sheets Integration comprehensive tests
+        self.test_google_sheets_import_status()
+        self.test_traditional_employee_import()
+        self.test_google_sheets_employee_import()
+        self.test_google_sheets_sales_rep_import()
+        
         return self.test_results
 
     def print_summary(self):
