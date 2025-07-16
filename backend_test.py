@@ -11,8 +11,8 @@ import uuid
 from datetime import datetime
 import time
 
-# Configuration - Use production URL from frontend/.env
-BASE_URL = "https://73279c9a-6b56-48ad-95d4-d2efdc02f864.preview.emergentagent.com/api"
+# Configuration - Use internal URL for testing from within container
+BASE_URL = "http://localhost:8001/api"
 HEADERS = {"Content-Type": "application/json"}
 
 class RoofHRTester:
