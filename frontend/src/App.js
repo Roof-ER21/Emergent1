@@ -747,27 +747,71 @@ const QRGeneratorApp = () => {
     return (
       <div className="space-y-6">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-            <div className="text-gray-600 text-sm font-medium">Total Reps</div>
-            <div className="text-2xl font-bold text-gray-900">{salesReps.length}</div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-red-500/20 text-red-400 mr-4">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-white">{salesReps.length}</p>
+                <p className="text-sm text-gray-400">Total Reps</p>
+              </div>
+            </div>
           </div>
-          <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-            <div className="text-red-600 text-sm font-medium">Total Leads</div>
-            <div className="text-2xl font-bold text-red-900">{totalLeads}</div>
+          
+          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-blue-500/20 text-blue-400 mr-4">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-white">{totalLeads}</p>
+                <p className="text-sm text-gray-400">Total Leads</p>
+              </div>
+            </div>
           </div>
-          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <div className="text-gray-600 text-sm font-medium">Total QR Codes</div>
-            <div className="text-2xl font-bold text-gray-900">{salesReps.filter(r => r.qr_code).length}</div>
+          
+          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-green-500/20 text-green-400 mr-4">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-white">{salesReps.filter(r => r.qr_code).length}</p>
+                <p className="text-sm text-gray-400">QR Codes</p>
+              </div>
+            </div>
           </div>
-          <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-            <div className="text-red-600 text-sm font-medium">Conversion Rate</div>
-            <div className="text-2xl font-bold text-red-900">{conversionRate}%</div>
+          
+          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-yellow-500/20 text-yellow-400 mr-4">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-white">{conversionRate}%</p>
+                <p className="text-sm text-gray-400">Conversion Rate</p>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold text-white mb-2">Sales Representatives</h2>
+            <p className="text-gray-400">Manage QR codes and landing pages</p>
+          </div>
+          
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="flex-1">
               <input
@@ -775,13 +819,13 @@ const QRGeneratorApp = () => {
                 placeholder="Search reps by name, email, or territory..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-400"
               />
             </div>
             <select
               value={filterDepartment}
               onChange={(e) => setFilterDepartment(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-white"
             >
               <option value="all">All Departments</option>
               <option value="Sales">Sales</option>
@@ -790,7 +834,7 @@ const QRGeneratorApp = () => {
             <select
               value={filterTerritory}
               onChange={(e) => setFilterTerritory(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-white"
             >
               <option value="all">All Territories</option>
               <option value="Northern Virginia">Northern Virginia</option>
@@ -800,51 +844,60 @@ const QRGeneratorApp = () => {
           </div>
 
           {/* Reps Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredReps.map((rep) => {
               const repLeads = leads.filter(lead => lead.rep_id === rep.id);
               const repConversions = repLeads.filter(lead => lead.status === 'converted');
               const repConversionRate = repLeads.length > 0 ? ((repConversions.length / repLeads.length) * 100).toFixed(1) : 0;
               
               return (
-                <div key={rep.id} className="border border-gray-200 rounded-lg p-4 hover:border-red-500 transition-colors">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <img 
-                      src={rep.picture?.startsWith('data:') ? rep.picture : `https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face`}
-                      alt={rep.name}
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">{rep.name}</h3>
-                      <p className="text-sm text-gray-600">{rep.territory}</p>
+                <div key={rep.id} className="bg-gray-750 border border-gray-600 rounded-lg p-6 hover:border-red-500 transition-all duration-200 transform hover:scale-105">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center border-2 border-red-400">
+                      <img 
+                        src={rep.picture?.startsWith('data:') ? rep.picture : `https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face`}
+                        alt={rep.name}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
                     </div>
-                    <QRCodeSVG size={40} value={rep.qr_code || 'QR123456'} />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-white">{rep.name}</h3>
+                      <p className="text-sm text-gray-400">{rep.territory}</p>
+                      <div className="mt-1">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-500/20 text-red-400">
+                          {rep.department}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex-shrink-0">
+                      <QRCodeSVG size={50} value={rep.qr_code || 'QR123456'} />
+                    </div>
                   </div>
                   
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Leads:</span>
-                      <span className="font-medium">{repLeads.length}</span>
+                  <div className="grid grid-cols-3 gap-4 mb-4">
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-white">{repLeads.length}</div>
+                      <div className="text-xs text-gray-400">Leads</div>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Conversions:</span>
-                      <span className="font-medium">{repConversions.length}</span>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-white">{repConversions.length}</div>
+                      <div className="text-xs text-gray-400">Conversions</div>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Rate:</span>
-                      <span className="font-medium">{repConversionRate}%</span>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-white">{repConversionRate}%</div>
+                      <div className="text-xs text-gray-400">Rate</div>
                     </div>
                   </div>
                   
                   <div className="flex space-x-2">
                     <button
                       onClick={() => setSelectedRep(rep)}
-                      className="flex-1 bg-red-600 text-white py-2 px-3 rounded-md hover:bg-red-700 transition-colors text-sm"
+                      className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
                     >
                       View Page
                     </button>
                     {isAdmin && (
-                      <button className="bg-gray-600 text-white py-2 px-3 rounded-md hover:bg-gray-700 transition-colors text-sm">
+                      <button className="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium">
                         Edit
                       </button>
                     )}
