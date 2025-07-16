@@ -952,7 +952,180 @@ class RoofHRTester:
             self.log_result("qr_generator", "role_based_qr_access", False, 
                            f"Could not verify role-based QR access: {str(e)}")
 
-    def test_cors_configuration(self):
+    def test_development_auth_bypass(self):
+        """Test development authentication bypass"""
+        print("\n🔧 Testing Development Authentication Bypass...")
+        
+        # Test with development token
+        dev_token = "dev-token-super_admin"
+        headers = self.headers.copy()
+        headers["Authorization"] = f"Bearer {dev_token}"
+        
+        try:
+            response = requests.get(f"{self.base_url}/auth/me", headers=headers, timeout=10)
+            
+            if response is not None and response.status_code == 200:
+                user_data = response.json()
+                if user_data.get("role") == "super_admin":
+                    self.log_result("authentication", "dev_auth_bypass", True, "Development authentication bypass working correctly")
+                else:
+                    self.log_result("authentication", "dev_auth_bypass", False, f"Dev auth returned wrong role: {user_data.get('role')}")
+            elif response is not None and response.status_code in [401, 403]:
+                self.log_result("authentication", "dev_auth_bypass", False, "Development authentication bypass not working")
+            elif response is not None:
+                self.log_result("authentication", "dev_auth_bypass", False, f"Unexpected status code: {response.status_code}")
+            else:
+                self.log_result("authentication", "dev_auth_bypass", False, "No response received")
+                
+        except Exception as e:
+            self.log_result("authentication", "dev_auth_bypass", False, f"Dev auth test failed: {str(e)}")
+
+    def test_authenticated_endpoints_with_dev_token(self):
+        """Test authenticated endpoints with development token"""
+        print("\n🔐 Testing Authenticated Endpoints with Dev Token...")
+        
+        # Set development token
+        self.auth_token = "dev-token-super_admin"
+        
+        # Test 1: Get employees with dev token
+        print("Testing GET /employees with dev token...")
+        response = self.make_request("GET", "/employees", auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                employees = response.json()
+                if isinstance(employees, list):
+                    self.log_result("employee_management", "get_employees_with_dev_token", True, f"Retrieved {len(employees)} employees successfully")
+                else:
+                    self.log_result("employee_management", "get_employees_with_dev_token", False, "Response is not a list")
+            except json.JSONDecodeError:
+                self.log_result("employee_management", "get_employees_with_dev_token", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("employee_management", "get_employees_with_dev_token", False, f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("employee_management", "get_employees_with_dev_token", False, "No response received")
+        
+        # Test 2: Get QR generator reps with dev token
+        print("Testing GET /qr-generator/reps with dev token...")
+        response = self.make_request("GET", "/qr-generator/reps", auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                reps = response.json()
+                if isinstance(reps, list):
+                    self.log_result("qr_generator", "get_reps_with_dev_token", True, f"Retrieved {len(reps)} sales reps successfully")
+                else:
+                    self.log_result("qr_generator", "get_reps_with_dev_token", False, "Response is not a list")
+            except json.JSONDecodeError:
+                self.log_result("qr_generator", "get_reps_with_dev_token", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("qr_generator", "get_reps_with_dev_token", False, f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("qr_generator", "get_reps_with_dev_token", False, "No response received")
+        
+        # Test 3: Get leads with dev token
+        print("Testing GET /qr-generator/leads with dev token...")
+        response = self.make_request("GET", "/qr-generator/leads", auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                leads = response.json()
+                if isinstance(leads, list):
+                    self.log_result("lead_capture", "get_leads_with_dev_token", True, f"Retrieved {len(leads)} leads successfully")
+                else:
+                    self.log_result("lead_capture", "get_leads_with_dev_token", False, "Response is not a list")
+            except json.JSONDecodeError:
+                self.log_result("lead_capture", "get_leads_with_dev_token", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("lead_capture", "get_leads_with_dev_token", False, f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("lead_capture", "get_leads_with_dev_token", False, "No response received")
+        
+        # Test 4: Get analytics with dev token
+        print("Testing GET /analytics/dashboard with dev token...")
+        response = self.make_request("GET", "/analytics/dashboard", auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                analytics = response.json()
+                if isinstance(analytics, dict):
+                    self.log_result("analytics", "get_analytics_with_dev_token", True, "Retrieved analytics successfully")
+                else:
+                    self.log_result("analytics", "get_analytics_with_dev_token", False, "Response is not a dict")
+            except json.JSONDecodeError:
+                self.log_result("analytics", "get_analytics_with_dev_token", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("analytics", "get_analytics_with_dev_token", False, f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("analytics", "get_analytics_with_dev_token", False, "No response received")
+        
+        # Test 5: Get QR analytics with dev token
+        print("Testing GET /qr-generator/analytics with dev token...")
+        response = self.make_request("GET", "/qr-generator/analytics", auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                qr_analytics = response.json()
+                if isinstance(qr_analytics, dict):
+                    self.log_result("qr_generator", "get_qr_analytics_with_dev_token", True, "Retrieved QR analytics successfully")
+                else:
+                    self.log_result("qr_generator", "get_qr_analytics_with_dev_token", False, "Response is not a dict")
+            except json.JSONDecodeError:
+                self.log_result("qr_generator", "get_qr_analytics_with_dev_token", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("qr_generator", "get_qr_analytics_with_dev_token", False, f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("qr_generator", "get_qr_analytics_with_dev_token", False, "No response received")
+
+    def test_sample_data_initialization(self):
+        """Test that sample data is properly initialized"""
+        print("\n🗄️ Testing Sample Data Initialization...")
+        
+        # Set development token
+        self.auth_token = "dev-token-super_admin"
+        
+        # Test 1: Check if sample sales reps exist
+        print("Checking sample sales reps...")
+        response = self.make_request("GET", "/qr-generator/reps", auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                reps = response.json()
+                if len(reps) >= 3:  # Should have at least 3 sample reps
+                    sample_rep_names = [rep.get("name") for rep in reps]
+                    expected_names = ["John Smith", "Sarah Johnson", "Mike Wilson"]
+                    found_names = [name for name in expected_names if name in sample_rep_names]
+                    
+                    if len(found_names) >= 2:
+                        self.log_result("qr_generator", "sample_reps_initialized", True, f"Sample reps found: {', '.join(found_names)}")
+                    else:
+                        self.log_result("qr_generator", "sample_reps_initialized", False, f"Expected sample reps not found. Found: {sample_rep_names}")
+                else:
+                    self.log_result("qr_generator", "sample_reps_initialized", False, f"Expected at least 3 reps, found {len(reps)}")
+            except json.JSONDecodeError:
+                self.log_result("qr_generator", "sample_reps_initialized", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("qr_generator", "sample_reps_initialized", False, f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("qr_generator", "sample_reps_initialized", False, "No response received")
+        
+        # Test 2: Check if sample leads exist
+        print("Checking sample leads...")
+        response = self.make_request("GET", "/qr-generator/leads", auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                leads = response.json()
+                if len(leads) >= 2:  # Should have at least 2 sample leads
+                    self.log_result("lead_capture", "sample_leads_initialized", True, f"Found {len(leads)} sample leads")
+                else:
+                    self.log_result("lead_capture", "sample_leads_initialized", False, f"Expected at least 2 leads, found {len(leads)}")
+            except json.JSONDecodeError:
+                self.log_result("lead_capture", "sample_leads_initialized", False, "Invalid JSON response")
+        elif response is not None:
+            self.log_result("lead_capture", "sample_leads_initialized", False, f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("lead_capture", "sample_leads_initialized", False, "No response received")
         """Test CORS configuration"""
         print("\n🌐 Testing CORS Configuration...")
         
