@@ -1257,28 +1257,22 @@ const HRRecruitmentApp = () => {
                 </button>
               </div>
             </div>
-            <div className="mb-8">
-              <h4 className="text-md font-medium text-gray-900 mb-4">Safety Trainings</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {safetyTrainings.map((training) => (
-                  <div key={training.id} className="border border-gray-200 rounded-lg p-4">
-                    <h5 className="font-medium text-gray-900">{training.name}</h5>
-                    <p className="text-sm text-gray-600 mt-1">{training.description}</p>
-                    <div className="flex justify-between items-center mt-3">
-                      <span className="text-xs text-gray-500">{training.duration_hours}h</span>
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        training.certification_required ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
-                      }`}>
-                        {training.certification_required ? 'Certification Required' : 'No Certification'}
-                      </span>
-                    </div>
-                    <div className="mt-2">
-                      <span className="text-xs text-gray-500">Required for: {training.required_for.toUpperCase()}</span>
-                    </div>
-                  </div>
-                ))}
+            {/* Hiring Type Filter */}
+            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-lg font-semibold text-gray-900">Candidates by Type</h4>
+                <select
+                  value={selectedHiringType}
+                  onChange={(e) => setSelectedHiringType(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                >
+                  <option value="all">All Types</option>
+                  <option value="insurance">Insurance</option>
+                  <option value="retail">Retail</option>
+                  <option value="office">Office</option>
+                  <option value="production">Production</option>
+                </select>
               </div>
-            </div>
             
             {/* Workers Comp Submissions */}
             <div className="mb-8">
