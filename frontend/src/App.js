@@ -1167,7 +1167,7 @@ const QRGeneratorApp = () => {
     );
   };
 
-  const LeadsTab = () => {
+  const OverviewTab = () => {
     const totalConversions = leads.filter(lead => lead.status === 'converted').length;
     const totalLeads = leads.length;
     const conversionRate = totalLeads > 0 ? ((totalConversions / totalLeads) * 100).toFixed(1) : 0;
@@ -1370,7 +1370,12 @@ const QRGeneratorApp = () => {
     );
   };
 
-  const LeadsTab = () => {
+  const OverviewTab = () => {
+    const totalConversions = leads.filter(lead => lead.status === 'converted').length;
+    const totalLeads = leads.length;
+    const conversionRate = totalLeads > 0 ? ((totalConversions / totalLeads) * 100).toFixed(1) : 0;
+    
+    return (
       <div className="space-y-6">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
