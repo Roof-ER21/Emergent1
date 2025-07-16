@@ -2718,17 +2718,15 @@ const QRGeneratorApp = () => {
 
 // Main App Component
 function App() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}
 
-  useEffect(() => {
-    // Check if user is logged in (mock for development)
-    const token = localStorage.getItem('token');
-    if (token) {
-      setUser({ role: 'super_admin' }); // Mock user
-    }
-    setLoading(false);
-  }, []);
+const AppContent = () => {
+  const { user, loading } = useAuth();
 
   if (loading) {
     return (
@@ -2739,11 +2737,9 @@ function App() {
   }
 
   return (
-    <AuthProvider>
-      <div className="min-h-screen bg-gray-900">
-        {user ? <AppHub /> : <Login />}
-      </div>
-    </AuthProvider>
+    <div className="min-h-screen bg-gray-900">
+      {user ? <AppHub /> : <Login />}
+    </div>
   );
 }
 
