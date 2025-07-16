@@ -1371,6 +1371,8 @@ const QRGeneratorApp = () => {
   };
 
   const LeadsTab = () => {
+    return (
+      <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
             <div className="flex items-center">
