@@ -552,15 +552,6 @@ const HRRecruitmentApp = () => {
     }
   };
 
-  const initializeSampleHiringFlows = async () => {
-    try {
-      await axios.post(`${API}/hiring/initialize-sample-flows`);
-      await fetchHiringFlows();
-    } catch (error) {
-      console.error('Error initializing sample hiring flows:', error);
-    }
-  };
-
   const handleCreateCandidate = async (e) => {
     e.preventDefault();
     try {
