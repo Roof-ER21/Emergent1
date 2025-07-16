@@ -445,203 +445,15 @@ const QRGeneratorApp = () => {
     }
   };
 
-  // Enhanced file upload with drag & drop, progress, and chunked uploads
-  const uploadFile = async (repId, file, type, onProgress = null) => {
+  // Upload file for sales rep
+  const uploadFile = async (repId, fileData, type) => {
     try {
-      const CHUNK_SIZE = 1024 * 1024; // 1MB chunks
-      const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-      const fileName = `${type}_${repId}_${Date.now()}_${file.name}`;
-      
-      // Initialize upload
-      const initResponse = await axios.post(`${API}/qr-generator/reps/${repId}/upload-init`, {
-        file_name: fileName,
-        file_type: file.type,
-        file_size: file.size,
-        total_chunks: totalChunks,
-        upload_type: type
-      });
-      
-      const uploadId = initResponse.data.upload_id;
-      
-      // Upload chunks
-      for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
-        const start = chunkIndex * CHUNK_SIZE;
-        const end = Math.min(start + CHUNK_SIZE, file.size);
-        const chunk = file.slice(start, end);
-        
-        // Convert chunk to base64
-        const base64Chunk = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result);
-          reader.readAsDataURL(chunk);
-        });
-        
-        // Upload chunk
-        await axios.post(`${API}/qr-generator/reps/${repId}/upload-chunk`, {
-          upload_id: uploadId,
-          chunk_index: chunkIndex,
-          chunk_data: base64Chunk
-        });
-        
-        // Update progress
-        if (onProgress) {
-          const progress = ((chunkIndex + 1) / totalChunks) * 100;
-          onProgress(progress);
-        }
-      }
-      
-      // Finalize upload
-      const finalResponse = await axios.post(`${API}/qr-generator/reps/${repId}/upload-complete`, {
-        upload_id: uploadId
-      });
-      
+      const endpoint = type === 'picture' ? 'upload-picture' : 'upload-video';
+      await axios.post(`${API}/qr-generator/reps/${repId}/${endpoint}`, fileData);
       // Refresh the sales rep data
       await fetchSalesReps();
-      
-      return finalResponse.data;
     } catch (error) {
       console.error(`Error uploading ${type}:`, error);
-      // Fallback to simple upload for compatibility
-      try {
-        const reader = new FileReader();
-        const base64Data = await new Promise((resolve) => {
-          reader.onloadend = () => resolve(reader.result);
-          reader.readAsDataURL(file);
-        });
-        
-        const fileData = {
-          file_data: base64Data,
-          file_type: file.type,
-          file_name: file.name
-        };
-        
-        const endpoint = type === 'picture' ? 'upload-picture' : 'upload-video';
-        await axios.post(`${API}/qr-generator/reps/${repId}/${endpoint}`, fileData);
-        await fetchSalesReps();
-      } catch (fallbackError) {
-        console.error('Fallback upload also failed:', fallbackError);
-        throw fallbackError;
-      }
-    }
-  };
-
-  // Bulk QR Code Generation
-  const handleBulkQRGeneration = async () => {
-    try {
-      const results = await Promise.all(
-        salesReps.map(async (rep) => {
-          const landingPageUrl = `${window.location.origin}/rep/${rep.id}`;
-          await generateQRCode(rep.id, landingPageUrl);
-          return { id: rep.id, name: rep.name, success: true };
-        })
-      );
-      
-      alert(`Successfully generated ${results.length} QR codes!`);
-      await fetchSalesReps();
-    } catch (error) {
-      console.error('Error generating bulk QR codes:', error);
-      alert('Error generating QR codes. Please try again.');
-    }
-  };
-
-  // Bulk Export QR Codes
-  const handleBulkExport = async () => {
-    try {
-      const zip = new JSZip();
-      
-      for (const rep of salesReps) {
-        if (rep.qr_code) {
-          const canvas = document.createElement('canvas');
-          const context = canvas.getContext('2d');
-          canvas.width = 200;
-          canvas.height = 200;
-          
-          // Generate QR code on canvas
-          const qrCode = new QRCode(canvas, {
-            text: `${window.location.origin}/rep/${rep.id}`,
-            width: 200,
-            height: 200,
-            correctLevel: QRCode.CorrectLevel.M
-          });
-          
-          // Convert to blob
-          const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-          zip.file(`${rep.name.replace(/\s+/g, '_')}_QR.png`, blob);
-        }
-      }
-      
-      const zipBlob = await zip.generateAsync({ type: 'blob' });
-      const url = URL.createObjectURL(zipBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'QR_Codes_Bulk_Export.zip';
-      a.click();
-      URL.revokeObjectURL(url);
-      
-      alert('QR codes exported successfully!');
-    } catch (error) {
-      console.error('Error exporting QR codes:', error);
-      alert('Error exporting QR codes. Please try again.');
-    }
-  };
-
-  // Custom QR Code Design
-  const generateCustomQRCode = async (repId, url, options = {}) => {
-    try {
-      const {
-        color = '#000000',
-        backgroundColor = '#ffffff',
-        logo = null,
-        size = 200,
-        style = 'square'
-      } = options;
-      
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      canvas.width = size;
-      canvas.height = size;
-      
-      // Generate QR code with custom options
-      const qrCode = new QRCode(canvas, {
-        text: url,
-        width: size,
-        height: size,
-        colorDark: color,
-        colorLight: backgroundColor,
-        correctLevel: QRCode.CorrectLevel.M
-      });
-      
-      // Add logo if provided
-      if (logo) {
-        const logoImg = new Image();
-        logoImg.onload = () => {
-          const logoSize = size * 0.2;
-          const logoX = (size - logoSize) / 2;
-          const logoY = (size - logoSize) / 2;
-          context.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
-          
-          // Update the canvas element
-          const targetCanvas = document.getElementById(`qr-${repId}`);
-          if (targetCanvas) {
-            const targetContext = targetCanvas.getContext('2d');
-            targetContext.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
-            targetContext.drawImage(canvas, 0, 0, targetCanvas.width, targetCanvas.height);
-          }
-        };
-        logoImg.src = logo;
-      } else {
-        // Update the canvas element
-        const targetCanvas = document.getElementById(`qr-${repId}`);
-        if (targetCanvas) {
-          const targetContext = targetCanvas.getContext('2d');
-          targetContext.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
-          targetContext.drawImage(canvas, 0, 0, targetCanvas.width, targetCanvas.height);
-        }
-      }
-      
-      await fetchSalesReps();
-    } catch (error) {
-      console.error('Error generating custom QR code:', error);
       throw error;
     }
   };
@@ -857,7 +669,7 @@ const QRGeneratorApp = () => {
               {/* Services Section */}
               <div className="p-6 bg-white">
                 <h3 className="text-xl font-bold text-gray-900 mb-4">Our Services</h3>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-4">
                   {[
                     { title: 'Roofing', desc: 'Complete roof replacement and repairs', icon: '🏠' },
                     { title: 'Siding', desc: 'Vinyl, wood, and fiber cement siding', icon: '🧱' },
@@ -866,10 +678,10 @@ const QRGeneratorApp = () => {
                     { title: 'Solar', desc: 'Solar panel installation and energy solutions', icon: '☀️' }
                   ].map((service, index) => (
                     <div key={index} className="flex items-start p-3 bg-gray-50 rounded-lg">
-                      <div className="text-xl mr-2">{service.icon}</div>
+                      <div className="text-2xl mr-3">{service.icon}</div>
                       <div>
-                        <h4 className="font-semibold text-gray-900 text-sm">{service.title}</h4>
-                        <p className="text-xs text-gray-600">{service.desc}</p>
+                        <h4 className="font-semibold text-gray-900">{service.title}</h4>
+                        <p className="text-sm text-gray-600">{service.desc}</p>
                       </div>
                     </div>
                   ))}
@@ -981,7 +793,7 @@ const QRGeneratorApp = () => {
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Complete Project Solution</h3>
                 <p className="text-gray-600 text-sm mb-4">From tear-off to solar - we handle everything</p>
                 
-                <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="space-y-3 mb-4">
                   {[
                     { step: '1', title: 'Free Inspection', desc: 'Comprehensive roof and property assessment' },
                     { step: '2', title: 'Insurance Coordination', desc: 'We handle all insurance paperwork and claims' },
@@ -990,12 +802,12 @@ const QRGeneratorApp = () => {
                     { step: '5', title: 'Solar Integration', desc: 'Optional solar panel installation for energy savings' },
                     { step: '6', title: 'Final Walkthrough', desc: 'Quality check and lifetime warranty activation' }
                   ].map((step, index) => (
-                    <div key={index} className="flex flex-col items-center p-3 bg-gray-50 rounded-lg">
-                      <div className="w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold mb-2 flex-shrink-0">
+                    <div key={index} className="flex items-start p-3 bg-gray-50 rounded-lg">
+                      <div className="w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3 flex-shrink-0">
                         {step.step}
                       </div>
-                      <div className="text-center">
-                        <h4 className="font-semibold text-gray-900 text-xs mb-1">{step.title}</h4>
+                      <div>
+                        <h4 className="font-semibold text-gray-900 text-sm">{step.title}</h4>
                         <p className="text-xs text-gray-600">{step.desc}</p>
                       </div>
                     </div>
@@ -1170,44 +982,10 @@ const QRGeneratorApp = () => {
     const totalLeads = leads.length;
     const conversionRate = totalLeads > 0 ? ((totalConversions / totalLeads) * 100).toFixed(1) : 0;
     
-    // Enhanced Analytics Data
-    const newLeads = leads.filter(lead => lead.status === 'new').length;
-    const assignedLeads = leads.filter(lead => lead.status === 'assigned').length;
-    const contactedLeads = leads.filter(lead => lead.status === 'contacted').length;
-    const lostLeads = leads.filter(lead => lead.status === 'lost').length;
-    
-    // Rep Performance Analytics
-    const repPerformance = salesReps.map(rep => {
-      const repLeads = leads.filter(lead => lead.rep_id === rep.id);
-      const repConversions = repLeads.filter(lead => lead.status === 'converted').length;
-      const repConversionRate = repLeads.length > 0 ? ((repConversions / repLeads.length) * 100).toFixed(1) : 0;
-      
-      return {
-        ...rep,
-        leadCount: repLeads.length,
-        conversions: repConversions,
-        conversionRate: repConversionRate
-      };
-    });
-    
-    // Time-based Analytics (last 30 days)
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    
-    const recentLeads = leads.filter(lead => {
-      const leadDate = new Date(lead.created_at);
-      return leadDate >= thirtyDaysAgo;
-    }).length;
-    
-    const recentConversions = leads.filter(lead => {
-      const leadDate = new Date(lead.created_at);
-      return leadDate >= thirtyDaysAgo && lead.status === 'converted';
-    }).length;
-    
     return (
       <div className="space-y-6">
-        {/* Enhanced Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
             <div className="flex items-center">
               <div className="p-3 rounded-full bg-red-500/20 text-red-400 mr-4">
@@ -1232,7 +1010,6 @@ const QRGeneratorApp = () => {
               <div>
                 <p className="text-2xl font-bold text-white">{totalLeads}</p>
                 <p className="text-sm text-gray-400">Total Leads</p>
-                <p className="text-xs text-blue-400">+{recentLeads} this month</p>
               </div>
             </div>
           </div>
@@ -1240,35 +1017,6 @@ const QRGeneratorApp = () => {
           <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
             <div className="flex items-center">
               <div className="p-3 rounded-full bg-green-500/20 text-green-400 mr-4">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-white">{totalConversions}</p>
-                <p className="text-sm text-gray-400">Conversions</p>
-                <p className="text-xs text-green-400">+{recentConversions} this month</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
-            <div className="flex items-center">
-              <div className="p-3 rounded-full bg-yellow-500/20 text-yellow-400 mr-4">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-white">{conversionRate}%</p>
-                <p className="text-sm text-gray-400">Conversion Rate</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
-            <div className="flex items-center">
-              <div className="p-3 rounded-full bg-purple-500/20 text-purple-400 mr-4">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
@@ -1279,94 +1027,10 @@ const QRGeneratorApp = () => {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Lead Pipeline Analytics */}
-        <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
-          <h3 className="text-lg font-semibold text-white mb-4">Lead Pipeline</h3>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-400">{newLeads}</div>
-              <div className="text-sm text-gray-400">New</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-yellow-400">{assignedLeads}</div>
-              <div className="text-sm text-gray-400">Assigned</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-orange-400">{contactedLeads}</div>
-              <div className="text-sm text-gray-400">Contacted</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-green-400">{totalConversions}</div>
-              <div className="text-sm text-gray-400">Converted</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-red-400">{lostLeads}</div>
-              <div className="text-sm text-gray-400">Lost</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Rep Performance Table */}
-        <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
-          <h3 className="text-lg font-semibold text-white mb-4">Rep Performance</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-700">
-                  <th className="text-left text-sm font-medium text-gray-400 pb-2">Rep</th>
-                  <th className="text-left text-sm font-medium text-gray-400 pb-2">Leads</th>
-                  <th className="text-left text-sm font-medium text-gray-400 pb-2">Conversions</th>
-                  <th className="text-left text-sm font-medium text-gray-400 pb-2">Rate</th>
-                  <th className="text-left text-sm font-medium text-gray-400 pb-2">QR Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {repPerformance.map((rep, index) => (
-                  <tr key={rep.id} className="border-b border-gray-700/50">
-                    <td className="py-3">
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center mr-3">
-                          {rep.picture ? (
-                            <img src={rep.picture} alt={rep.name} className="w-8 h-8 rounded-full object-cover" />
-                          ) : (
-                            <span className="text-xs text-gray-300">{rep.name.charAt(0)}</span>
-                          )}
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-white">{rep.name}</div>
-                          <div className="text-xs text-gray-400">{rep.territory}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-3 text-sm text-white">{rep.leadCount}</td>
-                    <td className="py-3 text-sm text-white">{rep.conversions}</td>
-                    <td className="py-3">
-                      <span className={`text-sm font-medium ${
-                        rep.conversionRate >= 20 ? 'text-green-400' :
-                        rep.conversionRate >= 10 ? 'text-yellow-400' :
-                        'text-red-400'
-                      }`}>
-                        {rep.conversionRate}%
-                      </span>
-                    </td>
-                    <td className="py-3">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        rep.qr_code ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-                      }`}>
-                        {rep.qr_code ? 'Active' : 'Inactive'}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    );
-  };
+          
+          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-yellow-500/20 text-yellow-400 mr-4">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
@@ -1379,32 +1043,7 @@ const QRGeneratorApp = () => {
           </div>
         </div>
 
-          {/* Bulk Actions */}
-          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
-            <h3 className="text-lg font-semibold text-white mb-4">Bulk Actions</h3>
-            <div className="flex flex-wrap gap-4">
-              <button
-                onClick={() => handleBulkQRGeneration()}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-              >
-                Generate All QR Codes
-              </button>
-              <button
-                onClick={() => handleBulkExport()}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
-              >
-                Export All QR Codes
-              </button>
-              <button
-                onClick={() => handleBulkLandingPagePreview()}
-                className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
-              >
-                Preview All Landing Pages
-              </button>
-            </div>
-          </div>
-
-          {/* Search and Filters */}
+        {/* Search and Filters */}
         <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
           <div className="mb-6">
             <h2 className="text-xl font-semibold text-white mb-2">Sales Representatives</h2>
@@ -1620,186 +1259,38 @@ const QRGeneratorApp = () => {
   const MyPageTab = () => {
     const [uploading, setUploading] = useState(false);
     const [uploadType, setUploadType] = useState('');
-    const [uploadProgress, setUploadProgress] = useState(0);
-    const [dragOver, setDragOver] = useState(false);
-    const [previewUrl, setPreviewUrl] = useState(null);
-    const [uploadError, setUploadError] = useState(null);
 
-    // Enhanced file upload with drag & drop support
-    const EnhancedFileUpload = ({ type, accept, children }) => {
-      const isUploading = uploading && uploadType === type;
-      
-      const validateFile = (file) => {
-        const maxSize = type === 'picture' ? 10 * 1024 * 1024 : 100 * 1024 * 1024; // 10MB for images, 100MB for videos
-        
-        if (file.size > maxSize) {
-          throw new Error(`File size too large. Maximum size is ${type === 'picture' ? '10MB' : '100MB'}.`);
-        }
-        
-        if (type === 'picture' && !file.type.startsWith('image/')) {
-          throw new Error('Please select a valid image file.');
-        }
-        
-        if (type === 'video' && !file.type.startsWith('video/')) {
-          throw new Error('Please select a valid video file.');
-        }
-        
-        return true;
-      };
-      
-      const handleFileSelect = async (file) => {
-        if (!file) return;
-        
-        try {
-          validateFile(file);
+    const handleFileUpload = async (e, type) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      setUploading(true);
+      setUploadType(type);
+
+      try {
+        // Convert file to base64
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          const base64String = reader.result;
           
-          setUploading(true);
-          setUploadType(type);
-          setUploadProgress(0);
-          setUploadError(null);
-          
-          // Create preview
-          const preview = URL.createObjectURL(file);
-          setPreviewUrl(preview);
-          
-          // Upload with progress
-          await uploadFile(currentRep.id, file, type, setUploadProgress);
+          const fileData = {
+            file_data: base64String,
+            file_type: file.type,
+            file_name: file.name
+          };
+
+          await uploadFile(currentRep.id, fileData, type);
           
           setUploading(false);
           setUploadType('');
-          setUploadProgress(0);
-          setPreviewUrl(null);
-        } catch (error) {
-          console.error('Error uploading file:', error);
-          setUploading(false);
-          setUploadType('');
-          setUploadProgress(0);
-          setUploadError(error.message || 'Error uploading file. Please try again.');
-          setPreviewUrl(null);
-        }
-      };
-      
-      const handleDragOver = (e) => {
-        e.preventDefault();
-        setDragOver(true);
-      };
-      
-      const handleDragLeave = (e) => {
-        e.preventDefault();
-        setDragOver(false);
-      };
-      
-      const handleDrop = (e) => {
-        e.preventDefault();
-        setDragOver(false);
-        
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-          handleFileSelect(files[0]);
-        }
-      };
-      
-      return (
-        <div className="space-y-3">
-          {/* Drag & Drop Zone */}
-          <div
-            className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-all duration-200 ${
-              dragOver 
-                ? 'border-blue-500 bg-blue-50' 
-                : 'border-gray-300 hover:border-gray-400'
-            } ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-          >
-            <input
-              type="file"
-              accept={accept}
-              onChange={(e) => handleFileSelect(e.target.files[0])}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              disabled={isUploading}
-            />
-            
-            <div className="space-y-2">
-              <div className="text-4xl">
-                {type === 'picture' ? '📸' : '🎥'}
-              </div>
-              <div className="text-sm text-gray-600">
-                <span className="font-medium">Click to upload</span> or drag and drop
-              </div>
-              <div className="text-xs text-gray-500">
-                {type === 'picture' ? 'PNG, JPG, GIF up to 10MB' : 'MP4, MOV, AVI up to 100MB'}
-              </div>
-            </div>
-            
-            {isUploading && (
-              <div className="mt-4">
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${uploadProgress}%` }}
-                  ></div>
-                </div>
-                <div className="text-sm text-gray-600 mt-1">
-                  Uploading... {Math.round(uploadProgress)}%
-                </div>
-              </div>
-            )}
-          </div>
-          
-          {/* Preview */}
-          {previewUrl && !isUploading && (
-            <div className="border rounded-lg p-4 bg-gray-50">
-              <div className="text-sm font-medium text-gray-700 mb-2">Preview:</div>
-              {type === 'picture' ? (
-                <img 
-                  src={previewUrl} 
-                  alt="Preview" 
-                  className="max-w-full h-48 object-cover rounded-md mx-auto"
-                />
-              ) : (
-                <video 
-                  src={previewUrl} 
-                  className="max-w-full h-48 object-cover rounded-md mx-auto"
-                  controls
-                />
-              )}
-            </div>
-          )}
-          
-          {/* Current Content */}
-          {!isUploading && (type === 'picture' ? currentRep.picture : currentRep.video) && (
-            <div className="border rounded-lg p-4 bg-gray-50">
-              <div className="text-sm font-medium text-gray-700 mb-2">Current {type}:</div>
-              {type === 'picture' ? (
-                <img 
-                  src={currentRep.picture} 
-                  alt="Current profile" 
-                  className="max-w-full h-48 object-cover rounded-md mx-auto"
-                />
-              ) : (
-                <video 
-                  src={currentRep.video} 
-                  className="max-w-full h-48 object-cover rounded-md mx-auto"
-                  controls
-                />
-              )}
-            </div>
-          )}
-          
-          {/* Error Message */}
-          {uploadError && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-              <div className="flex items-center">
-                <svg className="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div className="text-sm text-red-700">{uploadError}</div>
-              </div>
-            </div>
-          )}
-        </div>
-      );
+        };
+        reader.readAsDataURL(file);
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        setUploading(false);
+        setUploadType('');
+        alert('Error uploading file. Please try again.');
+      }
     };
 
     const handleUpdateProfile = async (updateData) => {
@@ -1824,43 +1315,45 @@ const QRGeneratorApp = () => {
       <div className="space-y-6">
         {/* Profile Management */}
         <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-          <div className="mb-6">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Manage Your Profile</h2>
-            <p className="text-gray-600">Upload your profile picture and welcome video to personalize your landing page.</p>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-semibold text-gray-900">Manage Your Profile</h2>
+            <div className="flex space-x-2">
+              <label className="cursor-pointer bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors text-sm">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileUpload(e, 'picture')}
+                  className="hidden"
+                  disabled={uploading}
+                />
+                {uploading && uploadType === 'picture' ? 'Uploading...' : 'Upload Photo'}
+              </label>
+              <label className="cursor-pointer bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors text-sm">
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={(e) => handleFileUpload(e, 'video')}
+                  className="hidden"
+                  disabled={uploading}
+                />
+                {uploading && uploadType === 'video' ? 'Uploading...' : 'Upload Video'}
+              </label>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Profile Picture Upload */}
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Profile Picture</h3>
-              <EnhancedFileUpload type="picture" accept="image/*" />
-            </div>
-            
-            {/* Video Upload */}
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Welcome Video</h3>
-              <EnhancedFileUpload type="video" accept="video/*" />
-            </div>
-          </div>
-        </div>
-
-        {/* Profile Information */}
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Profile Form */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Profile Information</h3>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">About Me</label>
                 <textarea
                   value={currentRep.about_me || ''}
                   onChange={(e) => handleUpdateProfile({ about_me: e.target.value })}
-                  rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  placeholder="Tell potential customers about yourself..."
+                  rows="4"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  placeholder="Tell customers about yourself..."
                 />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
                 <input
