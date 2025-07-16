@@ -814,6 +814,14 @@ const QRGeneratorApp = () => {
 
 // Main App Component
 function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}
+
+function AppContent() {
   const { user, loading } = useAuth();
 
   if (loading) {
