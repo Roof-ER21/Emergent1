@@ -345,7 +345,7 @@ const SalesLeaderboardApp = () => {
   );
 };
 
-// HR Recruitment App - Employee Management with Google Sheets Import
+// HR Recruitment App - Comprehensive HR Management System
 const HRRecruitmentApp = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('employees');
@@ -361,8 +361,43 @@ const HRRecruitmentApp = () => {
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState(null);
   const [importStatus, setImportStatus] = useState(null);
+  
+  // Onboarding Management
+  const [onboardingStages, setOnboardingStages] = useState([]);
+  const [newStage, setNewStage] = useState({
+    name: '',
+    description: '',
+    employee_type: 'all',
+    order: 1
+  });
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [onboardingProgress, setOnboardingProgress] = useState(null);
+  
+  // PTO Management
+  const [ptoRequests, setPtoRequests] = useState([]);
+  const [newPTORequest, setNewPTORequest] = useState({
+    start_date: '',
+    end_date: '',
+    reason: ''
+  });
+  const [ptoBalance, setPtoBalance] = useState(null);
+  
+  // Safety & Compliance
+  const [safetyTrainings, setSafetyTrainings] = useState([]);
+  const [workersCompSubmissions, setWorkersCompSubmissions] = useState([]);
+  const [overdueWorkersComp, setOverdueWorkersComp] = useState([]);
+  const [incidentReports, setIncidentReports] = useState([]);
+  
+  // Project Assignment
+  const [projectAssignments, setProjectAssignments] = useState([]);
+  const [qrScanAnalytics, setQrScanAnalytics] = useState({});
+  const [appointmentRequests, setAppointmentRequests] = useState([]);
+  
+  // Employee Self-Service
+  const [employeeDashboard, setEmployeeDashboard] = useState(null);
+  const [employeeRequests, setEmployeeRequests] = useState([]);
 
-  // Fetch employees from API
+  // Fetch functions
   const fetchEmployees = async () => {
     try {
       const response = await axios.get(`${API}/employees`);
@@ -375,13 +410,94 @@ const HRRecruitmentApp = () => {
     }
   };
 
-  // Fetch import status
   const fetchImportStatus = async () => {
     try {
       const response = await axios.get(`${API}/import/status`);
       setImportStatus(response.data);
     } catch (error) {
       console.error('Error fetching import status:', error);
+    }
+  };
+
+  const fetchOnboardingStages = async () => {
+    try {
+      const response = await axios.get(`${API}/onboarding/stages`);
+      setOnboardingStages(response.data);
+    } catch (error) {
+      console.error('Error fetching onboarding stages:', error);
+    }
+  };
+
+  const fetchPTORequests = async () => {
+    try {
+      const response = await axios.get(`${API}/pto/requests`);
+      setPtoRequests(response.data);
+    } catch (error) {
+      console.error('Error fetching PTO requests:', error);
+    }
+  };
+
+  const fetchSafetyTrainings = async () => {
+    try {
+      const response = await axios.get(`${API}/safety/trainings`);
+      setSafetyTrainings(response.data);
+    } catch (error) {
+      console.error('Error fetching safety trainings:', error);
+    }
+  };
+
+  const fetchWorkersCompSubmissions = async () => {
+    try {
+      const response = await axios.get(`${API}/compliance/workers-comp`);
+      setWorkersCompSubmissions(response.data);
+    } catch (error) {
+      console.error('Error fetching workers comp submissions:', error);
+    }
+  };
+
+  const fetchProjectAssignments = async () => {
+    try {
+      const response = await axios.get(`${API}/assignments`);
+      setProjectAssignments(response.data);
+    } catch (error) {
+      console.error('Error fetching project assignments:', error);
+    }
+  };
+
+  const fetchQRScanAnalytics = async () => {
+    try {
+      const response = await axios.get(`${API}/assignments/qr-scans`);
+      setQrScanAnalytics(response.data);
+    } catch (error) {
+      console.error('Error fetching QR scan analytics:', error);
+    }
+  };
+
+  const fetchEmployeeDashboard = async () => {
+    try {
+      const response = await axios.get(`${API}/self-service/dashboard`);
+      setEmployeeDashboard(response.data);
+    } catch (error) {
+      console.error('Error fetching employee dashboard:', error);
+    }
+  };
+
+  const fetchEmployeeRequests = async () => {
+    try {
+      const response = await axios.get(`${API}/self-service/requests`);
+      setEmployeeRequests(response.data);
+    } catch (error) {
+      console.error('Error fetching employee requests:', error);
+    }
+  };
+
+  const initializeSampleData = async () => {
+    try {
+      await axios.post(`${API}/hr/initialize-sample-data`);
+      await fetchOnboardingStages();
+      await fetchSafetyTrainings();
+    } catch (error) {
+      console.error('Error initializing sample data:', error);
     }
   };
 
@@ -434,29 +550,216 @@ const HRRecruitmentApp = () => {
     }
   };
 
+  // Handle onboarding stage creation
+  const handleCreateOnboardingStage = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API}/onboarding/stages`, newStage);
+      setNewStage({ name: '', description: '', employee_type: 'all', order: 1 });
+      await fetchOnboardingStages();
+    } catch (error) {
+      console.error('Error creating onboarding stage:', error);
+    }
+  };
+
+  // Handle PTO request creation
+  const handleCreatePTORequest = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API}/pto/requests`, newPTORequest);
+      setNewPTORequest({ start_date: '', end_date: '', reason: '' });
+      await fetchPTORequests();
+    } catch (error) {
+      console.error('Error creating PTO request:', error);
+    }
+  };
+
+  // Handle PTO approval/denial
+  const handlePTOApproval = async (requestId, status) => {
+    try {
+      await axios.put(`${API}/pto/requests/${requestId}`, { status });
+      await fetchPTORequests();
+    } catch (error) {
+      console.error('Error updating PTO request:', error);
+    }
+  };
+
+  // Handle worker comp submission
+  const handleWorkersCompSubmission = async (employeeId) => {
+    try {
+      await axios.post(`${API}/compliance/workers-comp?employee_id=${employeeId}`);
+      await fetchWorkersCompSubmissions();
+    } catch (error) {
+      console.error('Error creating workers comp submission:', error);
+    }
+  };
+
+  // Get employee onboarding progress
+  const getOnboardingProgress = async (employeeId) => {
+    try {
+      const response = await axios.get(`${API}/onboarding/employee/${employeeId}`);
+      setOnboardingProgress(response.data);
+    } catch (error) {
+      console.error('Error fetching onboarding progress:', error);
+    }
+  };
+
+  // Complete onboarding stage
+  const completeOnboardingStage = async (employeeId, stageId) => {
+    try {
+      await axios.post(`${API}/onboarding/employee/${employeeId}/stage/${stageId}/complete`);
+      await getOnboardingProgress(employeeId);
+    } catch (error) {
+      console.error('Error completing onboarding stage:', error);
+    }
+  };
+
   useEffect(() => {
     fetchEmployees();
     fetchImportStatus();
-  }, []);
+    
+    if (user?.role === 'super_admin' || user?.role === 'hr_manager') {
+      fetchOnboardingStages();
+      fetchPTORequests();
+      fetchSafetyTrainings();
+      fetchWorkersCompSubmissions();
+      fetchProjectAssignments();
+      fetchQRScanAnalytics();
+      fetchEmployeeRequests();
+    }
+    
+    if (user?.role === 'sales_rep' || user?.role === 'employee') {
+      fetchEmployeeDashboard();
+    }
+  }, [user]);
 
-  const isAuthorized = user?.role === 'super_admin' || user?.role === 'hr_manager';
+  const isAdmin = user?.role === 'super_admin' || user?.role === 'hr_manager';
+  const isManager = user?.role === 'sales_manager' || isAdmin;
+  const isEmployee = user?.role === 'employee' || user?.role === 'sales_rep';
 
-  if (!isAuthorized) {
+  if (!isAdmin && !isManager && !isEmployee) {
     return (
       <div className="bg-white rounded-lg shadow-sm p-8 border border-gray-200">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">HR Recruitment</h2>
-        <p className="text-gray-600">Access denied. HR Manager or Admin role required.</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">HR Management</h2>
+        <p className="text-gray-600">Access denied. HR Manager, Sales Manager, or Admin role required.</p>
       </div>
     );
   }
 
+  // Employee Self-Service View
+  if (isEmployee && !isManager) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="border-b border-gray-200 p-6">
+          <h2 className="text-2xl font-bold text-gray-900">Employee Dashboard</h2>
+        </div>
+        
+        <div className="p-6">
+          {employeeDashboard ? (
+            <div className="space-y-6">
+              {/* Personal Info Summary */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-blue-900">Personal Information</h3>
+                  <p className="text-blue-700">Name: {employeeDashboard.employee.name}</p>
+                  <p className="text-blue-700">Email: {employeeDashboard.employee.email}</p>
+                  <p className="text-blue-700">Role: {employeeDashboard.employee.role}</p>
+                  <p className="text-blue-700">Type: {employeeDashboard.employee_type?.toUpperCase()}</p>
+                </div>
+                
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-green-900">Onboarding Progress</h3>
+                  <p className="text-green-700">
+                    {employeeDashboard.onboarding_progress?.completed_stages || 0} of {employeeDashboard.onboarding_progress?.total_stages || 0} stages completed
+                  </p>
+                  <div className="w-full bg-green-200 rounded-full h-2 mt-2">
+                    <div 
+                      className="bg-green-600 h-2 rounded-full" 
+                      style={{ 
+                        width: `${((employeeDashboard.onboarding_progress?.completed_stages || 0) / (employeeDashboard.onboarding_progress?.total_stages || 1)) * 100}%` 
+                      }}
+                    ></div>
+                  </div>
+                </div>
+                
+                {employeeDashboard.employee_type === 'w2' && (
+                  <div className="bg-purple-50 p-4 rounded-lg">
+                    <h3 className="font-semibold text-purple-900">PTO Balance</h3>
+                    <p className="text-purple-700">
+                      Available: {employeeDashboard.pto_balance?.available_days || 0} days
+                    </p>
+                    <p className="text-purple-700">
+                      Used: {employeeDashboard.pto_balance?.used_days || 0} days
+                    </p>
+                  </div>
+                )}
+              </div>
+              
+              {/* Recent Requests */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-semibold text-gray-900 mb-3">Recent Requests</h3>
+                {employeeDashboard.recent_requests && employeeDashboard.recent_requests.length > 0 ? (
+                  <div className="space-y-2">
+                    {employeeDashboard.recent_requests.map((request, index) => (
+                      <div key={index} className="flex justify-between items-center p-2 bg-white rounded">
+                        <span>{request.title}</span>
+                        <span className={`px-2 py-1 rounded text-xs ${
+                          request.status === 'resolved' ? 'bg-green-100 text-green-800' : 
+                          request.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' : 
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {request.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-600">No recent requests</p>
+                )}
+              </div>
+              
+              {/* Documents */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-semibold text-gray-900 mb-3">Documents</h3>
+                {employeeDashboard.documents && employeeDashboard.documents.length > 0 ? (
+                  <div className="space-y-2">
+                    {employeeDashboard.documents.map((doc, index) => (
+                      <div key={index} className="flex justify-between items-center p-2 bg-white rounded">
+                        <span>{doc.document_name}</span>
+                        <span className="text-sm text-gray-600">{doc.document_type}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-600">No documents available</p>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
+              <p className="mt-2 text-gray-600">Loading dashboard...</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Admin/Manager View
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200">
       {/* Header */}
       <div className="border-b border-gray-200 p-6">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-gray-900">HR Management</h2>
+          <h2 className="text-2xl font-bold text-gray-900">HR Management System</h2>
           <div className="flex space-x-3">
+            <button
+              onClick={initializeSampleData}
+              className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+            >
+              Initialize Sample Data
+            </button>
             <button
               onClick={handleTraditionalImport}
               disabled={importing}
@@ -473,6 +776,32 @@ const HRRecruitmentApp = () => {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="border-b border-gray-200">
+        <nav className="flex space-x-8 px-6">
+          {[
+            { id: 'employees', name: 'Employees' },
+            { id: 'onboarding', name: 'Onboarding' },
+            { id: 'pto', name: 'PTO Management' },
+            { id: 'safety', name: 'Safety & Compliance' },
+            { id: 'assignments', name: 'Project Assignments' },
+            { id: 'requests', name: 'Employee Requests' }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === tab.id
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              {tab.name}
+            </button>
+          ))}
+        </nav>
       </div>
 
       {/* Import Status */}
@@ -532,67 +861,538 @@ const HRRecruitmentApp = () => {
         </div>
       )}
 
-      {/* Employees Table */}
+      {/* Tab Content */}
       <div className="p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Employees ({employees.length})</h3>
-        
-        {loading ? (
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-            <p className="mt-2 text-gray-600">Loading employees...</p>
+        {activeTab === 'employees' && (
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Employees ({employees.length})</h3>
+            
+            {loading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
+                <p className="mt-2 text-gray-600">Loading employees...</p>
+              </div>
+            ) : error ? (
+              <div className="text-center py-8">
+                <p className="text-red-600">{error}</p>
+              </div>
+            ) : employees.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-600">No employees found. Import some data to get started.</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Territory</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {employees.map((employee) => (
+                      <tr key={employee.id}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">{employee.name}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">{employee.email}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                            {employee.role}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            employee.employee_type === 'w2' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {employee.employee_type?.toUpperCase() || 'W2'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {employee.territory || 'N/A'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            employee.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          }`}>
+                            {employee.is_active ? 'Active' : 'Inactive'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={() => {
+                              setSelectedEmployee(employee);
+                              getOnboardingProgress(employee.id);
+                            }}
+                            className="text-red-600 hover:text-red-900 mr-3"
+                          >
+                            View Onboarding
+                          </button>
+                          {employee.employee_type === '1099' && (
+                            <button
+                              onClick={() => handleWorkersCompSubmission(employee.id)}
+                              className="text-blue-600 hover:text-blue-900"
+                            >
+                              Submit Workers Comp
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
-        ) : error ? (
-          <div className="text-center py-8">
-            <p className="text-red-600">{error}</p>
+        )}
+
+        {activeTab === 'onboarding' && (
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">Onboarding Management</h3>
+              <button
+                onClick={() => setSelectedEmployee(null)}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+              >
+                Create New Stage
+              </button>
+            </div>
+            
+            {/* Create New Stage Form */}
+            <div className="bg-gray-50 p-6 rounded-lg mb-6">
+              <h4 className="text-md font-medium text-gray-900 mb-4">Create Onboarding Stage</h4>
+              <form onSubmit={handleCreateOnboardingStage} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Stage Name</label>
+                  <input
+                    type="text"
+                    value={newStage.name}
+                    onChange={(e) => setNewStage({...newStage, name: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Employee Type</label>
+                  <select
+                    value={newStage.employee_type}
+                    onChange={(e) => setNewStage({...newStage, employee_type: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  >
+                    <option value="all">All Employees</option>
+                    <option value="w2">W2 Only</option>
+                    <option value="1099">1099 Only</option>
+                  </select>
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <textarea
+                    value={newStage.description}
+                    onChange={(e) => setNewStage({...newStage, description: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    rows="3"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Order</label>
+                  <input
+                    type="number"
+                    value={newStage.order}
+                    onChange={(e) => setNewStage({...newStage, order: parseInt(e.target.value)})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    min="1"
+                    required
+                  />
+                </div>
+                <div className="flex items-end">
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                  >
+                    Create Stage
+                  </button>
+                </div>
+              </form>
+            </div>
+            
+            {/* Onboarding Stages */}
+            <div className="space-y-4">
+              <h4 className="text-md font-medium text-gray-900">Onboarding Stages</h4>
+              {onboardingStages.map((stage) => (
+                <div key={stage.id} className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h5 className="font-medium text-gray-900">{stage.name}</h5>
+                      <p className="text-sm text-gray-600 mt-1">{stage.description}</p>
+                      <div className="flex space-x-4 mt-2">
+                        <span className="text-xs text-gray-500">Order: {stage.order}</span>
+                        <span className="text-xs text-gray-500">Type: {stage.employee_type}</span>
+                      </div>
+                    </div>
+                    <span className={`px-2 py-1 text-xs rounded-full ${
+                      stage.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {stage.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        ) : employees.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-gray-600">No employees found. Import some data to get started.</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Territory</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Commission Rate</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {employees.map((employee) => (
-                  <tr key={employee.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{employee.name}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{employee.email}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                        {employee.role}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {employee.territory || 'N/A'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {(employee.commission_rate * 100).toFixed(1)}%
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        employee.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
-                        {employee.is_active ? 'Active' : 'Inactive'}
-                      </span>
-                    </td>
+        )}
+
+        {activeTab === 'pto' && (
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">PTO Management (W2 Employees)</h3>
+            
+            {user?.role === 'employee' && (
+              <div className="bg-blue-50 p-6 rounded-lg mb-6">
+                <h4 className="text-md font-medium text-blue-900 mb-4">Request PTO</h4>
+                <form onSubmit={handleCreatePTORequest} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-blue-700 mb-1">Start Date</label>
+                    <input
+                      type="date"
+                      value={newPTORequest.start_date}
+                      onChange={(e) => setNewPTORequest({...newPTORequest, start_date: e.target.value})}
+                      className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-blue-700 mb-1">End Date</label>
+                    <input
+                      type="date"
+                      value={newPTORequest.end_date}
+                      onChange={(e) => setNewPTORequest({...newPTORequest, end_date: e.target.value})}
+                      className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-blue-700 mb-1">Reason</label>
+                    <input
+                      type="text"
+                      value={newPTORequest.reason}
+                      onChange={(e) => setNewPTORequest({...newPTORequest, reason: e.target.value})}
+                      className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+                  <div className="md:col-span-3">
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                      Submit Request
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+            
+            {/* PTO Requests Table */}
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">End Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Days</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {ptoRequests.map((request) => (
+                    <tr key={request.id}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {employees.find(e => e.id === request.employee_id)?.name || 'Unknown'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {new Date(request.start_date).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {new Date(request.end_date).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {request.days_requested}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {request.reason}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          request.status === 'approved' ? 'bg-green-100 text-green-800' : 
+                          request.status === 'denied' ? 'bg-red-100 text-red-800' : 
+                          'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {request.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        {request.status === 'pending' && isManager && (
+                          <div className="space-x-2">
+                            <button
+                              onClick={() => handlePTOApproval(request.id, 'approved')}
+                              className="text-green-600 hover:text-green-900"
+                            >
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => handlePTOApproval(request.id, 'denied')}
+                              className="text-red-600 hover:text-red-900"
+                            >
+                              Deny
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'safety' && (
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Safety & Compliance</h3>
+            
+            {/* Safety Trainings */}
+            <div className="mb-8">
+              <h4 className="text-md font-medium text-gray-900 mb-4">Safety Trainings</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {safetyTrainings.map((training) => (
+                  <div key={training.id} className="border border-gray-200 rounded-lg p-4">
+                    <h5 className="font-medium text-gray-900">{training.name}</h5>
+                    <p className="text-sm text-gray-600 mt-1">{training.description}</p>
+                    <div className="flex justify-between items-center mt-3">
+                      <span className="text-xs text-gray-500">{training.duration_hours}h</span>
+                      <span className={`px-2 py-1 text-xs rounded-full ${
+                        training.certification_required ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {training.certification_required ? 'Certification Required' : 'No Certification'}
+                      </span>
+                    </div>
+                    <div className="mt-2">
+                      <span className="text-xs text-gray-500">Required for: {training.required_for.toUpperCase()}</span>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            </div>
+            
+            {/* Workers Comp Submissions */}
+            <div className="mb-8">
+              <h4 className="text-md font-medium text-gray-900 mb-4">Workers Compensation Submissions</h4>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submission Date</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted By</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {workersCompSubmissions.map((submission) => (
+                      <tr key={submission.id}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {employees.find(e => e.id === submission.employee_id)?.name || 'Unknown'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {new Date(submission.submission_date).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {new Date(submission.submission_deadline).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            submission.status === 'approved' ? 'bg-green-100 text-green-800' : 
+                            submission.status === 'rejected' ? 'bg-red-100 text-red-800' : 
+                            'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {submission.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {employees.find(e => e.id === submission.submitted_by)?.name || 'Unknown'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'assignments' && (
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Project Assignments & QR Analytics</h3>
+            
+            {/* QR Scan Analytics */}
+            <div className="mb-8">
+              <h4 className="text-md font-medium text-gray-900 mb-4">QR Code Scan Analytics</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {Object.entries(qrScanAnalytics).map(([repId, stats]) => (
+                  <div key={repId} className="bg-blue-50 p-4 rounded-lg">
+                    <h5 className="font-medium text-blue-900">{stats.rep_name}</h5>
+                    <div className="mt-2 space-y-1">
+                      <p className="text-sm text-blue-700">Total Scans: {stats.total_scans}</p>
+                      <p className="text-sm text-blue-700">Leads Generated: {stats.leads_generated}</p>
+                      <p className="text-sm text-blue-700">
+                        Conversion Rate: {stats.total_scans > 0 ? ((stats.leads_generated / stats.total_scans) * 100).toFixed(1) : 0}%
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Project Assignments */}
+            <div>
+              <h4 className="text-md font-medium text-gray-900 mb-4">Project Assignments</h4>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lead</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned Rep</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned Date</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {projectAssignments.map((assignment) => (
+                      <tr key={assignment.id}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {assignment.lead_id}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {employees.find(e => e.id === assignment.assigned_rep_id)?.name || 'Unknown'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            assignment.priority === 'urgent' ? 'bg-red-100 text-red-800' : 
+                            assignment.priority === 'high' ? 'bg-orange-100 text-orange-800' : 
+                            assignment.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' : 
+                            'bg-green-100 text-green-800'
+                          }`}>
+                            {assignment.priority}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            assignment.status === 'completed' ? 'bg-green-100 text-green-800' : 
+                            assignment.status === 'in_progress' ? 'bg-blue-100 text-blue-800' : 
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {assignment.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {new Date(assignment.assignment_date).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {assignment.due_date ? new Date(assignment.due_date).toLocaleDateString() : 'No due date'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'requests' && (
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Employee Requests</h3>
+            
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Request Type</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {employeeRequests.map((request) => (
+                    <tr key={request.id}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {employees.find(e => e.id === request.employee_id)?.name || 'Unknown'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {request.request_type}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {request.title}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          request.priority === 'high' ? 'bg-red-100 text-red-800' : 
+                          request.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' : 
+                          'bg-green-100 text-green-800'
+                        }`}>
+                          {request.priority}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          request.status === 'resolved' ? 'bg-green-100 text-green-800' : 
+                          request.status === 'in_progress' ? 'bg-blue-100 text-blue-800' : 
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {request.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {new Date(request.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        {request.status === 'open' && (
+                          <button
+                            onClick={() => {
+                              const status = prompt('New status (in_progress, resolved, closed):');
+                              const resolution = prompt('Resolution:');
+                              if (status && resolution) {
+                                // Update request logic would go here
+                              }
+                            }}
+                            className="text-blue-600 hover:text-blue-900"
+                          >
+                            Update
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
