@@ -1206,40 +1206,49 @@ const QRGeneratorApp = () => {
   return (
     <div className="space-y-6">
       {/* Tab Navigation */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="border-b border-gray-200">
+      <div className="bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+        <div className="border-b border-gray-700">
           <nav className="flex space-x-8 px-6">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`py-4 px-2 border-b-2 font-medium text-sm flex items-center gap-2 ${
                 activeTab === 'overview'
-                  ? 'border-red-500 text-red-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  ? 'border-red-500 text-red-400'
+                  : 'border-transparent text-gray-400 hover:text-gray-300'
               }`}
             >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
               {isAdmin ? 'Rep Overview' : 'Overview'}
             </button>
             {isAdmin && (
               <button
                 onClick={() => setActiveTab('leads')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                className={`py-4 px-2 border-b-2 font-medium text-sm flex items-center gap-2 ${
                   activeTab === 'leads'
-                    ? 'border-red-500 text-red-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    ? 'border-red-500 text-red-400'
+                    : 'border-transparent text-gray-400 hover:text-gray-300'
                 }`}
               >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                </svg>
                 Lead Management
               </button>
             )}
             {user?.role === 'sales_rep' && (
               <button
                 onClick={() => setActiveTab('mypage')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                className={`py-4 px-2 border-b-2 font-medium text-sm flex items-center gap-2 ${
                   activeTab === 'mypage'
-                    ? 'border-red-500 text-red-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    ? 'border-red-500 text-red-400'
+                    : 'border-transparent text-gray-400 hover:text-gray-300'
                 }`}
               >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
                 My Landing Page
               </button>
             )}
