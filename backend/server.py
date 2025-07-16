@@ -1956,6 +1956,206 @@ async def create_hiring_flow(flow: HiringFlow, current_user: User = Depends(get_
     await db.hiring_flows.insert_one(flow.model_dump())
     return flow
 
+@api_router.get("/hiring/flows/{flow_id}", response_model=HiringFlow)
+async def get_hiring_flow(flow_id: str, current_user: User = Depends(get_current_user)):
+    """Get hiring flow by ID"""
+    if current_user.role not in ["super_admin", "hr_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    flow = await db.hiring_flows.find_one({"id": flow_id})
+    if not flow:
+        raise HTTPException(status_code=404, detail="Hiring flow not found")
+    
+    return HiringFlow(**flow)
+
+@api_router.put("/hiring/flows/{flow_id}", response_model=HiringFlow)
+async def update_hiring_flow(flow_id: str, flow_update: HiringFlow, current_user: User = Depends(get_current_user)):
+    """Update hiring flow"""
+    if current_user.role not in ["super_admin", "hr_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    flow_data = flow_update.model_dump()
+    flow_data["updated_at"] = datetime.utcnow()
+    
+    result = await db.hiring_flows.update_one(
+        {"id": flow_id},
+        {"$set": flow_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Hiring flow not found")
+    
+    return flow_update
+
+@api_router.delete("/hiring/flows/{flow_id}")
+async def delete_hiring_flow(flow_id: str, current_user: User = Depends(get_current_user)):
+    """Delete hiring flow"""
+    if current_user.role not in ["super_admin", "hr_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    result = await db.hiring_flows.delete_one({"id": flow_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Hiring flow not found")
+    
+    return {"message": "Hiring flow deleted successfully"}
+
+# Hiring Candidate Management Routes
+@api_router.get("/hiring/candidates", response_model=List[HiringCandidate])
+async def get_hiring_candidates(current_user: User = Depends(get_current_user)):
+    """Get all hiring candidates"""
+    if current_user.role not in ["super_admin", "hr_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    candidates = await db.hiring_candidates.find().to_list(1000)
+    return [HiringCandidate(**candidate) for candidate in candidates]
+
+@api_router.post("/hiring/candidates", response_model=HiringCandidate)
+async def create_hiring_candidate(candidate: HiringCandidate, current_user: User = Depends(get_current_user)):
+    """Create a new hiring candidate"""
+    if current_user.role not in ["super_admin", "hr_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    await db.hiring_candidates.insert_one(candidate.model_dump())
+    return candidate
+
+@api_router.get("/hiring/candidates/{candidate_id}", response_model=HiringCandidate)
+async def get_hiring_candidate(candidate_id: str, current_user: User = Depends(get_current_user)):
+    """Get hiring candidate by ID"""
+    if current_user.role not in ["super_admin", "hr_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    candidate = await db.hiring_candidates.find_one({"id": candidate_id})
+    if not candidate:
+        raise HTTPException(status_code=404, detail="Hiring candidate not found")
+    
+    return HiringCandidate(**candidate)
+
+@api_router.put("/hiring/candidates/{candidate_id}", response_model=HiringCandidate)
+async def update_hiring_candidate(candidate_id: str, candidate_update: HiringCandidate, current_user: User = Depends(get_current_user)):
+    """Update hiring candidate"""
+    if current_user.role not in ["super_admin", "hr_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    candidate_data = candidate_update.model_dump()
+    candidate_data["updated_at"] = datetime.utcnow()
+    
+    result = await db.hiring_candidates.update_one(
+        {"id": candidate_id},
+        {"$set": candidate_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Hiring candidate not found")
+    
+    return candidate_update
+
+@api_router.delete("/hiring/candidates/{candidate_id}")
+async def delete_hiring_candidate(candidate_id: str, current_user: User = Depends(get_current_user)):
+    """Delete hiring candidate"""
+    if current_user.role not in ["super_admin", "hr_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    result = await db.hiring_candidates.delete_one({"id": candidate_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Hiring candidate not found")
+    
+    return {"message": "Hiring candidate deleted successfully"}
+
+@api_router.get("/hiring/candidates/by-type/{hiring_type}", response_model=List[HiringCandidate])
+async def get_candidates_by_type(hiring_type: str, current_user: User = Depends(get_current_user)):
+    """Get candidates by hiring type"""
+    if current_user.role not in ["super_admin", "hr_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    candidates = await db.hiring_candidates.find({"hiring_type": hiring_type}).to_list(1000)
+    return [HiringCandidate(**candidate) for candidate in candidates]
+
+@api_router.post("/hiring/candidates/{candidate_id}/advance")
+async def advance_candidate_stage(candidate_id: str, current_user: User = Depends(get_current_user)):
+    """Advance candidate to next stage"""
+    if current_user.role not in ["super_admin", "hr_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    candidate = await db.hiring_candidates.find_one({"id": candidate_id})
+    if not candidate:
+        raise HTTPException(status_code=404, detail="Candidate not found")
+    
+    # Get the hiring flow to determine next stage
+    flow = await db.hiring_flows.find_one({"type": candidate["hiring_type"]})
+    if not flow:
+        raise HTTPException(status_code=404, detail="Hiring flow not found")
+    
+    current_stage_index = flow["stages"].index(candidate["current_stage"])
+    if current_stage_index < len(flow["stages"]) - 1:
+        next_stage = flow["stages"][current_stage_index + 1]
+        await db.hiring_candidates.update_one(
+            {"id": candidate_id},
+            {"$set": {"current_stage": next_stage, "updated_at": datetime.utcnow()}}
+        )
+        return {"message": f"Candidate advanced to {next_stage}"}
+    else:
+        await db.hiring_candidates.update_one(
+            {"id": candidate_id},
+            {"$set": {"status": "hired", "updated_at": datetime.utcnow()}}
+        )
+        return {"message": "Candidate hired successfully"}
+
+@api_router.post("/hiring/initialize-sample-flows")
+async def initialize_sample_hiring_flows(current_user: User = Depends(get_current_user)):
+    """Initialize sample hiring flows for different types"""
+    if current_user.role not in ["super_admin", "hr_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Check if flows already exist
+    existing_flows = await db.hiring_flows.count_documents({})
+    if existing_flows > 0:
+        return {"message": "Sample flows already exist"}
+    
+    sample_flows = [
+        {
+            "name": "Insurance Agent Hiring",
+            "type": "insurance",
+            "description": "Comprehensive hiring process for insurance agents",
+            "stages": ["application", "phone_screening", "skills_assessment", "interview_round_1", "interview_round_2", "background_check", "offer"],
+            "requirements": ["Valid insurance license", "2+ years experience", "Clean driving record", "Professional references"],
+            "timeline_days": 21,
+            "is_active": True
+        },
+        {
+            "name": "Retail Associate Hiring",
+            "type": "retail",
+            "description": "Streamlined hiring process for retail associates",
+            "stages": ["application", "phone_screening", "in_person_interview", "skills_assessment", "reference_check", "offer"],
+            "requirements": ["Customer service experience", "Availability for flexible hours", "Basic math skills", "Professional appearance"],
+            "timeline_days": 14,
+            "is_active": True
+        },
+        {
+            "name": "Office Administrator Hiring",
+            "type": "office",
+            "description": "Professional hiring process for office administrators",
+            "stages": ["application", "resume_review", "phone_screening", "skills_test", "panel_interview", "background_check", "offer"],
+            "requirements": ["Office management experience", "Proficiency in Microsoft Office", "Strong communication skills", "Organizational abilities"],
+            "timeline_days": 18,
+            "is_active": True
+        },
+        {
+            "name": "Production Worker Hiring",
+            "type": "production",
+            "description": "Safety-focused hiring process for production workers",
+            "stages": ["application", "safety_screening", "physical_assessment", "skills_demonstration", "interview", "drug_test", "offer"],
+            "requirements": ["Physical fitness", "Safety training certification", "Previous manufacturing experience", "Ability to work shifts"],
+            "timeline_days": 10,
+            "is_active": True
+        }
+    ]
+    
+    for flow_data in sample_flows:
+        flow = HiringFlow(**flow_data)
+        await db.hiring_flows.insert_one(flow.model_dump())
+    
+    return {"message": "Sample hiring flows initialized successfully"}
+
 @api_router.get("/safety/employee/{employee_id}/progress")
 async def get_employee_safety_progress(employee_id: str, current_user: User = Depends(get_current_user)):
     """Get safety training progress for employee"""
