@@ -179,7 +179,7 @@ frontend:
         comment: "Implemented login page with Emergent OAuth integration - needs testing"
 
   - task: "Employee Management Dashboard"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "App.js"
     stuck_count: 0
@@ -188,7 +188,7 @@ frontend:
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Employee directory, profiles, and Google Sheets import interface"
+        comment: "Implemented employee directory and Google Sheets import interface - needs testing"
 
   - task: "Job Management Dashboard"
     implemented: false
