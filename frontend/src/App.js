@@ -603,6 +603,10 @@ const QRGeneratorApp = () => {
       });
     };
 
+    const handleCTAClick = () => {
+      window.open('https://theroofdocs.com', '_blank');
+    };
+
     return (
       <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
         <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-gray-700">
@@ -619,9 +623,10 @@ const QRGeneratorApp = () => {
           {/* Mobile-optimized landing page */}
           <div className="p-6 bg-gray-900">
             <div className="max-w-sm mx-auto bg-white rounded-lg shadow-xl overflow-hidden">
+              
               {/* Header Section */}
               <div className="bg-gradient-to-r from-red-600 to-red-700 text-white p-6">
-                <div className="flex justify-between items-start">
+                <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center space-x-4">
                     <div className="w-16 h-16 rounded-full border-3 border-white/30 overflow-hidden bg-white/20">
                       <img 
@@ -633,48 +638,219 @@ const QRGeneratorApp = () => {
                     <div>
                       <h1 className="text-xl font-bold">{rep.name}</h1>
                       <p className="text-red-100 text-sm">{rep.territory}</p>
-                      <div className="flex items-center mt-1">
-                        <span className="text-xs bg-white/20 px-2 py-1 rounded-full">
-                          {rep.department}
-                        </span>
-                      </div>
                     </div>
                   </div>
                   <div className="w-20 h-14 bg-black/30 rounded-lg flex items-center justify-center">
-                    {rep.welcome_video?.startsWith('data:') ? (
-                      <video
-                        width="80"
-                        height="56"
-                        src={rep.welcome_video}
-                        controls
-                        className="rounded"
-                      />
-                    ) : (
-                      <div className="text-white/70 text-xs text-center">
-                        <div className="w-6 h-6 mx-auto mb-1">
-                          <svg fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                            <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                          </svg>
-                        </div>
-                        Video
+                    <div className="text-white/70 text-xs text-center">
+                      <div className="w-6 h-6 mx-auto mb-1">
+                        <svg fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                          <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                        </svg>
                       </div>
-                    )}
+                      Video
+                    </div>
                   </div>
+                </div>
+                
+                {/* Hero CTA */}
+                <div className="text-center">
+                  <h2 className="text-lg font-bold mb-2">Get Your FREE Home Inspection Today!</h2>
+                  <p className="text-red-100 text-sm mb-4">Professional assessment of your roof, siding, gutters, windows, and doors</p>
+                  <button
+                    onClick={handleCTAClick}
+                    className="bg-white text-red-600 px-6 py-3 rounded-lg font-semibold hover:bg-red-50 transition-colors w-full"
+                  >
+                    Schedule Free Inspection
+                  </button>
                 </div>
               </div>
 
-              {/* About Section */}
+              {/* Services Section */}
               <div className="p-6 bg-white">
-                <div className="mb-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-3">About Me</h2>
-                  <p className="text-gray-600 leading-relaxed">
-                    {rep.about_me || 'Professional roofing expert dedicated to quality service and customer satisfaction.'}
-                  </p>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Our Services</h3>
+                <div className="grid grid-cols-1 gap-4">
+                  {[
+                    { title: 'Roofing', desc: 'Complete roof replacement and repairs', icon: '🏠' },
+                    { title: 'Siding', desc: 'Vinyl, wood, and fiber cement siding', icon: '🧱' },
+                    { title: 'Gutters', desc: 'Seamless gutter installation and repair', icon: '💧' },
+                    { title: 'Windows & Doors', desc: 'Energy-efficient windows and door installation', icon: '🪟' },
+                    { title: 'Solar', desc: 'Solar panel installation and energy solutions', icon: '☀️' }
+                  ].map((service, index) => (
+                    <div key={index} className="flex items-start p-3 bg-gray-50 rounded-lg">
+                      <div className="text-2xl mr-3">{service.icon}</div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900">{service.title}</h4>
+                        <p className="text-sm text-gray-600">{service.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Smart Homeowner Benefits */}
+              <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Smart Homeowner Benefits</h3>
+                <p className="text-gray-600 text-sm mb-4">Save thousands, earn rewards, and get complete peace of mind</p>
+                
+                <div className="bg-white p-4 rounded-lg mb-4">
+                  <h4 className="font-bold text-gray-900 mb-2">Massive Savings</h4>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-red-600">$15,000</div>
+                    <div className="text-sm text-gray-600 mb-2">Average Single-Family Home Roof</div>
+                    <div className="text-green-600 font-semibold">Potential Savings: $13,500</div>
+                  </div>
                 </div>
                 
-                {/* Contact Info */}
-                <div className="grid grid-cols-1 gap-3 mb-6">
+                <button
+                  onClick={handleCTAClick}
+                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                >
+                  Calculate Your Savings
+                </button>
+              </div>
+
+              {/* Local & Trusted */}
+              <div className="p-6 bg-gray-50">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Local & Trusted</h3>
+                <p className="text-gray-600 text-sm mb-4">Your Neighborhood Experts</p>
+                
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-red-600">9</div>
+                    <div className="text-xs text-gray-600">Years in Business</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-red-600">5,000+</div>
+                    <div className="text-xs text-gray-600">Projects Completed</div>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">GAF Master Elite</span>
+                    <span className="text-green-600">✓</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Licensed & Insured</span>
+                    <span className="text-green-600">✓</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">BBB A+ Rating</span>
+                    <span className="text-green-600">✓</span>
+                  </div>
+                </div>
+                
+                <button
+                  onClick={handleCTAClick}
+                  className="w-full bg-gray-800 text-white py-3 px-4 rounded-lg font-semibold hover:bg-gray-900 transition-colors mt-4"
+                >
+                  See Local Projects
+                </button>
+              </div>
+
+              {/* Referral Rewards */}
+              <div className="p-6 bg-gradient-to-r from-yellow-50 to-orange-50">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Referral Rewards Program</h3>
+                <p className="text-gray-600 text-sm mb-4">Earn cash and rewards for every friend you refer</p>
+                
+                <div className="space-y-3 mb-4">
+                  <div className="flex items-center justify-between bg-white p-3 rounded-lg">
+                    <div>
+                      <span className="font-bold text-lg">1</span>
+                      <span className="text-gray-600 ml-2">Referral</span>
+                    </div>
+                    <div className="text-green-600 font-bold">$100 Cash</div>
+                  </div>
+                  <div className="flex items-center justify-between bg-white p-3 rounded-lg">
+                    <div>
+                      <span className="font-bold text-lg">5</span>
+                      <span className="text-gray-600 ml-2">Referrals</span>
+                    </div>
+                    <div className="text-green-600 font-bold">$500 Cash</div>
+                  </div>
+                </div>
+                
+                <div className="bg-white p-3 rounded-lg mb-4">
+                  <h4 className="font-semibold text-gray-900 mb-2">Exclusive Rewards Include:</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Commanders tickets entry</li>
+                    <li>• Disney World trip for two</li>
+                    <li>• Exclusive rewards program access</li>
+                  </ul>
+                </div>
+                
+                <button
+                  onClick={handleCTAClick}
+                  className="w-full bg-yellow-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-yellow-700 transition-colors"
+                >
+                  Start Referring Today
+                </button>
+              </div>
+
+              {/* Complete Project Solution */}
+              <div className="p-6 bg-white">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Complete Project Solution</h3>
+                <p className="text-gray-600 text-sm mb-4">From tear-off to solar - we handle everything</p>
+                
+                <div className="space-y-3 mb-4">
+                  {[
+                    { step: '1', title: 'Free Inspection', desc: 'Comprehensive roof and property assessment' },
+                    { step: '2', title: 'Insurance Coordination', desc: 'We handle all insurance paperwork and claims' },
+                    { step: '3', title: 'Professional Tear-Off', desc: 'Safe removal of old materials with cleanup' },
+                    { step: '4', title: 'Premium Installation', desc: 'Top-quality materials with expert craftsmanship' },
+                    { step: '5', title: 'Solar Integration', desc: 'Optional solar panel installation for energy savings' },
+                    { step: '6', title: 'Final Walkthrough', desc: 'Quality check and lifetime warranty activation' }
+                  ].map((step, index) => (
+                    <div key={index} className="flex items-start p-3 bg-gray-50 rounded-lg">
+                      <div className="w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3 flex-shrink-0">
+                        {step.step}
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900 text-sm">{step.title}</h4>
+                        <p className="text-xs text-gray-600">{step.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={handleCTAClick}
+                    className="bg-red-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-red-700 transition-colors text-sm"
+                  >
+                    See Our Process
+                  </button>
+                  <button
+                    onClick={handleCTAClick}
+                    className="bg-gray-800 text-white py-3 px-4 rounded-lg font-semibold hover:bg-gray-900 transition-colors text-sm"
+                  >
+                    Free Inspection
+                  </button>
+                </div>
+              </div>
+
+              {/* Customer Testimonials */}
+              <div className="p-6 bg-gray-50">
+                <h3 className="text-xl font-bold text-gray-900 mb-4">What Our Customers Say</h3>
+                <div className="space-y-4">
+                  {[
+                    { name: 'Mike Thompson', text: 'The Roof Docs did an amazing job on our roof replacement. Professional team and quality work!' },
+                    { name: 'Jennifer Martinez', text: 'Excellent service from start to finish. Our new siding looks fantastic!' },
+                    { name: 'Robert Chen', text: 'Outstanding window installation. Energy efficient and beautiful. Highly recommend The Roof Docs!' }
+                  ].map((review, index) => (
+                    <div key={index} className="bg-white p-4 rounded-lg">
+                      <p className="text-gray-600 text-sm italic mb-2">"{review.text}"</p>
+                      <div className="font-semibold text-gray-900 text-sm">- {review.name}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Contact Info */}
+              <div className="p-6 bg-white">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Contact {rep.name}</h3>
+                <div className="space-y-3">
                   <div className="flex items-center p-3 bg-gray-50 rounded-lg">
                     <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
                       <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -698,27 +874,19 @@ const QRGeneratorApp = () => {
                       <p className="font-medium text-gray-900">{rep.email}</p>
                     </div>
                   </div>
-                  
-                  <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                    <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
-                      <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Service Area</p>
-                      <p className="font-medium text-gray-900">{rep.territory}</p>
-                    </div>
-                  </div>
+                </div>
+                
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                  <p className="text-sm font-medium text-blue-900">About {rep.name}</p>
+                  <p className="text-sm text-blue-700 mt-1">{rep.about_me || 'Professional roofing expert dedicated to quality service and customer satisfaction.'}</p>
                 </div>
               </div>
 
-              {/* CTA Section */}
-              <div className="p-6 bg-gray-900 text-white">
+              {/* Final CTA Section */}
+              <div className="p-6 bg-gradient-to-r from-red-600 to-red-700 text-white">
                 <div className="text-center mb-6">
-                  <h3 className="text-xl font-bold mb-2">Get Your Free Roof Estimate</h3>
-                  <p className="text-gray-300 text-sm">Professional assessment • No obligation • Quick response</p>
+                  <h3 className="text-xl font-bold mb-2">Get Your FREE Home Inspection</h3>
+                  <p className="text-red-100 text-sm">Professional assessment • No obligation • Quick response</p>
                 </div>
                 
                 {leadSuccess ? (
@@ -739,7 +907,7 @@ const QRGeneratorApp = () => {
                         value={leadData.name}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-400"
+                        className="w-full px-4 py-3 bg-red-700/30 border border-red-500/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent text-white placeholder-red-200"
                       />
                       <input
                         type="email"
@@ -748,7 +916,7 @@ const QRGeneratorApp = () => {
                         value={leadData.email}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-400"
+                        className="w-full px-4 py-3 bg-red-700/30 border border-red-500/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent text-white placeholder-red-200"
                       />
                       <input
                         type="tel"
@@ -756,7 +924,7 @@ const QRGeneratorApp = () => {
                         placeholder="Your Phone"
                         value={leadData.phone}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-400"
+                        className="w-full px-4 py-3 bg-red-700/30 border border-red-500/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent text-white placeholder-red-200"
                       />
                       <input
                         type="text"
@@ -764,7 +932,7 @@ const QRGeneratorApp = () => {
                         placeholder="Property Address"
                         value={leadData.address}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-400"
+                        className="w-full px-4 py-3 bg-red-700/30 border border-red-500/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent text-white placeholder-red-200"
                       />
                       <textarea
                         name="message"
@@ -772,25 +940,32 @@ const QRGeneratorApp = () => {
                         rows="3"
                         value={leadData.message}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-400 resize-none"
+                        className="w-full px-4 py-3 bg-red-700/30 border border-red-500/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent text-white placeholder-red-200 resize-none"
                       />
                     </div>
                     <button
                       type="submit"
                       disabled={submittingLead}
-                      className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-4 px-6 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                      className="w-full bg-white text-red-600 py-4 px-6 rounded-lg hover:bg-red-50 transition-all duration-200 font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                     >
                       {submittingLead ? (
                         <>
-                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
                           Submitting...
                         </>
                       ) : (
-                        'Get My Free Estimate'
+                        'Schedule Your FREE Inspection'
                       )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCTAClick}
+                      className="w-full bg-red-800 text-white py-3 px-6 rounded-lg hover:bg-red-900 transition-all duration-200 font-semibold"
+                    >
+                      Visit Our Website
                     </button>
                   </form>
                 )}
