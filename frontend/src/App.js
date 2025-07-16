@@ -494,24 +494,60 @@ const QRGeneratorApp = () => {
     return matchesSearch && matchesDepartment && matchesTerritory;
   });
 
-  const QRCodeSVG = ({ size = 100, value = 'QR123456' }) => (
-    <div className="bg-white p-2 rounded border border-gray-300" style={{ width: size, height: size }}>
-      <svg width={size-16} height={size-16} viewBox="0 0 100 100">
-        <rect width="100" height="100" fill="white"/>
-        <g fill="black">
-          <rect x="10" y="10" width="30" height="30"/>
-          <rect x="60" y="10" width="30" height="30"/>
-          <rect x="10" y="60" width="30" height="30"/>
-          <rect x="50" y="50" width="10" height="10"/>
-          <rect x="70" y="50" width="10" height="10"/>
-          <rect x="50" y="70" width="10" height="10"/>
-          <rect x="70" y="70" width="10" height="10"/>
-          <rect x="45" y="45" width="5" height="5"/>
-          <rect x="55" y="55" width="5" height="5"/>
-        </g>
-      </svg>
-    </div>
-  );
+  const QRCodeSVG = ({ size = 100, value = 'QR123456' }) => {
+    const canvasRef = React.useRef(null);
+    
+    React.useEffect(() => {
+      if (canvasRef.current) {
+        try {
+          // Simple QR code pattern - for production use a proper QR library
+          const canvas = canvasRef.current;
+          const ctx = canvas.getContext('2d');
+          
+          // Clear canvas
+          ctx.fillStyle = 'white';
+          ctx.fillRect(0, 0, size, size);
+          
+          // Draw QR code pattern
+          ctx.fillStyle = 'black';
+          const cellSize = size / 10;
+          
+          // Corner squares
+          ctx.fillRect(0, 0, cellSize * 3, cellSize * 3);
+          ctx.fillRect(cellSize * 7, 0, cellSize * 3, cellSize * 3);
+          ctx.fillRect(0, cellSize * 7, cellSize * 3, cellSize * 3);
+          
+          // Center pattern
+          ctx.fillRect(cellSize * 4, cellSize * 4, cellSize * 2, cellSize * 2);
+          
+          // Random pattern for uniqueness
+          const seed = value.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+          const random = (seed * 9301 + 49297) % 233280;
+          
+          for (let i = 0; i < 10; i++) {
+            for (let j = 0; j < 10; j++) {
+              if ((i + j + random) % 3 === 0) {
+                ctx.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error generating QR code:', error);
+        }
+      }
+    }, [size, value]);
+
+    return (
+      <div className="bg-white p-2 rounded border border-gray-300" style={{ width: size, height: size }}>
+        <canvas
+          ref={canvasRef}
+          width={size - 16}
+          height={size - 16}
+          style={{ width: size - 16, height: size - 16 }}
+        />
+      </div>
+    );
+  };
 
   const RepLandingPage = ({ rep, onClose }) => (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 p-4">
