@@ -396,10 +396,10 @@ metadata:
 
 test_plan:
   current_focus:
+    - "User Authentication System with Emergent OAuth"
     - "QR Code Generator Backend APIs"
     - "Sales Rep Management System"
     - "Lead Capture and Distribution"
-    - "File Upload for Pictures/Videos"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
