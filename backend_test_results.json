@@ -4,93 +4,93 @@
       "success": true,
       "message": "API documentation accessible",
       "response_data": null,
-      "timestamp": "2025-07-16T07:01:30.313631"
+      "timestamp": "2025-07-16T07:03:18.373583"
     },
     "invalid_login": {
       "success": false,
-      "message": "Expected 401, got No response",
+      "message": "Expected 401/422, got No response",
       "response_data": null,
-      "timestamp": "2025-07-16T07:01:30.402180"
+      "timestamp": "2025-07-16T07:03:18.477361"
     },
     "unauthorized_access": {
       "success": false,
-      "message": "Expected 403, got No response",
+      "message": "Expected 401/403, got No response",
       "response_data": null,
-      "timestamp": "2025-07-16T07:01:30.404891"
+      "timestamp": "2025-07-16T07:03:18.479799"
     },
     "oauth_integration": {
       "success": true,
       "message": "OAuth integration implemented (requires valid session for full testing)",
       "response_data": null,
-      "timestamp": "2025-07-16T07:01:30.404919"
+      "timestamp": "2025-07-16T07:03:18.479823"
     },
     "endpoint_structure": {
       "success": true,
       "message": "All expected endpoints are properly structured",
       "response_data": null,
-      "timestamp": "2025-07-16T07:01:30.495623"
+      "timestamp": "2025-07-16T07:03:18.582685"
     },
     "cors_configuration": {
       "success": false,
       "message": "CORS headers missing",
       "response_data": null,
-      "timestamp": "2025-07-16T07:01:30.499530"
+      "timestamp": "2025-07-16T07:03:18.586339"
     }
   },
   "employee_management": {
     "get_employees_no_auth": {
       "success": false,
-      "message": "Expected 403, got No response",
+      "message": "Expected 401/403, got No response",
       "response_data": null,
-      "timestamp": "2025-07-16T07:01:30.407158"
+      "timestamp": "2025-07-16T07:03:18.481796"
     },
     "create_employee_no_auth": {
       "success": false,
-      "message": "Expected 403, got No response",
+      "message": "Expected 401/403, got No response",
       "response_data": null,
-      "timestamp": "2025-07-16T07:01:30.409503"
+      "timestamp": "2025-07-16T07:03:18.483829"
     },
     "google_sheets_import_no_auth": {
       "success": false,
-      "message": "Expected 403, got No response",
+      "message": "Expected 401/403, got No response",
       "response_data": null,
-      "timestamp": "2025-07-16T07:01:30.420149"
+      "timestamp": "2025-07-16T07:03:18.493436"
     },
     "json_response_structure": {
       "success": false,
-      "message": "API doesn't return JSON content-type",
+      "message": "No response received",
       "response_data": null,
-      "timestamp": "2025-07-16T07:01:30.497547"
+      "timestamp": "2025-07-16T07:03:18.584446"
     }
   },
   "job_management": {
     "get_jobs_no_auth": {
       "success": false,
-      "message": "Expected 403, got No response",
+      "message": "Expected 401/403, got No response",
       "response_data": null,
-      "timestamp": "2025-07-16T07:01:30.411543"
+      "timestamp": "2025-07-16T07:03:18.485737"
     },
     "create_job_no_auth": {
       "success": false,
-      "message": "Expected 403, got No response",
+      "message": "Expected 401/403, got No response",
       "response_data": null,
-      "timestamp": "2025-07-16T07:01:30.413693"
+      "timestamp": "2025-07-16T07:03:18.487766"
     }
   },
   "commission_system": {
     "get_commissions_no_auth": {
       "success": false,
-      "message": "Expected 403, got No response",
+      "message": "Expected 401/403, got No response",
       "response_data": null,
-      "timestamp": "2025-07-16T07:01:30.415981"
+      "timestamp": "2025-07-16T07:03:18.489707"
     }
   },
   "analytics": {
     "get_dashboard_no_auth": {
       "success": false,
-      "message": "Expected 403, got No response",
+      "message": "Expected 401/403, got No response",
       "response_data": null,
-      "timestamp": "2025-07-16T07:01:30.418109"
+      "timestamp": "2025-07-16T07:03:18.491562"
     }
   },
   "email_notifications": {}
