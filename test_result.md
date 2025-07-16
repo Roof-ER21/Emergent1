@@ -180,6 +180,54 @@ backend:
         agent: "testing"
         comment: "✅ PASSED: Email notification system working correctly. SMTP configuration implemented with Gmail, email templates contain all required placeholders, background task processing for emails, triggered on job status changes."
 
+  - task: "QR Code Generator Backend APIs"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Starting implementation of QR code generator backend APIs for sales rep management, QR code generation, lead capture, and file uploads"
+
+  - task: "Sales Rep Management System"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Need to implement CRUD operations for sales rep profiles, pictures, videos, and landing page data"
+
+  - task: "Lead Capture and Distribution"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implement lead capture from landing pages, admin distribution system, and email notifications"
+
+  - task: "File Upload for Pictures/Videos"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implement file upload endpoints for sales rep pictures and welcome videos with base64 encoding"
+
 frontend:
   - task: "User Authentication UI with Login/Logout"
     implemented: true
