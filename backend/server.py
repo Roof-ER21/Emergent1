@@ -648,6 +648,308 @@ async def get_dashboard_analytics(current_user: User = Depends(get_current_user)
             "completion_rate": (completed_jobs / total_jobs * 100) if total_jobs > 0 else 0
         }
 
+# QR Code Generator Routes
+@api_router.get("/qr-generator/reps", response_model=List[SalesRep])
+async def get_sales_reps(current_user: User = Depends(get_current_user)):
+    """Get all sales reps"""
+    if current_user.role == "sales_rep":
+        # Sales rep can only see their own data
+        reps = await db.sales_reps.find({"id": current_user.id}).to_list(1000)
+    else:
+        # Admin/managers can see all reps
+        reps = await db.sales_reps.find().to_list(1000)
+    
+    return [SalesRep(**rep) for rep in reps]
+
+@api_router.post("/qr-generator/reps", response_model=SalesRep)
+async def create_sales_rep(rep_create: SalesRepCreate, current_user: User = Depends(get_current_user)):
+    """Create a new sales rep"""
+    if current_user.role not in ["super_admin", "sales_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Generate QR code and landing page URL
+    qr_code = generate_qr_code(str(uuid.uuid4()))
+    landing_page_url = generate_landing_page_url(rep_create.name)
+    
+    rep_data = rep_create.model_dump()
+    rep_data["id"] = str(uuid.uuid4())
+    rep_data["qr_code"] = qr_code
+    rep_data["landing_page_url"] = landing_page_url
+    rep_data["created_at"] = datetime.utcnow()
+    rep_data["updated_at"] = datetime.utcnow()
+    
+    rep = SalesRep(**rep_data)
+    await db.sales_reps.insert_one(rep.model_dump())
+    
+    # Store QR code mapping
+    qr_mapping = QRCode(
+        rep_id=rep.id,
+        code=qr_code,
+        url=landing_page_url
+    )
+    await db.qr_codes.insert_one(qr_mapping.model_dump())
+    
+    return rep
+
+@api_router.get("/qr-generator/reps/{rep_id}", response_model=SalesRep)
+async def get_sales_rep(rep_id: str, current_user: User = Depends(get_current_user)):
+    """Get sales rep by ID"""
+    if current_user.role == "sales_rep" and current_user.id != rep_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    rep = await db.sales_reps.find_one({"id": rep_id})
+    if not rep:
+        raise HTTPException(status_code=404, detail="Sales rep not found")
+    
+    return SalesRep(**rep)
+
+@api_router.put("/qr-generator/reps/{rep_id}", response_model=SalesRep)
+async def update_sales_rep(rep_id: str, rep_update: SalesRepUpdate, current_user: User = Depends(get_current_user)):
+    """Update sales rep"""
+    if current_user.role == "sales_rep" and current_user.id != rep_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    if current_user.role == "sales_rep":
+        # Sales reps can only update certain fields
+        allowed_fields = ["phone", "about_me", "picture", "welcome_video"]
+        update_data = {k: v for k, v in rep_update.model_dump().items() if v is not None and k in allowed_fields}
+    else:
+        # Admin/managers can update all fields
+        update_data = {k: v for k, v in rep_update.model_dump().items() if v is not None}
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No valid fields to update")
+    
+    update_data["updated_at"] = datetime.utcnow()
+    
+    result = await db.sales_reps.update_one(
+        {"id": rep_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Sales rep not found")
+    
+    updated_rep = await db.sales_reps.find_one({"id": rep_id})
+    return SalesRep(**updated_rep)
+
+@api_router.delete("/qr-generator/reps/{rep_id}")
+async def delete_sales_rep(rep_id: str, current_user: User = Depends(get_current_user)):
+    """Delete sales rep"""
+    if current_user.role not in ["super_admin", "sales_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    result = await db.sales_reps.delete_one({"id": rep_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Sales rep not found")
+    
+    # Also delete QR code mapping
+    await db.qr_codes.delete_many({"rep_id": rep_id})
+    
+    return {"message": "Sales rep deleted successfully"}
+
+# File Upload Routes
+@api_router.post("/qr-generator/reps/{rep_id}/upload-picture")
+async def upload_rep_picture(rep_id: str, file_upload: FileUpload, current_user: User = Depends(get_current_user)):
+    """Upload sales rep picture"""
+    if current_user.role == "sales_rep" and current_user.id != rep_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Validate file type
+    if not file_upload.file_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="Invalid file type. Only images are allowed.")
+    
+    # Store as base64 in database
+    update_data = {
+        "picture": file_upload.file_data,
+        "updated_at": datetime.utcnow()
+    }
+    
+    result = await db.sales_reps.update_one(
+        {"id": rep_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Sales rep not found")
+    
+    return {"message": "Picture uploaded successfully"}
+
+@api_router.post("/qr-generator/reps/{rep_id}/upload-video")
+async def upload_rep_video(rep_id: str, file_upload: FileUpload, current_user: User = Depends(get_current_user)):
+    """Upload sales rep welcome video"""
+    if current_user.role == "sales_rep" and current_user.id != rep_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Validate file type
+    if not file_upload.file_type.startswith("video/"):
+        raise HTTPException(status_code=400, detail="Invalid file type. Only videos are allowed.")
+    
+    # Store as base64 in database
+    update_data = {
+        "welcome_video": file_upload.file_data,
+        "updated_at": datetime.utcnow()
+    }
+    
+    result = await db.sales_reps.update_one(
+        {"id": rep_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Sales rep not found")
+    
+    return {"message": "Video uploaded successfully"}
+
+# Lead Management Routes
+@api_router.get("/qr-generator/leads", response_model=List[Lead])
+async def get_leads(current_user: User = Depends(get_current_user)):
+    """Get all leads"""
+    if current_user.role == "sales_rep":
+        # Sales rep can only see their own leads
+        leads = await db.leads.find({"rep_id": current_user.id}).to_list(1000)
+    else:
+        # Admin/managers can see all leads
+        leads = await db.leads.find().to_list(1000)
+    
+    return [Lead(**lead) for lead in leads]
+
+@api_router.post("/qr-generator/leads", response_model=Lead)
+async def create_lead(lead_create: LeadCreate, background_tasks: BackgroundTasks):
+    """Create a new lead (public endpoint for landing pages)"""
+    # Get rep information
+    rep = await db.sales_reps.find_one({"id": lead_create.rep_id})
+    if not rep:
+        raise HTTPException(status_code=404, detail="Sales rep not found")
+    
+    lead_data = lead_create.model_dump()
+    lead_data["id"] = str(uuid.uuid4())
+    lead_data["rep_name"] = rep["name"]
+    lead_data["created_at"] = datetime.utcnow()
+    lead_data["updated_at"] = datetime.utcnow()
+    
+    lead = Lead(**lead_data)
+    await db.leads.insert_one(lead.model_dump())
+    
+    # Update rep's lead count
+    await db.sales_reps.update_one(
+        {"id": lead_create.rep_id},
+        {"$inc": {"leads": 1}}
+    )
+    
+    # Send notification email to rep
+    await send_lead_notification(lead, rep["email"], background_tasks)
+    
+    return lead
+
+@api_router.get("/qr-generator/leads/{lead_id}", response_model=Lead)
+async def get_lead(lead_id: str, current_user: User = Depends(get_current_user)):
+    """Get lead by ID"""
+    lead = await db.leads.find_one({"id": lead_id})
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead not found")
+    
+    # Check permissions
+    if current_user.role == "sales_rep" and lead["rep_id"] != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    return Lead(**lead)
+
+@api_router.put("/qr-generator/leads/{lead_id}", response_model=Lead)
+async def update_lead(lead_id: str, lead_update: LeadUpdate, current_user: User = Depends(get_current_user)):
+    """Update lead"""
+    lead = await db.leads.find_one({"id": lead_id})
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead not found")
+    
+    # Check permissions
+    if current_user.role == "sales_rep" and lead["rep_id"] != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    update_data = {k: v for k, v in lead_update.model_dump().items() if v is not None}
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No valid fields to update")
+    
+    update_data["updated_at"] = datetime.utcnow()
+    
+    # Track conversions
+    if lead_update.status == "converted" and lead["status"] != "converted":
+        # Increment conversion count for the rep
+        await db.sales_reps.update_one(
+            {"id": lead["rep_id"]},
+            {"$inc": {"conversions": 1}}
+        )
+    
+    result = await db.leads.update_one(
+        {"id": lead_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Lead not found")
+    
+    updated_lead = await db.leads.find_one({"id": lead_id})
+    return Lead(**updated_lead)
+
+# Public Landing Page Routes (no authentication required)
+@api_router.get("/public/rep/{rep_name}")
+async def get_rep_landing_page(rep_name: str):
+    """Get sales rep landing page data (public endpoint)"""
+    # Convert URL name back to search format
+    search_name = rep_name.replace("-", " ").title()
+    
+    rep = await db.sales_reps.find_one({"name": {"$regex": search_name, "$options": "i"}})
+    if not rep or not rep["is_active"]:
+        raise HTTPException(status_code=404, detail="Sales rep not found")
+    
+    # Return only public information
+    return {
+        "id": rep["id"],
+        "name": rep["name"],
+        "phone": rep["phone"],
+        "territory": rep["territory"],
+        "picture": rep["picture"],
+        "welcome_video": rep["welcome_video"],
+        "about_me": rep["about_me"],
+        "qr_code": rep["qr_code"],
+        "landing_page_url": rep["landing_page_url"]
+    }
+
+# QR Code Analytics
+@api_router.get("/qr-generator/analytics")
+async def get_qr_analytics(current_user: User = Depends(get_current_user)):
+    """Get QR code generator analytics"""
+    if current_user.role == "sales_rep":
+        # Sales rep specific analytics
+        rep = await db.sales_reps.find_one({"id": current_user.id})
+        leads = await db.leads.find({"rep_id": current_user.id}).to_list(1000)
+        
+        total_leads = len(leads)
+        new_leads = len([l for l in leads if l["status"] == "new"])
+        conversions = len([l for l in leads if l["status"] == "converted"])
+        
+        return {
+            "total_leads": total_leads,
+            "new_leads": new_leads,
+            "conversions": conversions,
+            "conversion_rate": (conversions / total_leads * 100) if total_leads > 0 else 0,
+            "qr_code": rep["qr_code"] if rep else None
+        }
+    else:
+        # Admin/manager analytics
+        total_reps = await db.sales_reps.count_documents({"is_active": True})
+        total_leads = await db.leads.count_documents({})
+        total_conversions = await db.leads.count_documents({"status": "converted"})
+        total_qr_codes = await db.qr_codes.count_documents({"is_active": True})
+        
+        return {
+            "total_reps": total_reps,
+            "total_leads": total_leads,
+            "total_conversions": total_conversions,
+            "total_qr_codes": total_qr_codes,
+            "conversion_rate": (total_conversions / total_leads * 100) if total_leads > 0 else 0
+        }
+
 # Include the router in the main app
 app.include_router(api_router)
 
