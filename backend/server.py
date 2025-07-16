@@ -158,6 +158,43 @@ class JobUpdate(BaseModel):
     status: Optional[str] = None
     value: Optional[float] = None
 
+class SalesRepCreate(BaseModel):
+    name: str
+    email: str
+    phone: Optional[str] = None
+    territory: str
+    department: str = "Sales"
+    about_me: Optional[str] = None
+
+class SalesRepUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    territory: Optional[str] = None
+    department: Optional[str] = None
+    picture: Optional[str] = None
+    welcome_video: Optional[str] = None
+    about_me: Optional[str] = None
+    is_active: Optional[bool] = None
+
+class LeadCreate(BaseModel):
+    name: str
+    email: str
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    message: Optional[str] = None
+    rep_id: str
+
+class LeadUpdate(BaseModel):
+    status: Optional[str] = None
+    priority: Optional[str] = None
+    assigned_to: Optional[str] = None
+
+class FileUpload(BaseModel):
+    file_data: str  # base64 encoded file
+    file_type: str  # image/jpeg, image/png, video/mp4, etc.
+    file_name: str
+
 # Email Templates
 EMAIL_TEMPLATE = """
 <!DOCTYPE html>
