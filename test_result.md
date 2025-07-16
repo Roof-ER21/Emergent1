@@ -154,7 +154,7 @@ backend:
         comment: "Implemented commission calculations triggered by job completion - needs testing"
 
   - task: "Gmail SMTP Email Notifications"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "server.py"
     stuck_count: 0
@@ -163,7 +163,7 @@ backend:
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Email notifications for job status changes using Gmail SMTP"
+        comment: "Implemented Gmail SMTP email notifications for job status changes - needs testing"
 
 frontend:
   - task: "User Authentication UI with Login/Logout"
