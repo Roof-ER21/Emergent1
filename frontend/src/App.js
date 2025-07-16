@@ -525,6 +525,127 @@ const QRGeneratorApp = () => {
     }
   };
 
+  // Bulk QR Code Generation
+  const handleBulkQRGeneration = async () => {
+    try {
+      const results = await Promise.all(
+        salesReps.map(async (rep) => {
+          const landingPageUrl = `${window.location.origin}/rep/${rep.id}`;
+          await generateQRCode(rep.id, landingPageUrl);
+          return { id: rep.id, name: rep.name, success: true };
+        })
+      );
+      
+      alert(`Successfully generated ${results.length} QR codes!`);
+      await fetchSalesReps();
+    } catch (error) {
+      console.error('Error generating bulk QR codes:', error);
+      alert('Error generating QR codes. Please try again.');
+    }
+  };
+
+  // Bulk Export QR Codes
+  const handleBulkExport = async () => {
+    try {
+      const zip = new JSZip();
+      
+      for (const rep of salesReps) {
+        if (rep.qr_code) {
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          canvas.width = 200;
+          canvas.height = 200;
+          
+          // Generate QR code on canvas
+          const qrCode = new QRCode(canvas, {
+            text: `${window.location.origin}/rep/${rep.id}`,
+            width: 200,
+            height: 200,
+            correctLevel: QRCode.CorrectLevel.M
+          });
+          
+          // Convert to blob
+          const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+          zip.file(`${rep.name.replace(/\s+/g, '_')}_QR.png`, blob);
+        }
+      }
+      
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(zipBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'QR_Codes_Bulk_Export.zip';
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      alert('QR codes exported successfully!');
+    } catch (error) {
+      console.error('Error exporting QR codes:', error);
+      alert('Error exporting QR codes. Please try again.');
+    }
+  };
+
+  // Custom QR Code Design
+  const generateCustomQRCode = async (repId, url, options = {}) => {
+    try {
+      const {
+        color = '#000000',
+        backgroundColor = '#ffffff',
+        logo = null,
+        size = 200,
+        style = 'square'
+      } = options;
+      
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.width = size;
+      canvas.height = size;
+      
+      // Generate QR code with custom options
+      const qrCode = new QRCode(canvas, {
+        text: url,
+        width: size,
+        height: size,
+        colorDark: color,
+        colorLight: backgroundColor,
+        correctLevel: QRCode.CorrectLevel.M
+      });
+      
+      // Add logo if provided
+      if (logo) {
+        const logoImg = new Image();
+        logoImg.onload = () => {
+          const logoSize = size * 0.2;
+          const logoX = (size - logoSize) / 2;
+          const logoY = (size - logoSize) / 2;
+          context.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
+          
+          // Update the canvas element
+          const targetCanvas = document.getElementById(`qr-${repId}`);
+          if (targetCanvas) {
+            const targetContext = targetCanvas.getContext('2d');
+            targetContext.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
+            targetContext.drawImage(canvas, 0, 0, targetCanvas.width, targetCanvas.height);
+          }
+        };
+        logoImg.src = logo;
+      } else {
+        // Update the canvas element
+        const targetCanvas = document.getElementById(`qr-${repId}`);
+        if (targetCanvas) {
+          const targetContext = targetCanvas.getContext('2d');
+          targetContext.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
+          targetContext.drawImage(canvas, 0, 0, targetCanvas.width, targetCanvas.height);
+        }
+      }
+      
+      await fetchSalesReps();
+    } catch (error) {
+      console.error('Error generating custom QR code:', error);
+      throw error;
+    }
+  };
+
   // Update lead status
   const updateLead = async (leadId, updateData) => {
     try {
