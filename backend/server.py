@@ -88,6 +88,48 @@ class Commission(BaseModel):
     status: str = "pending"  # pending, paid, cancelled
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+class SalesRep(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    email: str
+    phone: Optional[str] = None
+    territory: str
+    department: str = "Sales"
+    picture: Optional[str] = None  # base64 encoded image
+    welcome_video: Optional[str] = None  # video URL or base64
+    about_me: Optional[str] = None
+    qr_code: Optional[str] = None
+    landing_page_url: Optional[str] = None
+    leads: int = 0
+    conversions: int = 0
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class Lead(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    email: str
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    message: Optional[str] = None
+    rep_id: str
+    rep_name: str
+    status: str = "new"  # new, assigned, contacted, converted, lost
+    priority: str = "medium"  # high, medium, low
+    source: str = "QR Code"
+    assigned_to: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class QRCode(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    rep_id: str
+    code: str
+    url: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    is_active: bool = True
+
 class AuthRequest(BaseModel):
     session_id: str
 
