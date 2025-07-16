@@ -737,112 +737,124 @@ const QRGeneratorApp = () => {
     );
   };
 
-  const OverviewTab = () => (
-    <div className="space-y-6">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-          <div className="text-gray-600 text-sm font-medium">Total Reps</div>
-          <div className="text-2xl font-bold text-gray-900">{salesReps.length}</div>
-        </div>
-        <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-          <div className="text-red-600 text-sm font-medium">Total Leads</div>
-          <div className="text-2xl font-bold text-red-900">{leads.length}</div>
-        </div>
-        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-          <div className="text-gray-600 text-sm font-medium">Total QR Codes</div>
-          <div className="text-2xl font-bold text-gray-900">{salesReps.filter(r => r.qrCode).length}</div>
-        </div>
-        <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-          <div className="text-red-600 text-sm font-medium">Conversion Rate</div>
-          <div className="text-2xl font-bold text-red-900">32%</div>
-        </div>
-      </div>
-
-      {/* Search and Filters */}
-      <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="Search reps by name, email, or territory..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
+  const OverviewTab = () => {
+    const totalConversions = leads.filter(lead => lead.status === 'converted').length;
+    const totalLeads = leads.length;
+    const conversionRate = totalLeads > 0 ? ((totalConversions / totalLeads) * 100).toFixed(1) : 0;
+    
+    return (
+      <div className="space-y-6">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+            <div className="text-gray-600 text-sm font-medium">Total Reps</div>
+            <div className="text-2xl font-bold text-gray-900">{salesReps.length}</div>
           </div>
-          <select
-            value={filterDepartment}
-            onChange={(e) => setFilterDepartment(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-          >
-            <option value="all">All Departments</option>
-            <option value="Sales">Sales</option>
-            <option value="Management">Management</option>
-          </select>
-          <select
-            value={filterTerritory}
-            onChange={(e) => setFilterTerritory(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-          >
-            <option value="all">All Territories</option>
-            <option value="Northern Virginia">Northern Virginia</option>
-            <option value="Southern Virginia">Southern Virginia</option>
-            <option value="Maryland">Maryland</option>
-          </select>
+          <div className="bg-red-50 rounded-lg p-4 border border-red-200">
+            <div className="text-red-600 text-sm font-medium">Total Leads</div>
+            <div className="text-2xl font-bold text-red-900">{totalLeads}</div>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div className="text-gray-600 text-sm font-medium">Total QR Codes</div>
+            <div className="text-2xl font-bold text-gray-900">{salesReps.filter(r => r.qr_code).length}</div>
+          </div>
+          <div className="bg-red-50 rounded-lg p-4 border border-red-200">
+            <div className="text-red-600 text-sm font-medium">Conversion Rate</div>
+            <div className="text-2xl font-bold text-red-900">{conversionRate}%</div>
+          </div>
         </div>
 
-        {/* Reps Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredReps.map((rep) => (
-            <div key={rep.id} className="border border-gray-200 rounded-lg p-4 hover:border-red-500 transition-colors">
-              <div className="flex items-center space-x-3 mb-3">
-                <img 
-                  src={rep.picture} 
-                  alt={rep.name}
-                  className="w-12 h-12 rounded-full"
-                />
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">{rep.name}</h3>
-                  <p className="text-sm text-gray-600">{rep.territory}</p>
-                </div>
-                <QRCodeSVG size={40} value={rep.qrCode} />
-              </div>
-              
-              <div className="space-y-2 mb-4">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Leads:</span>
-                  <span className="font-medium">{rep.leads}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Conversions:</span>
-                  <span className="font-medium">{rep.conversions}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Rate:</span>
-                  <span className="font-medium">{((rep.conversions/rep.leads)*100).toFixed(1)}%</span>
-                </div>
-              </div>
-              
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => setSelectedRep(rep)}
-                  className="flex-1 bg-red-600 text-white py-2 px-3 rounded-md hover:bg-red-700 transition-colors text-sm"
-                >
-                  View Page
-                </button>
-                {isAdmin && (
-                  <button className="bg-gray-600 text-white py-2 px-3 rounded-md hover:bg-gray-700 transition-colors text-sm">
-                    Edit
-                  </button>
-                )}
-              </div>
+        {/* Search and Filters */}
+        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <div className="flex-1">
+              <input
+                type="text"
+                placeholder="Search reps by name, email, or territory..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+              />
             </div>
-          ))}
+            <select
+              value={filterDepartment}
+              onChange={(e) => setFilterDepartment(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+            >
+              <option value="all">All Departments</option>
+              <option value="Sales">Sales</option>
+              <option value="Management">Management</option>
+            </select>
+            <select
+              value={filterTerritory}
+              onChange={(e) => setFilterTerritory(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+            >
+              <option value="all">All Territories</option>
+              <option value="Northern Virginia">Northern Virginia</option>
+              <option value="Southern Virginia">Southern Virginia</option>
+              <option value="Maryland">Maryland</option>
+            </select>
+          </div>
+
+          {/* Reps Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredReps.map((rep) => {
+              const repLeads = leads.filter(lead => lead.rep_id === rep.id);
+              const repConversions = repLeads.filter(lead => lead.status === 'converted');
+              const repConversionRate = repLeads.length > 0 ? ((repConversions.length / repLeads.length) * 100).toFixed(1) : 0;
+              
+              return (
+                <div key={rep.id} className="border border-gray-200 rounded-lg p-4 hover:border-red-500 transition-colors">
+                  <div className="flex items-center space-x-3 mb-3">
+                    <img 
+                      src={rep.picture?.startsWith('data:') ? rep.picture : `https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face`}
+                      alt={rep.name}
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900">{rep.name}</h3>
+                      <p className="text-sm text-gray-600">{rep.territory}</p>
+                    </div>
+                    <QRCodeSVG size={40} value={rep.qr_code || 'QR123456'} />
+                  </div>
+                  
+                  <div className="space-y-2 mb-4">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Leads:</span>
+                      <span className="font-medium">{repLeads.length}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Conversions:</span>
+                      <span className="font-medium">{repConversions.length}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Rate:</span>
+                      <span className="font-medium">{repConversionRate}%</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => setSelectedRep(rep)}
+                      className="flex-1 bg-red-600 text-white py-2 px-3 rounded-md hover:bg-red-700 transition-colors text-sm"
+                    >
+                      View Page
+                    </button>
+                    {isAdmin && (
+                      <button className="bg-gray-600 text-white py-2 px-3 rounded-md hover:bg-gray-700 transition-colors text-sm">
+                        Edit
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const LeadsTab = () => (
     <div className="space-y-6">
