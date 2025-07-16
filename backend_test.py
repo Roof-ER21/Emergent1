@@ -12,7 +12,7 @@ from datetime import datetime
 import time
 
 # Configuration
-BASE_URL = "http://localhost:8001/api"
+BASE_URL = "https://73279c9a-6b56-48ad-95d4-d2efdc02f864.preview.emergentagent.com/api"
 HEADERS = {"Content-Type": "application/json"}
 
 class RoofHRTester:
