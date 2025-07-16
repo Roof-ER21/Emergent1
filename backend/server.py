@@ -693,7 +693,7 @@ async def delete_employee(employee_id: str, current_user: User = Depends(get_cur
 
 @api_router.post("/employees/import")
 async def import_employees(import_request: EmployeeImport, current_user: User = Depends(get_current_user)):
-    """Import employees from Google Sheets"""
+    """Import employees from Google Sheets (fallback to sample data)"""
     if current_user.role not in ["super_admin", "hr_manager"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
@@ -715,6 +715,126 @@ async def import_employees(import_request: EmployeeImport, current_user: User = 
             imported_count += 1
     
     return {"message": f"Imported {imported_count} employees successfully"}
+
+@api_router.post("/employees/import-from-sheets")
+async def import_employees_from_sheets(import_request: GoogleSheetsImportRequest, current_user: User = Depends(get_current_user)):
+    """Import employees from Google Sheets with real API integration"""
+    if current_user.role not in ["super_admin", "hr_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    if import_request.data_type != "employees":
+        raise HTTPException(status_code=400, detail="Invalid data type for employee import")
+    
+    try:
+        # Read data from Google Sheets
+        sheet_data = await google_sheets_service.read_sheet_data(
+            import_request.spreadsheet_id, 
+            import_request.range_name
+        )
+        
+        if not sheet_data:
+            raise HTTPException(status_code=400, detail="No data found in the specified range")
+        
+        # Skip header row
+        data_rows = sheet_data[1:] if len(sheet_data) > 1 else []
+        
+        imported_count = 0
+        errors = []
+        
+        for i, row in enumerate(data_rows, start=2):  # Start from row 2 (after header)
+            try:
+                emp_data = parse_employee_row(row)
+                if not emp_data.get("name") or not emp_data.get("email"):
+                    errors.append(f"Row {i}: Missing required fields (name, email)")
+                    continue
+                
+                employee = Employee(**emp_data)
+                existing = await db.employees.find_one({"email": employee.email})
+                if not existing:
+                    await db.employees.insert_one(employee.model_dump())
+                    imported_count += 1
+                    
+            except Exception as e:
+                errors.append(f"Row {i}: {str(e)}")
+        
+        response = {"imported": imported_count, "total_rows": len(data_rows)}
+        if errors:
+            response["errors"] = errors
+            
+        return response
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Import failed: {str(e)}")
+
+@api_router.post("/sales-reps/import-from-sheets")
+async def import_sales_reps_from_sheets(import_request: GoogleSheetsImportRequest, current_user: User = Depends(get_current_user)):
+    """Import sales reps from Google Sheets with real API integration"""
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    if import_request.data_type != "sales_reps":
+        raise HTTPException(status_code=400, detail="Invalid data type for sales rep import")
+    
+    try:
+        # Read data from Google Sheets
+        sheet_data = await google_sheets_service.read_sheet_data(
+            import_request.spreadsheet_id, 
+            import_request.range_name
+        )
+        
+        if not sheet_data:
+            raise HTTPException(status_code=400, detail="No data found in the specified range")
+        
+        # Skip header row
+        data_rows = sheet_data[1:] if len(sheet_data) > 1 else []
+        
+        imported_count = 0
+        errors = []
+        
+        for i, row in enumerate(data_rows, start=2):  # Start from row 2 (after header)
+            try:
+                rep_data = parse_sales_rep_row(row)
+                if not rep_data.get("name") or not rep_data.get("email"):
+                    errors.append(f"Row {i}: Missing required fields (name, email)")
+                    continue
+                
+                sales_rep = SalesRep(**rep_data)
+                existing = await db.sales_reps.find_one({"email": sales_rep.email})
+                if not existing:
+                    await db.sales_reps.insert_one(sales_rep.model_dump())
+                    imported_count += 1
+                    
+            except Exception as e:
+                errors.append(f"Row {i}: {str(e)}")
+        
+        response = {"imported": imported_count, "total_rows": len(data_rows)}
+        if errors:
+            response["errors"] = errors
+            
+        return response
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Import failed: {str(e)}")
+
+@api_router.get("/import/status")
+async def get_import_status(current_user: User = Depends(get_current_user)):
+    """Get Google Sheets import status and configuration"""
+    if current_user.role not in ["super_admin", "hr_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    return {
+        "google_sheets_enabled": google_sheets_service.enabled,
+        "credentials_configured": os.path.exists(google_sheets_service.credentials_path),
+        "supported_data_types": ["employees", "sales_reps"],
+        "sample_ranges": {
+            "employees": "Employees!A:E",
+            "sales_reps": "Sales Reps!A:F"
+        }
+    }
 
 # Job Management Routes
 @api_router.get("/jobs", response_model=List[Job])
