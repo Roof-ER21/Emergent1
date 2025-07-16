@@ -474,8 +474,8 @@ const QRGeneratorApp = () => {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading QR Code Generator...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading QR Code Generator...</p>
         </div>
       </div>
     );
@@ -483,12 +483,17 @@ const QRGeneratorApp = () => {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <div className="text-red-800 font-medium">Error</div>
-        <div className="text-red-600 mt-1">{error}</div>
+      <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-6">
+        <div className="flex items-center mb-4">
+          <svg className="w-6 h-6 text-red-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div className="text-red-400 font-medium">Error</div>
+        </div>
+        <div className="text-red-300 mb-4">{error}</div>
         <button
           onClick={() => window.location.reload()}
-          className="mt-2 px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
         >
           Retry
         </button>
