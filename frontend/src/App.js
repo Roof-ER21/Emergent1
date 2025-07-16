@@ -599,135 +599,193 @@ const QRGeneratorApp = () => {
     };
 
     return (
-      <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-          <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-gray-900">Landing Page Preview</h2>
+      <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+        <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-gray-700">
+          <div className="sticky top-0 bg-gray-800 border-b border-gray-700 px-6 py-4 flex justify-between items-center">
+            <h2 className="text-xl font-semibold text-white">Landing Page Preview</h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-2xl"
+              className="text-gray-400 hover:text-white text-2xl transition-colors"
             >
               ×
             </button>
           </div>
           
           {/* Mobile-optimized landing page */}
-          <div className="p-6 bg-gray-50">
-            <div className="max-w-sm mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-              {/* Header with picture and video */}
-              <div className="bg-red-600 text-white p-4">
+          <div className="p-6 bg-gray-900">
+            <div className="max-w-sm mx-auto bg-white rounded-lg shadow-xl overflow-hidden">
+              {/* Header Section */}
+              <div className="bg-gradient-to-r from-red-600 to-red-700 text-white p-6">
                 <div className="flex justify-between items-start">
-                  <div className="flex items-center space-x-3">
-                    <img 
-                      src={rep.picture?.startsWith('data:') ? rep.picture : `https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face`}
-                      alt={rep.name}
-                      className="w-16 h-16 rounded-full border-2 border-white object-cover"
-                    />
+                  <div className="flex items-center space-x-4">
+                    <div className="w-16 h-16 rounded-full border-3 border-white/30 overflow-hidden bg-white/20">
+                      <img 
+                        src={rep.picture?.startsWith('data:') ? rep.picture : `https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face`}
+                        alt={rep.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                     <div>
                       <h1 className="text-xl font-bold">{rep.name}</h1>
-                      <p className="text-red-100">{rep.territory}</p>
+                      <p className="text-red-100 text-sm">{rep.territory}</p>
+                      <div className="flex items-center mt-1">
+                        <span className="text-xs bg-white/20 px-2 py-1 rounded-full">
+                          {rep.department}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  <div className="w-24 h-16 bg-black rounded">
+                  <div className="w-20 h-14 bg-black/30 rounded-lg flex items-center justify-center">
                     {rep.welcome_video?.startsWith('data:') ? (
                       <video
-                        width="96"
-                        height="64"
+                        width="80"
+                        height="56"
                         src={rep.welcome_video}
                         controls
                         className="rounded"
                       />
                     ) : (
-                      <iframe
-                        width="96"
-                        height="64"
-                        src={rep.welcome_video || 'https://www.youtube.com/embed/dQw4w9WgXcQ'}
-                        title="Welcome Video"
-                        className="rounded"
-                      />
+                      <div className="text-white/70 text-xs text-center">
+                        <div className="w-6 h-6 mx-auto mb-1">
+                          <svg fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                            <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        Video
+                      </div>
                     )}
                   </div>
                 </div>
               </div>
 
-              {/* About Me Section */}
-              <div className="p-4">
-                <h2 className="text-lg font-semibold text-gray-900 mb-2">About Me</h2>
-                <p className="text-gray-600 mb-4">{rep.about_me || 'Professional roofing expert dedicated to quality service.'}</p>
+              {/* About Section */}
+              <div className="p-6 bg-white">
+                <div className="mb-6">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-3">About Me</h2>
+                  <p className="text-gray-600 leading-relaxed">
+                    {rep.about_me || 'Professional roofing expert dedicated to quality service and customer satisfaction.'}
+                  </p>
+                </div>
                 
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center text-gray-700">
-                    <span className="text-red-600 mr-2">📞</span>
-                    {rep.phone || 'Contact for phone'}
+                {/* Contact Info */}
+                <div className="grid grid-cols-1 gap-3 mb-6">
+                  <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                    <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                      <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Phone</p>
+                      <p className="font-medium text-gray-900">{rep.phone || 'Contact for phone'}</p>
+                    </div>
                   </div>
-                  <div className="flex items-center text-gray-700">
-                    <span className="text-red-600 mr-2">✉️</span>
-                    {rep.email}
+                  
+                  <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                    <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                      <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Email</p>
+                      <p className="font-medium text-gray-900">{rep.email}</p>
+                    </div>
                   </div>
-                  <div className="flex items-center text-gray-700">
-                    <span className="text-red-600 mr-2">📍</span>
-                    {rep.territory}
+                  
+                  <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                    <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                      <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Service Area</p>
+                      <p className="font-medium text-gray-900">{rep.territory}</p>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Call to Action */}
-              <div className="p-4 bg-gray-50">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Get Your Free Roof Estimate</h3>
+              {/* CTA Section */}
+              <div className="p-6 bg-gray-900 text-white">
+                <div className="text-center mb-6">
+                  <h3 className="text-xl font-bold mb-2">Get Your Free Roof Estimate</h3>
+                  <p className="text-gray-300 text-sm">Professional assessment • No obligation • Quick response</p>
+                </div>
+                
                 {leadSuccess ? (
-                  <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-                    Thank you! Your request has been submitted successfully.
+                  <div className="bg-green-500/20 border border-green-500/30 text-green-400 px-4 py-6 rounded-lg text-center">
+                    <svg className="w-12 h-12 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="font-medium">Thank you for your request!</p>
+                    <p className="text-sm">We'll contact you within 24 hours.</p>
                   </div>
                 ) : (
-                  <form onSubmit={handleLeadSubmit} className="space-y-3">
-                    <input
-                      type="text"
-                      name="name"
-                      placeholder="Your Name"
-                      value={leadData.name}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                    />
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="Your Email"
-                      value={leadData.email}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                    />
-                    <input
-                      type="tel"
-                      name="phone"
-                      placeholder="Your Phone"
-                      value={leadData.phone}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                    />
-                    <input
-                      type="text"
-                      name="address"
-                      placeholder="Your Address"
-                      value={leadData.address}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                    />
-                    <textarea
-                      name="message"
-                      placeholder="Tell us about your roofing needs..."
-                      rows="3"
-                      value={leadData.message}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                    />
+                  <form onSubmit={handleLeadSubmit} className="space-y-4">
+                    <div className="grid grid-cols-1 gap-4">
+                      <input
+                        type="text"
+                        name="name"
+                        placeholder="Your Name *"
+                        value={leadData.name}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-400"
+                      />
+                      <input
+                        type="email"
+                        name="email"
+                        placeholder="Your Email *"
+                        value={leadData.email}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-400"
+                      />
+                      <input
+                        type="tel"
+                        name="phone"
+                        placeholder="Your Phone"
+                        value={leadData.phone}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-400"
+                      />
+                      <input
+                        type="text"
+                        name="address"
+                        placeholder="Property Address"
+                        value={leadData.address}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-400"
+                      />
+                      <textarea
+                        name="message"
+                        placeholder="Tell us about your roofing needs..."
+                        rows="3"
+                        value={leadData.message}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-400 resize-none"
+                      />
+                    </div>
                     <button
                       type="submit"
                       disabled={submittingLead}
-                      className="w-full bg-red-600 text-white py-3 px-4 rounded-md hover:bg-red-700 transition-colors font-semibold disabled:opacity-50"
+                      className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-4 px-6 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                     >
-                      {submittingLead ? 'Submitting...' : 'Get My Free Estimate'}
+                      {submittingLead ? (
+                        <>
+                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Submitting...
+                        </>
+                      ) : (
+                        'Get My Free Estimate'
+                      )}
                     </button>
                   </form>
                 )}
