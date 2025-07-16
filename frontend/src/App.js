@@ -963,104 +963,190 @@ const QRGeneratorApp = () => {
     );
   };
 
-  const MyPageTab = () => (
-    <div className="space-y-6">
-      <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Your Landing Page</h2>
-          <p className="text-gray-600">This is how customers see your personal landing page</p>
+  const MyPageTab = () => {
+    const [uploading, setUploading] = useState(false);
+    const [uploadType, setUploadType] = useState('');
+
+    const handleFileUpload = async (e, type) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      setUploading(true);
+      setUploadType(type);
+
+      try {
+        // Convert file to base64
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          const base64String = reader.result;
+          
+          const fileData = {
+            file_data: base64String,
+            file_type: file.type,
+            file_name: file.name
+          };
+
+          await uploadFile(currentRep.id, fileData, type);
+          
+          setUploading(false);
+          setUploadType('');
+        };
+        reader.readAsDataURL(file);
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        setUploading(false);
+        setUploadType('');
+        alert('Error uploading file. Please try again.');
+      }
+    };
+
+    const handleUpdateProfile = async (updateData) => {
+      try {
+        await updateSalesRep(currentRep.id, updateData);
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        alert('Error updating profile. Please try again.');
+      }
+    };
+
+    if (!currentRep) {
+      return (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="text-yellow-800 font-medium">Sales Rep Profile Not Found</div>
+          <div className="text-yellow-600 mt-1">Please contact your administrator to set up your profile.</div>
         </div>
-        
-        {currentRep && (
-          <div className="max-w-sm mx-auto">
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
-              {/* Header */}
-              <div className="bg-red-600 text-white p-4">
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center space-x-3">
-                    <img 
-                      src={currentRep.picture} 
-                      alt={currentRep.name}
-                      className="w-16 h-16 rounded-full border-2 border-white"
-                    />
-                    <div>
-                      <h1 className="text-xl font-bold">{currentRep.name}</h1>
-                      <p className="text-red-100">{currentRep.territory}</p>
-                    </div>
-                  </div>
-                  <div className="w-24 h-16 bg-black rounded">
-                    <iframe
-                      width="96"
-                      height="64"
-                      src={currentRep.welcomeVideo}
-                      title="Welcome Video"
-                      className="rounded"
-                    />
-                  </div>
-                </div>
-              </div>
+      );
+    }
 
-              {/* About Me */}
-              <div className="p-4">
-                <h2 className="text-lg font-semibold text-gray-900 mb-2">About Me</h2>
-                <p className="text-gray-600 mb-4">{currentRep.aboutMe}</p>
-                
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center text-gray-700">
-                    <span className="text-red-600 mr-2">📞</span>
-                    {currentRep.phone}
-                  </div>
-                  <div className="flex items-center text-gray-700">
-                    <span className="text-red-600 mr-2">✉️</span>
-                    {currentRep.email}
-                  </div>
-                  <div className="flex items-center text-gray-700">
-                    <span className="text-red-600 mr-2">📍</span>
-                    {currentRep.territory}
-                  </div>
-                </div>
-              </div>
+    return (
+      <div className="space-y-6">
+        {/* Profile Management */}
+        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-semibold text-gray-900">Manage Your Profile</h2>
+            <div className="flex space-x-2">
+              <label className="cursor-pointer bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors text-sm">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileUpload(e, 'picture')}
+                  className="hidden"
+                  disabled={uploading}
+                />
+                {uploading && uploadType === 'picture' ? 'Uploading...' : 'Upload Photo'}
+              </label>
+              <label className="cursor-pointer bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors text-sm">
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={(e) => handleFileUpload(e, 'video')}
+                  className="hidden"
+                  disabled={uploading}
+                />
+                {uploading && uploadType === 'video' ? 'Uploading...' : 'Upload Video'}
+              </label>
+            </div>
+          </div>
 
-              {/* Call to Action */}
-              <div className="p-4 bg-gray-50">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Get Your Free Roof Estimate</h3>
-                <div className="space-y-3">
-                  <input
-                    type="text"
-                    placeholder="Your Name"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                    disabled
-                  />
-                  <input
-                    type="email"
-                    placeholder="Your Email"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                    disabled
-                  />
-                  <button
-                    className="w-full bg-red-600 text-white py-3 px-4 rounded-md font-semibold"
-                    disabled
-                  >
-                    Get My Free Estimate
-                  </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Profile Form */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">About Me</label>
+                <textarea
+                  value={currentRep.about_me || ''}
+                  onChange={(e) => handleUpdateProfile({ about_me: e.target.value })}
+                  rows="4"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  placeholder="Tell customers about yourself..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                <input
+                  type="tel"
+                  value={currentRep.phone || ''}
+                  onChange={(e) => handleUpdateProfile({ phone: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  placeholder="Your phone number"
+                />
+              </div>
+              <div className="pt-4 border-t">
+                <h3 className="text-lg font-medium text-gray-900 mb-2">QR Code</h3>
+                <div className="flex items-center space-x-4">
+                  <QRCodeSVG size={80} value={currentRep.qr_code || 'QR123456'} />
+                  <div>
+                    <p className="text-sm text-gray-600">Your QR Code</p>
+                    <p className="text-xs text-gray-500 font-mono">{currentRep.qr_code}</p>
+                    <p className="text-xs text-gray-500 mt-1">Share this code with customers</p>
+                  </div>
                 </div>
               </div>
             </div>
-            
-            <div className="mt-4 text-center">
-              <div className="inline-flex items-center space-x-2">
-                <QRCodeSVG size={80} value={currentRep.qrCode} />
-                <div className="text-left">
-                  <p className="text-sm text-gray-600">Your QR Code</p>
-                  <p className="text-xs text-gray-500">{currentRep.qrCode}</p>
+
+            {/* Landing Page Preview */}
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Landing Page Preview</h3>
+              <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                {/* Header */}
+                <div className="bg-red-600 text-white p-3">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center space-x-2">
+                      <img 
+                        src={currentRep.picture?.startsWith('data:') ? currentRep.picture : `https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face`}
+                        alt={currentRep.name}
+                        className="w-12 h-12 rounded-full border-2 border-white object-cover"
+                      />
+                      <div>
+                        <h1 className="text-lg font-bold">{currentRep.name}</h1>
+                        <p className="text-red-100 text-sm">{currentRep.territory}</p>
+                      </div>
+                    </div>
+                    <div className="w-16 h-12 bg-black rounded text-xs flex items-center justify-center">
+                      {currentRep.welcome_video ? 'Video' : 'Upload Video'}
+                    </div>
+                  </div>
+                </div>
+
+                {/* About Me */}
+                <div className="p-3">
+                  <h2 className="text-md font-semibold text-gray-900 mb-2">About Me</h2>
+                  <p className="text-sm text-gray-600 mb-3">{currentRep.about_me || 'Add your bio to tell customers about yourself...'}</p>
+                  
+                  <div className="space-y-1 mb-3">
+                    <div className="flex items-center text-sm text-gray-700">
+                      <span className="text-red-600 mr-2">📞</span>
+                      {currentRep.phone || 'Add phone number'}
+                    </div>
+                    <div className="flex items-center text-sm text-gray-700">
+                      <span className="text-red-600 mr-2">✉️</span>
+                      {currentRep.email}
+                    </div>
+                  </div>
+                </div>
+
+                {/* CTA */}
+                <div className="p-3 bg-gray-50 border-t">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-2">Get Your Free Roof Estimate</h3>
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      placeholder="Your Name"
+                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                      disabled
+                    />
+                    <button className="w-full bg-red-600 text-white py-2 px-3 rounded text-sm font-semibold">
+                      Get My Free Estimate
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="space-y-6">
