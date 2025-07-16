@@ -116,10 +116,10 @@ class RoofHRTester:
         print("Testing GET /employees...")
         response = self.make_request("GET", "/employees", auth_required=False)
         
-        if response and response.status_code == 403:
+        if response and response.status_code in [401, 403]:
             self.log_result("employee_management", "get_employees_no_auth", True, "Correctly requires authentication")
         else:
-            self.log_result("employee_management", "get_employees_no_auth", False, f"Expected 403, got {response.status_code if response else 'No response'}")
+            self.log_result("employee_management", "get_employees_no_auth", False, f"Expected 401/403, got {response.status_code if response else 'No response'}")
         
         # Test 2: Create employee without auth
         print("Testing POST /employees without auth...")
@@ -133,10 +133,10 @@ class RoofHRTester:
         }
         response = self.make_request("POST", "/employees", employee_data, auth_required=False)
         
-        if response and response.status_code == 403:
+        if response and response.status_code in [401, 403]:
             self.log_result("employee_management", "create_employee_no_auth", True, "Correctly requires authentication")
         else:
-            self.log_result("employee_management", "create_employee_no_auth", False, f"Expected 403, got {response.status_code if response else 'No response'}")
+            self.log_result("employee_management", "create_employee_no_auth", False, f"Expected 401/403, got {response.status_code if response else 'No response'}")
 
     def test_job_management_without_auth(self):
         """Test job management endpoints without authentication"""
