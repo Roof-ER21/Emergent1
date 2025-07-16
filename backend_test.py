@@ -253,17 +253,21 @@ class RoofHRTester:
         # Since we can't authenticate, we'll test the error responses for proper structure
         response = self.make_request("GET", "/employees", auth_required=False)
         
-        if response and response.headers.get('content-type', '').startswith('application/json'):
-            try:
-                error_data = response.json()
-                if 'detail' in error_data:
-                    self.log_result("employee_management", "json_response_structure", True, "API returns properly structured JSON responses")
-                else:
-                    self.log_result("employee_management", "json_response_structure", False, "JSON response missing expected fields")
-            except json.JSONDecodeError:
-                self.log_result("employee_management", "json_response_structure", False, "API returns invalid JSON")
+        if response:
+            content_type = response.headers.get('content-type', '')
+            if 'application/json' in content_type:
+                try:
+                    error_data = response.json()
+                    if 'detail' in error_data:
+                        self.log_result("employee_management", "json_response_structure", True, "API returns properly structured JSON responses")
+                    else:
+                        self.log_result("employee_management", "json_response_structure", False, "JSON response missing expected fields")
+                except json.JSONDecodeError:
+                    self.log_result("employee_management", "json_response_structure", False, "API returns invalid JSON")
+            else:
+                self.log_result("employee_management", "json_response_structure", False, f"API returns content-type: {content_type}")
         else:
-            self.log_result("employee_management", "json_response_structure", False, "API doesn't return JSON content-type")
+            self.log_result("employee_management", "json_response_structure", False, "No response received")
 
     def test_cors_configuration(self):
         """Test CORS configuration"""
