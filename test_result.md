@@ -432,6 +432,7 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Hiring Flow Management System with Type-Specific Workflows"
     - "User Authentication System with Emergent OAuth"
     - "QR Code Generator Backend APIs"
     - "Sales Rep Management System"
