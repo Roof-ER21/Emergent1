@@ -834,13 +834,4 @@ function App() {
   return <AppHub />;
 }
 
-// Wrap the App with AuthProvider
-function AppWrapper() {
-  return (
-    <AuthProvider>
-      <App />
-    </AuthProvider>
-  );
-}
-
-export default AppWrapper;
+export default App;
