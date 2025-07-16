@@ -1937,12 +1937,15 @@ async def get_pto_balance(employee_id: str, current_user: User = Depends(get_cur
     
     return balance
 
-# Safety & Compliance Management
-@api_router.get("/safety/trainings", response_model=List[SafetyTraining])
-async def get_safety_trainings(current_user: User = Depends(get_current_user)):
-    """Get all safety trainings"""
-    trainings = await db.safety_trainings.find({"is_active": True}).to_list(100)
-    return [SafetyTraining(**training) for training in trainings]
+# Hiring Flow Management Routes
+@api_router.get("/hiring/flows", response_model=List[HiringFlow])
+async def get_hiring_flows(current_user: User = Depends(get_current_user)):
+    """Get all hiring flows"""
+    if current_user.role not in ["super_admin", "hr_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    flows = await db.hiring_flows.find().to_list(1000)
+    return [HiringFlow(**flow) for flow in flows]
 
 @api_router.post("/safety/trainings", response_model=SafetyTraining)
 async def create_safety_training(training_create: SafetyTrainingCreate, current_user: User = Depends(get_current_user)):
