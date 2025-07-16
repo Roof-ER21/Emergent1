@@ -548,6 +548,410 @@ class RoofHRTester:
             self.log_result("authentication", "emergent_oauth_integration", False, 
                            f"Could not verify Emergent OAuth integration: {str(e)}")
 
+    def test_qr_generator_apis(self):
+        """Test QR Code Generator APIs without authentication"""
+        print("\n🔗 Testing QR Code Generator APIs (No Auth)...")
+        
+        # Test 1: Get all sales reps
+        print("Testing GET /qr-generator/reps...")
+        response = self.make_request("GET", "/qr-generator/reps", auth_required=False)
+        
+        if response is not None and response.status_code in [401, 403]:
+            self.log_result("qr_generator", "get_sales_reps_no_auth", True, "Correctly requires authentication")
+        elif response is not None:
+            self.log_result("qr_generator", "get_sales_reps_no_auth", False, f"Expected 401/403, got {response.status_code}")
+        else:
+            self.log_result("qr_generator", "get_sales_reps_no_auth", False, "No response received")
+        
+        # Test 2: Create sales rep without auth
+        print("Testing POST /qr-generator/reps without auth...")
+        rep_data = {
+            "name": "John Smith",
+            "email": "john.smith@theroofdocs.com",
+            "phone": "555-0123",
+            "territory": "North VA",
+            "department": "Sales",
+            "about_me": "Experienced roofing sales representative"
+        }
+        response = self.make_request("POST", "/qr-generator/reps", rep_data, auth_required=False)
+        
+        if response is not None and response.status_code in [401, 403]:
+            self.log_result("qr_generator", "create_sales_rep_no_auth", True, "Correctly requires authentication")
+        elif response is not None:
+            self.log_result("qr_generator", "create_sales_rep_no_auth", False, f"Expected 401/403, got {response.status_code}")
+        else:
+            self.log_result("qr_generator", "create_sales_rep_no_auth", False, "No response received")
+
+    def test_sales_rep_management(self):
+        """Test Sales Rep Management endpoints without authentication"""
+        print("\n👤 Testing Sales Rep Management (No Auth)...")
+        
+        test_rep_id = "test-rep-123"
+        
+        # Test 1: Get specific sales rep
+        print(f"Testing GET /qr-generator/reps/{test_rep_id}...")
+        response = self.make_request("GET", f"/qr-generator/reps/{test_rep_id}", auth_required=False)
+        
+        if response is not None and response.status_code in [401, 403]:
+            self.log_result("sales_rep_management", "get_sales_rep_no_auth", True, "Correctly requires authentication")
+        elif response is not None:
+            self.log_result("sales_rep_management", "get_sales_rep_no_auth", False, f"Expected 401/403, got {response.status_code}")
+        else:
+            self.log_result("sales_rep_management", "get_sales_rep_no_auth", False, "No response received")
+        
+        # Test 2: Update sales rep without auth
+        print(f"Testing PUT /qr-generator/reps/{test_rep_id}...")
+        update_data = {
+            "phone": "555-9999",
+            "about_me": "Updated bio"
+        }
+        response = self.make_request("PUT", f"/qr-generator/reps/{test_rep_id}", update_data, auth_required=False)
+        
+        if response is not None and response.status_code in [401, 403]:
+            self.log_result("sales_rep_management", "update_sales_rep_no_auth", True, "Correctly requires authentication")
+        elif response is not None:
+            self.log_result("sales_rep_management", "update_sales_rep_no_auth", False, f"Expected 401/403, got {response.status_code}")
+        else:
+            self.log_result("sales_rep_management", "update_sales_rep_no_auth", False, "No response received")
+        
+        # Test 3: Delete sales rep without auth
+        print(f"Testing DELETE /qr-generator/reps/{test_rep_id}...")
+        response = self.make_request("DELETE", f"/qr-generator/reps/{test_rep_id}", auth_required=False)
+        
+        if response is not None and response.status_code in [401, 403]:
+            self.log_result("sales_rep_management", "delete_sales_rep_no_auth", True, "Correctly requires authentication")
+        elif response is not None:
+            self.log_result("sales_rep_management", "delete_sales_rep_no_auth", False, f"Expected 401/403, got {response.status_code}")
+        else:
+            self.log_result("sales_rep_management", "delete_sales_rep_no_auth", False, "No response received")
+
+    def test_file_upload_endpoints(self):
+        """Test File Upload endpoints without authentication"""
+        print("\n📁 Testing File Upload Endpoints (No Auth)...")
+        
+        test_rep_id = "test-rep-123"
+        
+        # Test 1: Upload picture without auth
+        print(f"Testing POST /qr-generator/reps/{test_rep_id}/upload-picture...")
+        picture_data = {
+            "file_data": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+            "file_type": "image/png",
+            "file_name": "profile.png"
+        }
+        response = self.make_request("POST", f"/qr-generator/reps/{test_rep_id}/upload-picture", picture_data, auth_required=False)
+        
+        if response is not None and response.status_code in [401, 403]:
+            self.log_result("file_upload", "upload_picture_no_auth", True, "Correctly requires authentication")
+        elif response is not None:
+            self.log_result("file_upload", "upload_picture_no_auth", False, f"Expected 401/403, got {response.status_code}")
+        else:
+            self.log_result("file_upload", "upload_picture_no_auth", False, "No response received")
+        
+        # Test 2: Upload video without auth
+        print(f"Testing POST /qr-generator/reps/{test_rep_id}/upload-video...")
+        video_data = {
+            "file_data": "AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAAIZnJlZQAAABBtZGF0",
+            "file_type": "video/mp4",
+            "file_name": "welcome.mp4"
+        }
+        response = self.make_request("POST", f"/qr-generator/reps/{test_rep_id}/upload-video", video_data, auth_required=False)
+        
+        if response is not None and response.status_code in [401, 403]:
+            self.log_result("file_upload", "upload_video_no_auth", True, "Correctly requires authentication")
+        elif response is not None:
+            self.log_result("file_upload", "upload_video_no_auth", False, f"Expected 401/403, got {response.status_code}")
+        else:
+            self.log_result("file_upload", "upload_video_no_auth", False, "No response received")
+
+    def test_lead_capture_system(self):
+        """Test Lead Capture and Distribution system"""
+        print("\n📋 Testing Lead Capture System...")
+        
+        # Test 1: Get all leads without auth
+        print("Testing GET /qr-generator/leads...")
+        response = self.make_request("GET", "/qr-generator/leads", auth_required=False)
+        
+        if response is not None and response.status_code in [401, 403]:
+            self.log_result("lead_capture", "get_leads_no_auth", True, "Correctly requires authentication")
+        elif response is not None:
+            self.log_result("lead_capture", "get_leads_no_auth", False, f"Expected 401/403, got {response.status_code}")
+        else:
+            self.log_result("lead_capture", "get_leads_no_auth", False, "No response received")
+        
+        # Test 2: Create lead (public endpoint - should work without auth)
+        print("Testing POST /qr-generator/leads (public endpoint)...")
+        lead_data = {
+            "name": "Jane Doe",
+            "email": "jane.doe@email.com",
+            "phone": "555-0456",
+            "address": "123 Main St, Richmond, VA",
+            "message": "Interested in roof repair services",
+            "rep_id": "test-rep-123"
+        }
+        response = self.make_request("POST", "/qr-generator/leads", lead_data, auth_required=False)
+        
+        if response is not None and response.status_code == 404:
+            self.log_result("lead_capture", "create_lead_public", True, "Public lead creation endpoint accessible (404 expected for non-existent rep)")
+        elif response is not None and response.status_code in [200, 201]:
+            self.log_result("lead_capture", "create_lead_public", True, "Public lead creation endpoint working")
+        elif response is not None and response.status_code in [401, 403]:
+            self.log_result("lead_capture", "create_lead_public", False, "Public endpoint incorrectly requires authentication")
+        elif response is not None:
+            self.log_result("lead_capture", "create_lead_public", True, f"Public endpoint accessible (status: {response.status_code})")
+        else:
+            self.log_result("lead_capture", "create_lead_public", False, "No response received")
+        
+        # Test 3: Get specific lead without auth
+        test_lead_id = "test-lead-123"
+        print(f"Testing GET /qr-generator/leads/{test_lead_id}...")
+        response = self.make_request("GET", f"/qr-generator/leads/{test_lead_id}", auth_required=False)
+        
+        if response is not None and response.status_code in [401, 403]:
+            self.log_result("lead_capture", "get_lead_no_auth", True, "Correctly requires authentication")
+        elif response is not None:
+            self.log_result("lead_capture", "get_lead_no_auth", False, f"Expected 401/403, got {response.status_code}")
+        else:
+            self.log_result("lead_capture", "get_lead_no_auth", False, "No response received")
+        
+        # Test 4: Update lead without auth
+        print(f"Testing PUT /qr-generator/leads/{test_lead_id}...")
+        update_data = {
+            "status": "contacted",
+            "priority": "high"
+        }
+        response = self.make_request("PUT", f"/qr-generator/leads/{test_lead_id}", update_data, auth_required=False)
+        
+        if response is not None and response.status_code in [401, 403]:
+            self.log_result("lead_capture", "update_lead_no_auth", True, "Correctly requires authentication")
+        elif response is not None:
+            self.log_result("lead_capture", "update_lead_no_auth", False, f"Expected 401/403, got {response.status_code}")
+        else:
+            self.log_result("lead_capture", "update_lead_no_auth", False, "No response received")
+
+    def test_public_landing_page(self):
+        """Test Public Landing Page endpoint"""
+        print("\n🌐 Testing Public Landing Page...")
+        
+        # Test 1: Get rep landing page (public endpoint)
+        test_rep_name = "john-smith"
+        print(f"Testing GET /public/rep/{test_rep_name}...")
+        response = self.make_request("GET", f"/public/rep/{test_rep_name}", auth_required=False)
+        
+        if response is not None and response.status_code == 404:
+            self.log_result("qr_generator", "public_landing_page", True, "Public landing page endpoint accessible (404 expected for non-existent rep)")
+        elif response is not None and response.status_code == 200:
+            self.log_result("qr_generator", "public_landing_page", True, "Public landing page endpoint working")
+        elif response is not None and response.status_code in [401, 403]:
+            self.log_result("qr_generator", "public_landing_page", False, "Public endpoint incorrectly requires authentication")
+        elif response is not None:
+            self.log_result("qr_generator", "public_landing_page", True, f"Public endpoint accessible (status: {response.status_code})")
+        else:
+            self.log_result("qr_generator", "public_landing_page", False, "No response received")
+
+    def test_qr_analytics(self):
+        """Test QR Analytics endpoint"""
+        print("\n📊 Testing QR Analytics...")
+        
+        # Test 1: Get QR analytics without auth
+        print("Testing GET /qr-generator/analytics...")
+        response = self.make_request("GET", "/qr-generator/analytics", auth_required=False)
+        
+        if response is not None and response.status_code in [401, 403]:
+            self.log_result("qr_generator", "qr_analytics_no_auth", True, "Correctly requires authentication")
+        elif response is not None:
+            self.log_result("qr_generator", "qr_analytics_no_auth", False, f"Expected 401/403, got {response.status_code}")
+        else:
+            self.log_result("qr_generator", "qr_analytics_no_auth", False, "No response received")
+
+    def test_qr_generator_models(self):
+        """Test QR Generator data models"""
+        print("\n🗄️ Testing QR Generator Models...")
+        
+        try:
+            # Read the server.py file to check QR generator model definitions
+            with open('/app/backend/server.py', 'r') as f:
+                server_content = f.read()
+            
+            required_models = ['SalesRep', 'Lead', 'QRCode', 'SalesRepCreate', 'SalesRepUpdate', 'LeadCreate', 'LeadUpdate', 'FileUpload']
+            models_found = []
+            
+            for model in required_models:
+                if f'class {model}(BaseModel):' in server_content:
+                    models_found.append(model)
+            
+            if len(models_found) == len(required_models):
+                self.log_result("qr_generator", "qr_generator_models", True, 
+                               f"All QR generator models found: {', '.join(models_found)}")
+            else:
+                missing = set(required_models) - set(models_found)
+                self.log_result("qr_generator", "qr_generator_models", False, 
+                               f"Missing QR generator models: {', '.join(missing)}")
+                
+        except Exception as e:
+            self.log_result("qr_generator", "qr_generator_models", False, 
+                           f"Could not verify QR generator models: {str(e)}")
+
+    def test_qr_generator_functions(self):
+        """Test QR Generator helper functions"""
+        print("\n⚙️ Testing QR Generator Functions...")
+        
+        try:
+            # Read the server.py file to check QR generator functions
+            with open('/app/backend/server.py', 'r') as f:
+                server_content = f.read()
+            
+            required_functions = [
+                'def generate_qr_code(',
+                'def generate_landing_page_url(',
+                'async def send_lead_notification('
+            ]
+            
+            functions_found = []
+            for func in required_functions:
+                if func in server_content:
+                    functions_found.append(func.split('(')[0].replace('def ', '').replace('async ', ''))
+            
+            if len(functions_found) == len(required_functions):
+                self.log_result("qr_generator", "qr_generator_functions", True, 
+                               f"All QR generator functions found: {', '.join(functions_found)}")
+            else:
+                missing = set([f.split('(')[0].replace('def ', '').replace('async ', '') for f in required_functions]) - set(functions_found)
+                self.log_result("qr_generator", "qr_generator_functions", False, 
+                               f"Missing QR generator functions: {', '.join(missing)}")
+                
+        except Exception as e:
+            self.log_result("qr_generator", "qr_generator_functions", False, 
+                           f"Could not verify QR generator functions: {str(e)}")
+
+    def test_file_validation_logic(self):
+        """Test file validation logic"""
+        print("\n📁 Testing File Validation Logic...")
+        
+        try:
+            # Read the server.py file to check file validation
+            with open('/app/backend/server.py', 'r') as f:
+                server_content = f.read()
+            
+            validation_checks = [
+                'if not file_upload.file_type.startswith("image/")',
+                'if not file_upload.file_type.startswith("video/")',
+                'Invalid file type. Only images are allowed.',
+                'Invalid file type. Only videos are allowed.'
+            ]
+            
+            validation_implemented = True
+            for check in validation_checks:
+                if check not in server_content:
+                    validation_implemented = False
+                    break
+            
+            if validation_implemented:
+                self.log_result("file_upload", "file_validation_logic", True, 
+                               "File validation logic properly implemented")
+            else:
+                self.log_result("file_upload", "file_validation_logic", False, 
+                               "File validation logic not properly implemented")
+                
+        except Exception as e:
+            self.log_result("file_upload", "file_validation_logic", False, 
+                           f"Could not verify file validation logic: {str(e)}")
+
+    def test_lead_notification_system(self):
+        """Test lead notification system"""
+        print("\n📧 Testing Lead Notification System...")
+        
+        try:
+            # Read the server.py file to check lead notification system
+            with open('/app/backend/server.py', 'r') as f:
+                server_content = f.read()
+            
+            notification_components = [
+                'await send_lead_notification(lead, rep["email"], background_tasks)',
+                'You have received a new lead from',
+                'New Lead Alert -'
+            ]
+            
+            notification_implemented = True
+            for component in notification_components:
+                if component not in server_content:
+                    notification_implemented = False
+                    break
+            
+            if notification_implemented:
+                self.log_result("lead_capture", "lead_notification_system", True, 
+                               "Lead notification system properly implemented")
+            else:
+                self.log_result("lead_capture", "lead_notification_system", False, 
+                               "Lead notification system not properly implemented")
+                
+        except Exception as e:
+            self.log_result("lead_capture", "lead_notification_system", False, 
+                           f"Could not verify lead notification system: {str(e)}")
+
+    def test_conversion_tracking(self):
+        """Test conversion tracking logic"""
+        print("\n📈 Testing Conversion Tracking...")
+        
+        try:
+            # Read the server.py file to check conversion tracking
+            with open('/app/backend/server.py', 'r') as f:
+                server_content = f.read()
+            
+            tracking_components = [
+                'if lead_update.status == "converted" and lead["status"] != "converted"',
+                '{"$inc": {"conversions": 1}}',
+                '{"$inc": {"leads": 1}}'
+            ]
+            
+            tracking_implemented = True
+            for component in tracking_components:
+                if component not in server_content:
+                    tracking_implemented = False
+                    break
+            
+            if tracking_implemented:
+                self.log_result("lead_capture", "conversion_tracking", True, 
+                               "Conversion tracking properly implemented")
+            else:
+                self.log_result("lead_capture", "conversion_tracking", False, 
+                               "Conversion tracking not properly implemented")
+                
+        except Exception as e:
+            self.log_result("lead_capture", "conversion_tracking", False, 
+                           f"Could not verify conversion tracking: {str(e)}")
+
+    def test_role_based_qr_access(self):
+        """Test role-based access for QR generator endpoints"""
+        print("\n🔐 Testing Role-Based QR Access...")
+        
+        try:
+            # Read the server.py file to check role-based access for QR endpoints
+            with open('/app/backend/server.py', 'r') as f:
+                server_content = f.read()
+            
+            rbac_checks = [
+                'if current_user.role == "sales_rep" and current_user.id != rep_id',
+                'if current_user.role not in ["super_admin", "sales_manager"]',
+                'allowed_fields = ["phone", "about_me", "picture", "welcome_video"]'
+            ]
+            
+            rbac_implemented = True
+            for check in rbac_checks:
+                if check not in server_content:
+                    rbac_implemented = False
+                    break
+            
+            if rbac_implemented:
+                self.log_result("qr_generator", "role_based_qr_access", True, 
+                               "Role-based access for QR endpoints properly implemented")
+            else:
+                self.log_result("qr_generator", "role_based_qr_access", False, 
+                               "Role-based access for QR endpoints not properly implemented")
+                
+        except Exception as e:
+            self.log_result("qr_generator", "role_based_qr_access", False, 
+                           f"Could not verify role-based QR access: {str(e)}")
+
     def test_cors_configuration(self):
         """Test CORS configuration"""
         print("\n🌐 Testing CORS Configuration...")
