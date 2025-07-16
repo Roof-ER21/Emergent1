@@ -203,7 +203,7 @@ frontend:
         comment: "Implemented job creation, status tracking, and workflow management - needs testing"
 
   - task: "Sales Rep Dashboard with Commission Tracking"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "App.js"
     stuck_count: 0
@@ -212,7 +212,7 @@ frontend:
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Personal dashboard for sales reps with commission calculations"
+        comment: "Implemented sales rep dashboard with commission calculations - needs testing"
 
   - task: "Admin Dashboard with Analytics"
     implemented: false
