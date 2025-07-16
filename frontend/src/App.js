@@ -2356,6 +2356,17 @@ const QRGeneratorApp = () => {
   };
 
   const LeadsTab = () => {
+    const [leadFilters, setLeadFilters] = useState({
+      status: 'all',
+      priority: 'all',
+      rep: 'all',
+      dateRange: 'all'
+    });
+    
+    const [sortBy, setSortBy] = useState('created_at');
+    const [sortOrder, setSortOrder] = useState('desc');
+    const [searchQuery, setSearchQuery] = useState('');
+
     const handleLeadStatusChange = async (leadId, newStatus) => {
       try {
         await updateLead(leadId, { status: newStatus });
