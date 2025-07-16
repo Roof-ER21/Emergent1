@@ -1090,7 +1090,7 @@ const SalesLeaderboardApp = () => {
                   Current: {currentUser.metrics.monthly_signups} signups
                 </div>
                 <div className="text-xs text-orange-600">
-                  Next tier: {mockBonusTiers[currentUser.metrics.current_tier]?.threshold || 'Max tier'} signups
+                  Next tier: {bonusTiers[currentUser.metrics.current_tier]?.tier_name || 'Max tier'} - {bonusTiers[currentUser.metrics.current_tier]?.signup_threshold || 'Max'} signups
                 </div>
               </div>
             </div>
