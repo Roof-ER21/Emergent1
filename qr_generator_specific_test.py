@@ -10,7 +10,7 @@ import uuid
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://73279c9a-6b56-48ad-95d4-d2efdc02f864.preview.emergentagent.com/api"
+BASE_URL = "https://33b33743-99df-44c4-98d4-d821875bb83a.preview.emergentagent.com/api"
 HEADERS = {"Content-Type": "application/json"}
 DEV_TOKEN = "dev-token-super_admin"
 
