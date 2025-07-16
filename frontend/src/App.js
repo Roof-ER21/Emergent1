@@ -124,20 +124,20 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-gray-100 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-96 border-2 border-red-600">
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="bg-gray-800 p-8 rounded-lg shadow-xl w-96 border border-gray-700">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-red-600 mb-2">Roof-HR Suite</h1>
-          <p className="text-gray-600">4-in-1 Enterprise Management System</p>
+          <h1 className="text-3xl font-bold text-red-400 mb-2">Roof-HR Suite</h1>
+          <p className="text-gray-400">4-in-1 Enterprise Management System</p>
         </div>
         
         <div className="space-y-3">
-          <h3 className="text-lg font-semibold text-gray-800 mb-3">Select Your Role:</h3>
+          <h3 className="text-lg font-semibold text-white mb-3">Select Your Role:</h3>
           
           <button
             onClick={() => handleDevLogin('super_admin')}
             disabled={loading}
-            className="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+            className="w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors font-medium"
           >
             Super Admin
           </button>
@@ -145,7 +145,7 @@ const Login = () => {
           <button
             onClick={() => handleDevLogin('sales_manager')}
             disabled={loading}
-            className="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors"
+            className="w-full bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors font-medium"
           >
             Sales Manager
           </button>
@@ -153,7 +153,7 @@ const Login = () => {
           <button
             onClick={() => handleDevLogin('sales_rep')}
             disabled={loading}
-            className="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors"
+            className="w-full bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors font-medium"
           >
             Sales Rep
           </button>
@@ -161,7 +161,7 @@ const Login = () => {
           <button
             onClick={() => handleDevLogin('hr_manager')}
             disabled={loading}
-            className="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors"
+            className="w-full bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors font-medium"
           >
             HR Manager
           </button>
