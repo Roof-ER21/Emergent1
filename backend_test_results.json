@@ -1,0 +1,15 @@
+{
+  "authentication": {
+    "api_availability": {
+      "success": false,
+      "message": "API not accessible: HTTPSConnectionPool(host='a3ca6108-30b6-450a-b32e-182bb4a3ce55.preview.emergentagent.com', port=443): Read timed out. (read timeout=10)",
+      "response_data": null,
+      "timestamp": "2025-07-16T07:01:03.541223"
+    }
+  },
+  "employee_management": {},
+  "job_management": {},
+  "commission_system": {},
+  "analytics": {},
+  "email_notifications": {}
+}
