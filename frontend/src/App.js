@@ -37,13 +37,46 @@ const AuthProvider = ({ children }) => {
 
   const loginDev = async (role = 'super_admin') => {
     // Development login bypass
-    const devUser = {
-      id: 'dev-user-123',
-      email: 'admin@theroofdocs.com',
-      name: 'Admin User',
-      role: role,
-      picture: null
+    const devUsers = {
+      'super_admin': {
+        id: 'admin-123',
+        email: 'admin@theroofdocs.com',
+        name: 'Admin User',
+        role: 'super_admin',
+        picture: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+        phone: '(555) 123-4567',
+        territory: 'All Regions'
+      },
+      'sales_manager': {
+        id: 'manager-456',
+        email: 'manager@theroofdocs.com',
+        name: 'Sales Manager',
+        role: 'sales_manager',
+        picture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+        phone: '(555) 234-5678',
+        territory: 'Mid-Atlantic'
+      },
+      'sales_rep': {
+        id: 'rep-789',
+        email: 'john.smith@theroofdocs.com',
+        name: 'John Smith',
+        role: 'sales_rep',
+        picture: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+        phone: '(555) 345-6789',
+        territory: 'Northern Virginia'
+      },
+      'hr_manager': {
+        id: 'hr-101',
+        email: 'hr@theroofdocs.com',
+        name: 'HR Manager',
+        role: 'hr_manager',
+        picture: 'https://images.unsplash.com/photo-1494790108755-2616b9cf1d1e?w=150&h=150&fit=crop&crop=face',
+        phone: '(555) 456-7890',
+        territory: 'Corporate'
+      }
     };
+    
+    const devUser = devUsers[role] || devUsers['super_admin'];
     
     // Create a mock token for development
     const mockToken = 'dev-token-' + Date.now();
@@ -110,14 +143,6 @@ const Login = () => {
           </button>
           
           <button
-            onClick={() => handleDevLogin('hr_manager')}
-            disabled={loading}
-            className="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors"
-          >
-            HR Manager
-          </button>
-          
-          <button
             onClick={() => handleDevLogin('sales_manager')}
             disabled={loading}
             className="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors"
@@ -131,6 +156,14 @@ const Login = () => {
             className="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors"
           >
             Sales Rep
+          </button>
+          
+          <button
+            onClick={() => handleDevLogin('hr_manager')}
+            disabled={loading}
+            className="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors"
+          >
+            HR Manager
           </button>
         </div>
         
@@ -153,28 +186,23 @@ const AppHub = () => {
       name: 'Sales Leaderboard',
       description: 'Track performance, competitions, and sales metrics',
       icon: '🏆',
-      color: 'red',
-      roles: ['super_admin', 'sales_manager', 'sales_rep']
+      color: 'red'
     },
     {
       id: 'hr-recruitment',
       name: 'HR Recruitment',
       description: 'Manage applicants, interviews, and onboarding',
       icon: '👥',
-      color: 'gray',
-      roles: ['super_admin', 'hr_manager']
+      color: 'gray'
     },
     {
       id: 'qr-generator',
       name: 'QR Code Generator',
       description: 'Generate QR codes with individual landing pages',
       icon: '📱',
-      color: 'red',
-      roles: ['super_admin', 'sales_manager', 'sales_rep']
+      color: 'red'
     }
   ];
-
-  const availableApps = apps.filter(app => app.roles.includes(user?.role));
 
   const getRoleDisplay = (role) => {
     const roleMap = {
@@ -223,11 +251,11 @@ const AppHub = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Choose Your Application</h2>
-          <p className="text-gray-600 text-lg">Select the tool you need to access</p>
+          <p className="text-gray-600 text-lg">All applications available with role-based permissions</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {availableApps.map((app) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {apps.map((app) => (
             <div
               key={app.id}
               className="bg-white rounded-lg shadow-sm border-2 border-gray-200 hover:border-red-500 transition-all duration-200 cursor-pointer transform hover:scale-105"
@@ -250,14 +278,6 @@ const AppHub = () => {
             </div>
           ))}
         </div>
-
-        {availableApps.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-gray-400 text-6xl mb-4">🔒</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No Applications Available</h3>
-            <p className="text-gray-600">Your role doesn't have access to any applications.</p>
-          </div>
-        )}
       </div>
     </div>
   );
@@ -313,250 +333,442 @@ const AppWrapper = ({ app, onBack }) => {
   );
 };
 
-// Sales Leaderboard App
+// Sales Leaderboard App (placeholder)
 const SalesLeaderboardApp = () => {
   const { user } = useAuth();
-  const [leaderboard, setLeaderboard] = useState([
-    { id: 1, name: 'John Smith', sales: 125000, deals: 15, rank: 1, growth: 12.5 },
-    { id: 2, name: 'Sarah Johnson', sales: 98000, deals: 12, rank: 2, growth: 8.3 },
-    { id: 3, name: 'Mike Wilson', sales: 87000, deals: 10, rank: 3, growth: -2.1 },
-    { id: 4, name: 'Lisa Davis', sales: 76000, deals: 8, rank: 4, growth: 15.7 },
-    { id: 5, name: 'Tom Brown', sales: 65000, deals: 7, rank: 5, growth: 5.2 }
-  ]);
-
-  const [competitions, setCompetitions] = useState([
-    { id: 1, name: 'Q1 Sales Challenge', period: 'Jan - Mar 2025', status: 'active', prize: '$5,000' },
-    { id: 2, name: 'Monthly Deal Closer', period: 'January 2025', status: 'completed', prize: '$1,000' },
-    { id: 3, name: 'New Customer Acquisition', period: 'Feb - Apr 2025', status: 'upcoming', prize: '$3,000' }
-  ]);
-
-  const userStats = leaderboard.find(rep => rep.name === user?.name) || {
-    sales: 45000, deals: 6, rank: 8, growth: 3.2
-  };
-
+  
   return (
-    <div className="space-y-8">
-      {/* Personal Stats */}
-      <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Your Performance</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-            <div className="text-red-600 text-sm font-medium">Total Sales</div>
-            <div className="text-2xl font-bold text-red-900">${userStats.sales.toLocaleString()}</div>
-          </div>
-          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <div className="text-gray-600 text-sm font-medium">Deals Closed</div>
-            <div className="text-2xl font-bold text-gray-900">{userStats.deals}</div>
-          </div>
-          <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-            <div className="text-red-600 text-sm font-medium">Current Rank</div>
-            <div className="text-2xl font-bold text-red-900">#{userStats.rank}</div>
-          </div>
-          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <div className="text-gray-600 text-sm font-medium">Growth Rate</div>
-            <div className={`text-2xl font-bold ${userStats.growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {userStats.growth >= 0 ? '+' : ''}{userStats.growth.toFixed(1)}%
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="bg-white rounded-lg shadow-sm p-8 border border-gray-200">
+      <h2 className="text-2xl font-bold text-gray-900 mb-4">Sales Leaderboard</h2>
+      <p className="text-gray-600">Performance tracking and competitions coming soon...</p>
+    </div>
+  );
+};
 
-      {/* Leaderboard */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">Sales Leaderboard</h2>
-          <p className="text-gray-600">Current month rankings</p>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sales</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deals</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Growth</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {leaderboard.map((rep, index) => (
-                <tr key={rep.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <span className={`text-lg font-bold ${
-                        index === 0 ? 'text-yellow-500' : 
-                        index === 1 ? 'text-gray-400' : 
-                        index === 2 ? 'text-yellow-600' : 'text-gray-600'
-                      }`}>
-                        {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${rep.rank}`}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{rep.name}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">${rep.sales.toLocaleString()}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{rep.deals}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className={`text-sm font-medium ${rep.growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {rep.growth >= 0 ? '+' : ''}{rep.growth.toFixed(1)}%
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+// HR Recruitment App (placeholder)
+const HRRecruitmentApp = () => {
+  const { user } = useAuth();
+  
+  return (
+    <div className="bg-white rounded-lg shadow-sm p-8 border border-gray-200">
+      <h2 className="text-2xl font-bold text-gray-900 mb-4">HR Recruitment</h2>
+      <p className="text-gray-600">Applicant tracking and interview management coming soon...</p>
+    </div>
+  );
+};
 
-      {/* Competitions */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">Active Competitions</h2>
-          <p className="text-gray-600">Compete for prizes and recognition</p>
+// QR Generator App - Main Focus
+const QRGeneratorApp = () => {
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('overview');
+  const [salesReps, setSalesReps] = useState([
+    {
+      id: 'rep-789',
+      name: 'John Smith',
+      email: 'john.smith@theroofdocs.com',
+      phone: '(555) 345-6789',
+      territory: 'Northern Virginia',
+      department: 'Sales',
+      picture: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+      qrCode: 'QR123456',
+      landingPageUrl: 'https://theroofdocs.com/rep/john-smith',
+      welcomeVideo: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      aboutMe: 'Hi! I\'m John Smith, your local roofing expert with over 10 years of experience. I specialize in residential roofing solutions and pride myself on honest, quality work.',
+      leads: 25,
+      conversions: 8,
+      isActive: true
+    },
+    {
+      id: 'rep-890',
+      name: 'Sarah Johnson',
+      email: 'sarah.johnson@theroofdocs.com',
+      phone: '(555) 456-7890',
+      territory: 'Southern Virginia',
+      department: 'Sales',
+      picture: 'https://images.unsplash.com/photo-1494790108755-2616b9cf1d1e?w=150&h=150&fit=crop&crop=face',
+      qrCode: 'QR234567',
+      landingPageUrl: 'https://theroofdocs.com/rep/sarah-johnson',
+      welcomeVideo: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      aboutMe: 'Hello! I\'m Sarah Johnson, dedicated to providing exceptional roofing services. With 8 years in the industry, I focus on storm damage restoration and preventive maintenance.',
+      leads: 32,
+      conversions: 12,
+      isActive: true
+    },
+    {
+      id: 'rep-901',
+      name: 'Mike Wilson',
+      email: 'mike.wilson@theroofdocs.com',
+      phone: '(555) 567-8901',
+      territory: 'Maryland',
+      department: 'Sales',
+      picture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+      qrCode: 'QR345678',
+      landingPageUrl: 'https://theroofdocs.com/rep/mike-wilson',
+      welcomeVideo: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      aboutMe: 'I\'m Mike Wilson, your trusted roofing professional in Maryland. I specialize in commercial and residential projects, ensuring every job meets the highest standards.',
+      leads: 18,
+      conversions: 5,
+      isActive: true
+    }
+  ]);
+
+  const [leads, setLeads] = useState([
+    {
+      id: 'lead-001',
+      name: 'Robert Davis',
+      email: 'robert.davis@email.com',
+      phone: '(555) 111-2222',
+      address: '123 Main St, Richmond, VA',
+      repId: 'rep-789',
+      repName: 'John Smith',
+      status: 'new',
+      priority: 'high',
+      source: 'QR Code',
+      message: 'Need roof inspection after storm damage',
+      createdAt: '2025-01-16T10:30:00Z',
+      assignedTo: null
+    },
+    {
+      id: 'lead-002',
+      name: 'Emily Brown',
+      email: 'emily.brown@email.com',
+      phone: '(555) 222-3333',
+      address: '456 Oak Ave, Norfolk, VA',
+      repId: 'rep-890',
+      repName: 'Sarah Johnson',
+      status: 'assigned',
+      priority: 'medium',
+      source: 'QR Code',
+      message: 'Interested in solar roof installation',
+      createdAt: '2025-01-15T14:15:00Z',
+      assignedTo: 'rep-890'
+    },
+    {
+      id: 'lead-003',
+      name: 'David Miller',
+      email: 'david.miller@email.com',
+      phone: '(555) 333-4444',
+      address: '789 Pine Rd, Baltimore, MD',
+      repId: 'rep-901',
+      repName: 'Mike Wilson',
+      status: 'contacted',
+      priority: 'low',
+      source: 'QR Code',
+      message: 'Routine maintenance and gutter cleaning',
+      createdAt: '2025-01-14T09:45:00Z',
+      assignedTo: 'rep-901'
+    }
+  ]);
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterDepartment, setFilterDepartment] = useState('all');
+  const [filterTerritory, setFilterTerritory] = useState('all');
+  const [selectedRep, setSelectedRep] = useState(null);
+
+  const isAdmin = user?.role === 'super_admin' || user?.role === 'sales_manager';
+  const currentRep = salesReps.find(rep => rep.id === user?.id);
+
+  const filteredReps = salesReps.filter(rep => {
+    const matchesSearch = rep.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         rep.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         rep.territory.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesDepartment = filterDepartment === 'all' || rep.department === filterDepartment;
+    const matchesTerritory = filterTerritory === 'all' || rep.territory === filterTerritory;
+    return matchesSearch && matchesDepartment && matchesTerritory;
+  });
+
+  const QRCodeSVG = ({ size = 100, value = 'QR123456' }) => (
+    <div className="bg-white p-2 rounded border border-gray-300" style={{ width: size, height: size }}>
+      <svg width={size-16} height={size-16} viewBox="0 0 100 100">
+        <rect width="100" height="100" fill="white"/>
+        <g fill="black">
+          <rect x="10" y="10" width="30" height="30"/>
+          <rect x="60" y="10" width="30" height="30"/>
+          <rect x="10" y="60" width="30" height="30"/>
+          <rect x="50" y="50" width="10" height="10"/>
+          <rect x="70" y="50" width="10" height="10"/>
+          <rect x="50" y="70" width="10" height="10"/>
+          <rect x="70" y="70" width="10" height="10"/>
+          <rect x="45" y="45" width="5" height="5"/>
+          <rect x="55" y="55" width="5" height="5"/>
+        </g>
+      </svg>
+    </div>
+  );
+
+  const RepLandingPage = ({ rep, onClose }) => (
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+          <h2 className="text-xl font-semibold text-gray-900">Landing Page Preview</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 text-2xl"
+          >
+            ×
+          </button>
         </div>
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {competitions.map((competition) => (
-              <div key={competition.id} className="border border-gray-200 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-semibold text-gray-900">{competition.name}</h3>
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    competition.status === 'active' ? 'bg-green-100 text-green-800' :
-                    competition.status === 'completed' ? 'bg-gray-100 text-gray-800' :
-                    'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {competition.status.charAt(0).toUpperCase() + competition.status.slice(1)}
-                  </span>
+        
+        {/* Mobile-optimized landing page */}
+        <div className="p-6 bg-gray-50">
+          <div className="max-w-sm mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+            {/* Header with picture and video */}
+            <div className="bg-red-600 text-white p-4">
+              <div className="flex justify-between items-start">
+                <div className="flex items-center space-x-3">
+                  <img 
+                    src={rep.picture} 
+                    alt={rep.name}
+                    className="w-16 h-16 rounded-full border-2 border-white"
+                  />
+                  <div>
+                    <h1 className="text-xl font-bold">{rep.name}</h1>
+                    <p className="text-red-100">{rep.territory}</p>
+                  </div>
                 </div>
-                <p className="text-sm text-gray-600 mb-2">{competition.period}</p>
-                <div className="text-lg font-bold text-red-600">{competition.prize}</div>
+                <div className="w-24 h-16 bg-black rounded">
+                  <iframe
+                    width="96"
+                    height="64"
+                    src={rep.welcomeVideo}
+                    title="Welcome Video"
+                    className="rounded"
+                  />
+                </div>
               </div>
-            ))}
+            </div>
+
+            {/* About Me Section */}
+            <div className="p-4">
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">About Me</h2>
+              <p className="text-gray-600 mb-4">{rep.aboutMe}</p>
+              
+              <div className="space-y-2 mb-4">
+                <div className="flex items-center text-gray-700">
+                  <span className="text-red-600 mr-2">📞</span>
+                  {rep.phone}
+                </div>
+                <div className="flex items-center text-gray-700">
+                  <span className="text-red-600 mr-2">✉️</span>
+                  {rep.email}
+                </div>
+                <div className="flex items-center text-gray-700">
+                  <span className="text-red-600 mr-2">📍</span>
+                  {rep.territory}
+                </div>
+              </div>
+            </div>
+
+            {/* Call to Action */}
+            <div className="p-4 bg-gray-50">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Get Your Free Roof Estimate</h3>
+              <form className="space-y-3">
+                <input
+                  type="text"
+                  placeholder="Your Name"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                />
+                <input
+                  type="email"
+                  placeholder="Your Email"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                />
+                <input
+                  type="tel"
+                  placeholder="Your Phone"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                />
+                <input
+                  type="text"
+                  placeholder="Your Address"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                />
+                <textarea
+                  placeholder="Tell us about your roofing needs..."
+                  rows="3"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                />
+                <button
+                  type="submit"
+                  className="w-full bg-red-600 text-white py-3 px-4 rounded-md hover:bg-red-700 transition-colors font-semibold"
+                >
+                  Get My Free Estimate
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
-};
 
-// HR Recruitment App
-const HRRecruitmentApp = () => {
-  const [applicants, setApplicants] = useState([
-    { id: 1, name: 'Alex Johnson', position: 'Sales Representative', status: 'interview', applied: '2025-01-15', email: 'alex.johnson@email.com' },
-    { id: 2, name: 'Maria Garcia', position: 'Project Manager', status: 'review', applied: '2025-01-14', email: 'maria.garcia@email.com' },
-    { id: 3, name: 'David Wilson', position: 'Field Worker', status: 'hired', applied: '2025-01-13', email: 'david.wilson@email.com' },
-    { id: 4, name: 'Jennifer Lee', position: 'Sales Representative', status: 'rejected', applied: '2025-01-12', email: 'jennifer.lee@email.com' },
-    { id: 5, name: 'Robert Brown', position: 'HR Assistant', status: 'new', applied: '2025-01-16', email: 'robert.brown@email.com' }
-  ]);
-
-  const [interviews, setInterviews] = useState([
-    { id: 1, applicant: 'Alex Johnson', position: 'Sales Representative', date: '2025-01-20', time: '10:00 AM', interviewer: 'Sales Manager' },
-    { id: 2, applicant: 'Maria Garcia', position: 'Project Manager', date: '2025-01-21', time: '2:00 PM', interviewer: 'HR Manager' },
-    { id: 3, applicant: 'Robert Brown', position: 'HR Assistant', date: '2025-01-22', time: '11:00 AM', interviewer: 'HR Manager' }
-  ]);
-
-  const getStatusColor = (status) => {
-    const colors = {
-      'new': 'bg-blue-100 text-blue-800',
-      'review': 'bg-yellow-100 text-yellow-800',
-      'interview': 'bg-purple-100 text-purple-800',
-      'hired': 'bg-green-100 text-green-800',
-      'rejected': 'bg-red-100 text-red-800'
-    };
-    return colors[status] || 'bg-gray-100 text-gray-800';
-  };
-
-  const updateApplicantStatus = (id, newStatus) => {
-    setApplicants(applicants.map(app => 
-      app.id === id ? { ...app, status: newStatus } : app
-    ));
-  };
-
-  return (
-    <div className="space-y-8">
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+  const OverviewTab = () => (
+    <div className="space-y-6">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-          <div className="text-gray-600 text-sm font-medium">Total Applicants</div>
-          <div className="text-2xl font-bold text-gray-900">{applicants.length}</div>
+          <div className="text-gray-600 text-sm font-medium">Total Reps</div>
+          <div className="text-2xl font-bold text-gray-900">{salesReps.length}</div>
         </div>
         <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-          <div className="text-red-600 text-sm font-medium">New Applications</div>
-          <div className="text-2xl font-bold text-red-900">{applicants.filter(a => a.status === 'new').length}</div>
+          <div className="text-red-600 text-sm font-medium">Total Leads</div>
+          <div className="text-2xl font-bold text-red-900">{leads.length}</div>
         </div>
         <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-          <div className="text-gray-600 text-sm font-medium">In Review</div>
-          <div className="text-2xl font-bold text-gray-900">{applicants.filter(a => a.status === 'review').length}</div>
+          <div className="text-gray-600 text-sm font-medium">Total QR Codes</div>
+          <div className="text-2xl font-bold text-gray-900">{salesReps.filter(r => r.qrCode).length}</div>
         </div>
         <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-          <div className="text-red-600 text-sm font-medium">Interviews</div>
-          <div className="text-2xl font-bold text-red-900">{applicants.filter(a => a.status === 'interview').length}</div>
-        </div>
-        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-          <div className="text-gray-600 text-sm font-medium">Hired</div>
-          <div className="text-2xl font-bold text-gray-900">{applicants.filter(a => a.status === 'hired').length}</div>
+          <div className="text-red-600 text-sm font-medium">Conversion Rate</div>
+          <div className="text-2xl font-bold text-red-900">32%</div>
         </div>
       </div>
 
-      {/* Applicants */}
+      {/* Search and Filters */}
+      <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <div className="flex-1">
+            <input
+              type="text"
+              placeholder="Search reps by name, email, or territory..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+            />
+          </div>
+          <select
+            value={filterDepartment}
+            onChange={(e) => setFilterDepartment(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+          >
+            <option value="all">All Departments</option>
+            <option value="Sales">Sales</option>
+            <option value="Management">Management</option>
+          </select>
+          <select
+            value={filterTerritory}
+            onChange={(e) => setFilterTerritory(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+          >
+            <option value="all">All Territories</option>
+            <option value="Northern Virginia">Northern Virginia</option>
+            <option value="Southern Virginia">Southern Virginia</option>
+            <option value="Maryland">Maryland</option>
+          </select>
+        </div>
+
+        {/* Reps Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredReps.map((rep) => (
+            <div key={rep.id} className="border border-gray-200 rounded-lg p-4 hover:border-red-500 transition-colors">
+              <div className="flex items-center space-x-3 mb-3">
+                <img 
+                  src={rep.picture} 
+                  alt={rep.name}
+                  className="w-12 h-12 rounded-full"
+                />
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900">{rep.name}</h3>
+                  <p className="text-sm text-gray-600">{rep.territory}</p>
+                </div>
+                <QRCodeSVG size={40} value={rep.qrCode} />
+              </div>
+              
+              <div className="space-y-2 mb-4">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Leads:</span>
+                  <span className="font-medium">{rep.leads}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Conversions:</span>
+                  <span className="font-medium">{rep.conversions}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Rate:</span>
+                  <span className="font-medium">{((rep.conversions/rep.leads)*100).toFixed(1)}%</span>
+                </div>
+              </div>
+              
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setSelectedRep(rep)}
+                  className="flex-1 bg-red-600 text-white py-2 px-3 rounded-md hover:bg-red-700 transition-colors text-sm"
+                >
+                  View Page
+                </button>
+                {isAdmin && (
+                  <button className="bg-gray-600 text-white py-2 px-3 rounded-md hover:bg-gray-700 transition-colors text-sm">
+                    Edit
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const LeadsTab = () => (
+    <div className="space-y-6">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">Applicant Management</h2>
-          <p className="text-gray-600">Track and manage job applications</p>
+          <h2 className="text-xl font-semibold text-gray-900">Lead Management</h2>
+          <p className="text-gray-600">Track and distribute leads from QR code landing pages</p>
         </div>
+        
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applied</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rep</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {applicants.map((applicant) => (
-                <tr key={applicant.id} className="hover:bg-gray-50">
+              {leads.map((lead) => (
+                <tr key={lead.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
-                        <span className="text-red-600 font-medium">{applicant.name.charAt(0)}</span>
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{applicant.name}</div>
-                        <div className="text-sm text-gray-500">{applicant.email}</div>
-                      </div>
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">{lead.name}</div>
+                      <div className="text-sm text-gray-500">{lead.email}</div>
+                      <div className="text-sm text-gray-500">{lead.phone}</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{applicant.position}</div>
+                    <div className="text-sm text-gray-900">{lead.repName}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{applicant.applied}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(applicant.status)}`}>
-                      {applicant.status.charAt(0).toUpperCase() + applicant.status.slice(1)}
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      lead.status === 'new' ? 'bg-blue-100 text-blue-800' :
+                      lead.status === 'assigned' ? 'bg-yellow-100 text-yellow-800' :
+                      lead.status === 'contacted' ? 'bg-green-100 text-green-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}
                     </span>
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      lead.priority === 'high' ? 'bg-red-100 text-red-800' :
+                      lead.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-green-100 text-green-800'
+                    }`}>
+                      {lead.priority.charAt(0).toUpperCase() + lead.priority.slice(1)}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {new Date(lead.createdAt).toLocaleDateString()}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <select
-                      value={applicant.status}
-                      onChange={(e) => updateApplicantStatus(applicant.id, e.target.value)}
-                      className="text-sm border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                    >
-                      <option value="new">New</option>
-                      <option value="review">Review</option>
-                      <option value="interview">Interview</option>
-                      <option value="hired">Hired</option>
-                      <option value="rejected">Rejected</option>
-                    </select>
+                    <div className="flex space-x-2">
+                      <button className="text-red-600 hover:text-red-900">Assign</button>
+                      <button className="text-gray-600 hover:text-gray-900">View</button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -564,250 +776,164 @@ const HRRecruitmentApp = () => {
           </table>
         </div>
       </div>
-
-      {/* Interviews */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">Scheduled Interviews</h2>
-          <p className="text-gray-600">Upcoming interview appointments</p>
-        </div>
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {interviews.map((interview) => (
-              <div key={interview.id} className="border border-gray-200 rounded-lg p-4">
-                <h3 className="font-semibold text-gray-900 mb-2">{interview.applicant}</h3>
-                <p className="text-sm text-gray-600 mb-1">{interview.position}</p>
-                <p className="text-sm text-gray-600 mb-1">{interview.date} at {interview.time}</p>
-                <p className="text-sm text-gray-600">Interviewer: {interview.interviewer}</p>
-                <button className="mt-3 w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors">
-                  Join Interview
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
     </div>
   );
-};
 
-// QR Generator App
-const QRGeneratorApp = () => {
-  const { user } = useAuth();
-  const [qrCodes, setQrCodes] = useState([
-    { id: 1, name: 'Main Sales Page', url: 'https://theroofdocs.com/sales/john-smith', views: 145, leads: 12, created: '2025-01-10' },
-    { id: 2, name: 'Emergency Services', url: 'https://theroofdocs.com/emergency/john-smith', views: 89, leads: 8, created: '2025-01-12' },
-    { id: 3, name: 'Free Estimate', url: 'https://theroofdocs.com/estimate/john-smith', views: 203, leads: 18, created: '2025-01-08' }
-  ]);
-
-  const [newQR, setNewQR] = useState({
-    name: '',
-    pageType: 'sales',
-    customMessage: '',
-    contactInfo: true,
-    leadCapture: true
-  });
-
-  const [showGenerator, setShowGenerator] = useState(false);
-
-  const generateQR = () => {
-    const newQRCode = {
-      id: Date.now(),
-      name: newQR.name,
-      url: `https://theroofdocs.com/${newQR.pageType}/${user?.name?.toLowerCase().replace(' ', '-')}`,
-      views: 0,
-      leads: 0,
-      created: new Date().toISOString().split('T')[0]
-    };
-    
-    setQrCodes([...qrCodes, newQRCode]);
-    setNewQR({ name: '', pageType: 'sales', customMessage: '', contactInfo: true, leadCapture: true });
-    setShowGenerator(false);
-  };
-
-  const QRCodeSVG = ({ size = 100 }) => (
-    <svg width={size} height={size} viewBox="0 0 100 100" className="border border-gray-300">
-      <rect width="100" height="100" fill="white"/>
-      <g fill="black">
-        <rect x="10" y="10" width="30" height="30"/>
-        <rect x="60" y="10" width="30" height="30"/>
-        <rect x="10" y="60" width="30" height="30"/>
-        <rect x="50" y="50" width="10" height="10"/>
-        <rect x="70" y="50" width="10" height="10"/>
-        <rect x="50" y="70" width="10" height="10"/>
-        <rect x="70" y="70" width="10" height="10"/>
-      </g>
-    </svg>
-  );
-
-  return (
-    <div className="space-y-8">
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-          <div className="text-gray-600 text-sm font-medium">Total QR Codes</div>
-          <div className="text-2xl font-bold text-gray-900">{qrCodes.length}</div>
+  const MyPageTab = () => (
+    <div className="space-y-6">
+      <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Your Landing Page</h2>
+          <p className="text-gray-600">This is how customers see your personal landing page</p>
         </div>
-        <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-          <div className="text-red-600 text-sm font-medium">Total Views</div>
-          <div className="text-2xl font-bold text-red-900">{qrCodes.reduce((sum, qr) => sum + qr.views, 0)}</div>
-        </div>
-        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-          <div className="text-gray-600 text-sm font-medium">Total Leads</div>
-          <div className="text-2xl font-bold text-gray-900">{qrCodes.reduce((sum, qr) => sum + qr.leads, 0)}</div>
-        </div>
-      </div>
-
-      {/* Generate New QR */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">QR Code Generator</h2>
-              <p className="text-gray-600">Create custom QR codes with landing pages</p>
-            </div>
-            <button
-              onClick={() => setShowGenerator(!showGenerator)}
-              className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
-            >
-              {showGenerator ? 'Cancel' : 'Generate New QR'}
-            </button>
-          </div>
-        </div>
-
-        {showGenerator && (
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">QR Code Name</label>
-                  <input
-                    type="text"
-                    value={newQR.name}
-                    onChange={(e) => setNewQR({...newQR, name: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                    placeholder="e.g., Main Sales Page"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Page Type</label>
-                  <select
-                    value={newQR.pageType}
-                    onChange={(e) => setNewQR({...newQR, pageType: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                  >
-                    <option value="sales">Sales Page</option>
-                    <option value="emergency">Emergency Services</option>
-                    <option value="estimate">Free Estimate</option>
-                    <option value="contact">Contact Form</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Custom Message</label>
-                  <textarea
-                    value={newQR.customMessage}
-                    onChange={(e) => setNewQR({...newQR, customMessage: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                    rows={3}
-                    placeholder="Optional custom message for your landing page"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={newQR.contactInfo}
-                      onChange={(e) => setNewQR({...newQR, contactInfo: e.target.checked})}
-                      className="mr-2"
+        
+        {currentRep && (
+          <div className="max-w-sm mx-auto">
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
+              {/* Header */}
+              <div className="bg-red-600 text-white p-4">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center space-x-3">
+                    <img 
+                      src={currentRep.picture} 
+                      alt={currentRep.name}
+                      className="w-16 h-16 rounded-full border-2 border-white"
                     />
-                    <span className="text-sm text-gray-700">Include contact information</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={newQR.leadCapture}
-                      onChange={(e) => setNewQR({...newQR, leadCapture: e.target.checked})}
-                      className="mr-2"
+                    <div>
+                      <h1 className="text-xl font-bold">{currentRep.name}</h1>
+                      <p className="text-red-100">{currentRep.territory}</p>
+                    </div>
+                  </div>
+                  <div className="w-24 h-16 bg-black rounded">
+                    <iframe
+                      width="96"
+                      height="64"
+                      src={currentRep.welcomeVideo}
+                      title="Welcome Video"
+                      className="rounded"
                     />
-                    <span className="text-sm text-gray-700">Enable lead capture form</span>
-                  </label>
+                  </div>
                 </div>
-
-                <button
-                  onClick={generateQR}
-                  disabled={!newQR.name}
-                  className="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 disabled:opacity-50 transition-colors"
-                >
-                  Generate QR Code
-                </button>
               </div>
 
-              <div className="flex items-center justify-center">
-                <div className="text-center">
-                  <QRCodeSVG size={200} />
-                  <p className="mt-4 text-sm text-gray-600">QR Code Preview</p>
+              {/* About Me */}
+              <div className="p-4">
+                <h2 className="text-lg font-semibold text-gray-900 mb-2">About Me</h2>
+                <p className="text-gray-600 mb-4">{currentRep.aboutMe}</p>
+                
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center text-gray-700">
+                    <span className="text-red-600 mr-2">📞</span>
+                    {currentRep.phone}
+                  </div>
+                  <div className="flex items-center text-gray-700">
+                    <span className="text-red-600 mr-2">✉️</span>
+                    {currentRep.email}
+                  </div>
+                  <div className="flex items-center text-gray-700">
+                    <span className="text-red-600 mr-2">📍</span>
+                    {currentRep.territory}
+                  </div>
+                </div>
+              </div>
+
+              {/* Call to Action */}
+              <div className="p-4 bg-gray-50">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Get Your Free Roof Estimate</h3>
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    placeholder="Your Name"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    disabled
+                  />
+                  <input
+                    type="email"
+                    placeholder="Your Email"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    disabled
+                  />
+                  <button
+                    className="w-full bg-red-600 text-white py-3 px-4 rounded-md font-semibold"
+                    disabled
+                  >
+                    Get My Free Estimate
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-4 text-center">
+              <div className="inline-flex items-center space-x-2">
+                <QRCodeSVG size={80} value={currentRep.qrCode} />
+                <div className="text-left">
+                  <p className="text-sm text-gray-600">Your QR Code</p>
+                  <p className="text-xs text-gray-500">{currentRep.qrCode}</p>
                 </div>
               </div>
             </div>
           </div>
         )}
       </div>
+    </div>
+  );
 
-      {/* Existing QR Codes */}
+  return (
+    <div className="space-y-6">
+      {/* Tab Navigation */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">Your QR Codes</h2>
-          <p className="text-gray-600">Manage and track your QR code performance</p>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">QR Code</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Views</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Leads</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {qrCodes.map((qr) => (
-                <tr key={qr.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <QRCodeSVG size={50} />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{qr.name}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{qr.url}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{qr.views}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{qr.leads}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{qr.created}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex space-x-2">
-                      <button className="text-red-600 hover:text-red-800 text-sm">Download</button>
-                      <button className="text-gray-600 hover:text-gray-800 text-sm">Edit</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="border-b border-gray-200">
+          <nav className="flex space-x-8 px-6">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'overview'
+                  ? 'border-red-500 text-red-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {isAdmin ? 'Rep Overview' : 'Overview'}
+            </button>
+            {isAdmin && (
+              <button
+                onClick={() => setActiveTab('leads')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'leads'
+                    ? 'border-red-500 text-red-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                Lead Management
+              </button>
+            )}
+            {user?.role === 'sales_rep' && (
+              <button
+                onClick={() => setActiveTab('mypage')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'mypage'
+                    ? 'border-red-500 text-red-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                My Landing Page
+              </button>
+            )}
+          </nav>
         </div>
       </div>
+
+      {/* Tab Content */}
+      {activeTab === 'overview' && <OverviewTab />}
+      {activeTab === 'leads' && <LeadsTab />}
+      {activeTab === 'mypage' && <MyPageTab />}
+
+      {/* Rep Landing Page Preview Modal */}
+      {selectedRep && (
+        <RepLandingPage 
+          rep={selectedRep} 
+          onClose={() => setSelectedRep(null)} 
+        />
+      )}
     </div>
   );
 };
