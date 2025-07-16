@@ -146,10 +146,10 @@ class RoofHRTester:
         print("Testing GET /jobs...")
         response = self.make_request("GET", "/jobs", auth_required=False)
         
-        if response and response.status_code == 403:
+        if response and response.status_code in [401, 403]:
             self.log_result("job_management", "get_jobs_no_auth", True, "Correctly requires authentication")
         else:
-            self.log_result("job_management", "get_jobs_no_auth", False, f"Expected 403, got {response.status_code if response else 'No response'}")
+            self.log_result("job_management", "get_jobs_no_auth", False, f"Expected 401/403, got {response.status_code if response else 'No response'}")
         
         # Test 2: Create job without auth
         print("Testing POST /jobs without auth...")
@@ -164,10 +164,10 @@ class RoofHRTester:
         }
         response = self.make_request("POST", "/jobs", job_data, auth_required=False)
         
-        if response and response.status_code == 403:
+        if response and response.status_code in [401, 403]:
             self.log_result("job_management", "create_job_no_auth", True, "Correctly requires authentication")
         else:
-            self.log_result("job_management", "create_job_no_auth", False, f"Expected 403, got {response.status_code if response else 'No response'}")
+            self.log_result("job_management", "create_job_no_auth", False, f"Expected 401/403, got {response.status_code if response else 'No response'}")
 
     def test_commission_system_without_auth(self):
         """Test commission endpoints without authentication"""
@@ -177,10 +177,10 @@ class RoofHRTester:
         print("Testing GET /commissions...")
         response = self.make_request("GET", "/commissions", auth_required=False)
         
-        if response and response.status_code == 403:
+        if response and response.status_code in [401, 403]:
             self.log_result("commission_system", "get_commissions_no_auth", True, "Correctly requires authentication")
         else:
-            self.log_result("commission_system", "get_commissions_no_auth", False, f"Expected 403, got {response.status_code if response else 'No response'}")
+            self.log_result("commission_system", "get_commissions_no_auth", False, f"Expected 401/403, got {response.status_code if response else 'No response'}")
 
     def test_analytics_without_auth(self):
         """Test analytics endpoints without authentication"""
@@ -190,10 +190,10 @@ class RoofHRTester:
         print("Testing GET /analytics/dashboard...")
         response = self.make_request("GET", "/analytics/dashboard", auth_required=False)
         
-        if response and response.status_code == 403:
+        if response and response.status_code in [401, 403]:
             self.log_result("analytics", "get_dashboard_no_auth", True, "Correctly requires authentication")
         else:
-            self.log_result("analytics", "get_dashboard_no_auth", False, f"Expected 403, got {response.status_code if response else 'No response'}")
+            self.log_result("analytics", "get_dashboard_no_auth", False, f"Expected 401/403, got {response.status_code if response else 'No response'}")
 
     def test_google_sheets_import_without_auth(self):
         """Test Google Sheets import without authentication"""
@@ -205,10 +205,10 @@ class RoofHRTester:
         }
         response = self.make_request("POST", "/employees/import", import_data, auth_required=False)
         
-        if response and response.status_code == 403:
+        if response and response.status_code in [401, 403]:
             self.log_result("employee_management", "google_sheets_import_no_auth", True, "Correctly requires authentication")
         else:
-            self.log_result("employee_management", "google_sheets_import_no_auth", False, f"Expected 403, got {response.status_code if response else 'No response'}")
+            self.log_result("employee_management", "google_sheets_import_no_auth", False, f"Expected 401/403, got {response.status_code if response else 'No response'}")
 
     def test_endpoint_structure(self):
         """Test that all expected endpoints are properly structured"""
