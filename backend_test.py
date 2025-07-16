@@ -101,8 +101,10 @@ class RoofHRTester:
             self.log_result("authentication", "invalid_login", True, "Correctly rejected invalid session")
         elif response and response.status_code == 422:
             self.log_result("authentication", "invalid_login", True, "Correctly rejected invalid session (validation error)")
+        elif response:
+            self.log_result("authentication", "invalid_login", False, f"Expected 401/422, got {response.status_code}")
         else:
-            self.log_result("authentication", "invalid_login", False, f"Expected 401/422, got {response.status_code if response else 'No response'}")
+            self.log_result("authentication", "invalid_login", False, "No response received")
         
         # Test 2: Get current user without auth (should fail)
         print("Testing /auth/me without authentication...")
@@ -110,8 +112,10 @@ class RoofHRTester:
         
         if response and response.status_code in [401, 403]:
             self.log_result("authentication", "unauthorized_access", True, "Correctly rejected unauthorized access")
+        elif response:
+            self.log_result("authentication", "unauthorized_access", False, f"Expected 401/403, got {response.status_code}")
         else:
-            self.log_result("authentication", "unauthorized_access", False, f"Expected 401/403, got {response.status_code if response else 'No response'}")
+            self.log_result("authentication", "unauthorized_access", False, "No response received")
         
         # Note: We can't test successful login without a valid Emergent OAuth session
         self.log_result("authentication", "oauth_integration", True, "OAuth integration implemented (requires valid session for full testing)")
