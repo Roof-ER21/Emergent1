@@ -4,87 +4,99 @@
       "success": true,
       "message": "API documentation accessible",
       "response_data": null,
-      "timestamp": "2025-07-16T08:50:28.301258"
+      "timestamp": "2025-07-16T15:16:36.251771"
     },
     "invalid_login": {
       "success": true,
       "message": "Correctly rejected invalid session",
       "response_data": null,
-      "timestamp": "2025-07-16T08:50:28.490817"
+      "timestamp": "2025-07-16T15:16:36.332075"
     },
     "unauthorized_access": {
       "success": true,
       "message": "Correctly rejected unauthorized access",
       "response_data": null,
-      "timestamp": "2025-07-16T08:50:28.493995"
+      "timestamp": "2025-07-16T15:16:36.349969"
     },
     "oauth_integration": {
       "success": true,
       "message": "OAuth integration implemented (requires valid session for full testing)",
       "response_data": null,
-      "timestamp": "2025-07-16T08:50:28.494030"
+      "timestamp": "2025-07-16T15:16:36.350008"
     },
-    "endpoint_structure": {
+    "dev_auth_bypass": {
       "success": true,
-      "message": "All expected endpoints are properly structured",
+      "message": "Development authentication bypass working correctly",
       "response_data": null,
-      "timestamp": "2025-07-16T08:50:28.592910"
+      "timestamp": "2025-07-16T15:16:36.408967"
     },
     "cors_configuration": {
       "success": true,
       "message": "CORS properly configured",
       "response_data": null,
-      "timestamp": "2025-07-16T08:50:28.597209"
+      "timestamp": "2025-07-16T15:16:37.144278"
+    },
+    "endpoint_structure": {
+      "success": true,
+      "message": "All expected endpoints are properly structured",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:37.103906"
     },
     "role_based_access": {
       "success": true,
       "message": "Role-based access control properly implemented",
       "response_data": null,
-      "timestamp": "2025-07-16T08:50:28.597743"
+      "timestamp": "2025-07-16T15:16:37.461466"
     },
     "emergent_oauth_integration": {
       "success": true,
       "message": "Emergent OAuth integration properly implemented",
       "response_data": null,
-      "timestamp": "2025-07-16T08:50:28.598043"
+      "timestamp": "2025-07-16T15:16:37.461746"
     }
   },
   "employee_management": {
+    "get_employees_with_dev_token": {
+      "success": true,
+      "message": "Retrieved 0 employees successfully",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:36.430331"
+    },
     "get_employees_no_auth": {
       "success": true,
       "message": "Correctly requires authentication",
       "response_data": null,
-      "timestamp": "2025-07-16T08:50:28.496796"
+      "timestamp": "2025-07-16T15:16:36.624056"
     },
     "create_employee_no_auth": {
       "success": true,
       "message": "Correctly requires authentication",
       "response_data": null,
-      "timestamp": "2025-07-16T08:50:28.501597"
+      "timestamp": "2025-07-16T15:16:36.644165"
     },
     "google_sheets_import_no_auth": {
       "success": true,
       "message": "Correctly requires authentication",
       "response_data": null,
-      "timestamp": "2025-07-16T08:50:28.514307"
+      "timestamp": "2025-07-16T15:16:36.808639"
     },
     "json_response_structure": {
       "success": true,
       "message": "API returns properly structured JSON responses",
       "response_data": null,
-      "timestamp": "2025-07-16T08:50:28.595025"
+      "timestamp": "2025-07-16T15:16:37.123866"
     },
     "database_models": {
       "success": true,
       "message": "All required models found: User, Employee, Job, Commission, UserSession",
       "response_data": null,
-      "timestamp": "2025-07-16T08:50:28.597663"
+      "timestamp": "2025-07-16T15:16:37.461381"
     },
     "google_sheets_integration": {
-      "success": true,
-      "message": "Google Sheets integration properly implemented",
+      "success": false,
+      "message": "Google Sheets integration not properly implemented",
       "response_data": null,
-      "timestamp": "2025-07-16T08:50:28.597810"
+      "timestamp": "2025-07-16T15:16:37.461551"
     }
   },
   "job_management": {
@@ -92,19 +104,19 @@
       "success": true,
       "message": "Correctly requires authentication",
       "response_data": null,
-      "timestamp": "2025-07-16T08:50:28.504218"
+      "timestamp": "2025-07-16T15:16:36.657859"
     },
     "create_job_no_auth": {
       "success": true,
       "message": "Correctly requires authentication",
       "response_data": null,
-      "timestamp": "2025-07-16T08:50:28.506974"
+      "timestamp": "2025-07-16T15:16:36.676090"
     },
     "job_status_workflow": {
       "success": true,
       "message": "Job status workflow properly implemented",
       "response_data": null,
-      "timestamp": "2025-07-16T08:50:28.597964"
+      "timestamp": "2025-07-16T15:16:37.461678"
     }
   },
   "commission_system": {
@@ -112,21 +124,27 @@
       "success": true,
       "message": "Correctly requires authentication",
       "response_data": null,
-      "timestamp": "2025-07-16T08:50:28.509522"
+      "timestamp": "2025-07-16T15:16:36.733101"
     },
     "commission_calculation_logic": {
       "success": true,
       "message": "Commission calculation logic correct: 10000.0 * 0.05 = 500.0",
       "response_data": null,
-      "timestamp": "2025-07-16T08:50:28.597345"
+      "timestamp": "2025-07-16T15:16:37.461076"
     }
   },
   "analytics": {
+    "get_analytics_with_dev_token": {
+      "success": true,
+      "message": "Retrieved analytics successfully",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:36.491768"
+    },
     "get_dashboard_no_auth": {
       "success": true,
       "message": "Correctly requires authentication",
       "response_data": null,
-      "timestamp": "2025-07-16T08:50:28.511844"
+      "timestamp": "2025-07-16T15:16:36.750944"
     }
   },
   "email_notifications": {
@@ -134,17 +152,165 @@
       "success": true,
       "message": "Email template contains all required placeholders",
       "response_data": null,
-      "timestamp": "2025-07-16T08:50:28.597572"
+      "timestamp": "2025-07-16T15:16:37.461283"
     },
     "smtp_configuration": {
       "success": true,
       "message": "SMTP email configuration properly implemented",
       "response_data": null,
-      "timestamp": "2025-07-16T08:50:28.597878"
+      "timestamp": "2025-07-16T15:16:37.461613"
     }
   },
-  "qr_generator": {},
-  "sales_rep_management": {},
-  "lead_capture": {},
-  "file_upload": {}
+  "qr_generator": {
+    "get_reps_with_dev_token": {
+      "success": true,
+      "message": "Retrieved 3 sales reps successfully",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:36.451845"
+    },
+    "get_qr_analytics_with_dev_token": {
+      "success": true,
+      "message": "Retrieved QR analytics successfully",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:36.514056"
+    },
+    "sample_reps_initialized": {
+      "success": true,
+      "message": "Sample reps found: John Smith, Sarah Johnson, Mike Wilson",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:36.529833"
+    },
+    "get_sales_reps_no_auth": {
+      "success": true,
+      "message": "Correctly requires authentication",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:37.169326"
+    },
+    "create_sales_rep_no_auth": {
+      "success": true,
+      "message": "Correctly requires authentication",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:37.187022"
+    },
+    "public_landing_page": {
+      "success": true,
+      "message": "Public landing page endpoint working",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:37.440748"
+    },
+    "qr_analytics_no_auth": {
+      "success": true,
+      "message": "Correctly requires authentication",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:37.460797"
+    },
+    "qr_generator_models": {
+      "success": true,
+      "message": "All QR generator models found: SalesRep, Lead, QRCode, SalesRepCreate, SalesRepUpdate, LeadCreate, LeadUpdate, FileUpload",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:37.461811"
+    },
+    "qr_generator_functions": {
+      "success": true,
+      "message": "All QR generator functions found: generate_qr_code, generate_landing_page_url, send_lead_notification",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:37.461873"
+    },
+    "role_based_qr_access": {
+      "success": true,
+      "message": "Role-based access for QR endpoints properly implemented",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:37.462201"
+    }
+  },
+  "sales_rep_management": {
+    "get_sales_rep_no_auth": {
+      "success": true,
+      "message": "Correctly requires authentication",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:37.202097"
+    },
+    "update_sales_rep_no_auth": {
+      "success": true,
+      "message": "Correctly requires authentication",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:37.218355"
+    },
+    "delete_sales_rep_no_auth": {
+      "success": true,
+      "message": "Correctly requires authentication",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:37.232473"
+    }
+  },
+  "lead_capture": {
+    "get_leads_with_dev_token": {
+      "success": true,
+      "message": "Retrieved 3 leads successfully",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:36.470335"
+    },
+    "sample_leads_initialized": {
+      "success": true,
+      "message": "Found 3 sample leads",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:36.551367"
+    },
+    "get_leads_no_auth": {
+      "success": true,
+      "message": "Correctly requires authentication",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:37.328729"
+    },
+    "create_lead_public": {
+      "success": true,
+      "message": "Public lead creation endpoint accessible (404 expected for non-existent rep)",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:37.346297"
+    },
+    "get_lead_no_auth": {
+      "success": true,
+      "message": "Correctly requires authentication",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:37.401238"
+    },
+    "update_lead_no_auth": {
+      "success": true,
+      "message": "Correctly requires authentication",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:37.416423"
+    },
+    "lead_notification_system": {
+      "success": true,
+      "message": "Lead notification system properly implemented",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:37.462027"
+    },
+    "conversion_tracking": {
+      "success": true,
+      "message": "Conversion tracking properly implemented",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:37.462118"
+    }
+  },
+  "file_upload": {
+    "upload_picture_no_auth": {
+      "success": true,
+      "message": "Correctly requires authentication",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:37.295326"
+    },
+    "upload_video_no_auth": {
+      "success": true,
+      "message": "Correctly requires authentication",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:37.312428"
+    },
+    "file_validation_logic": {
+      "success": true,
+      "message": "File validation logic properly implemented",
+      "response_data": null,
+      "timestamp": "2025-07-16T15:16:37.461955"
+    }
+  }
 }
