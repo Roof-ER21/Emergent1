@@ -368,7 +368,15 @@ const QRGeneratorApp = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterDepartment, setFilterDepartment] = useState('all');
   const [filterTerritory, setFilterTerritory] = useState('all');
-  const [selectedRep, setSelectedRep] = useState(null);
+  const [submittingLead, setSubmittingLead] = useState(false);
+  const [leadSuccess, setLeadSuccess] = useState(false);
+  const [leadData, setLeadData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    message: ''
+  });
 
   const isAdmin = user?.role === 'super_admin' || user?.role === 'sales_manager';
   const currentRep = salesReps.find(rep => rep.id === user?.id);
