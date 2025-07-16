@@ -263,7 +263,11 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "QR Code Generator Backend APIs"
+    - "Sales Rep Management System"
+    - "Lead Capture and Distribution"
+    - "File Upload for Pictures/Videos"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -275,3 +279,5 @@ agent_communication:
     message: "✅ BACKEND TESTING COMPLETE: All 22 comprehensive tests passed! Authentication system with Emergent OAuth working correctly, employee management CRUD with Google Sheets import functional, job management with workflow stages operational, commission calculation engine working properly, and Gmail SMTP email notifications implemented correctly. All endpoints properly secured with role-based access control. System is production-ready for backend functionality."
   - agent: "testing"
     message: "✅ FRONTEND TESTING COMPLETE: All 5 frontend tasks tested and working perfectly! Login page with OAuth integration functional, employee management dashboard implemented, job management with workflow tracking ready, commission tracking dashboard complete, and admin analytics dashboard working. Responsive design tested across devices. Backend-frontend integration verified - all API endpoints properly protected. System is production-ready for frontend functionality. Full MVP is complete and working!"
+  - agent: "main"
+    message: "Starting implementation of QR Code Generator comprehensive features. Focus on backend APIs for sales rep management, QR code generation, lead capture, file uploads, and landing page management. Frontend already has UI structure with mock data - need to integrate with real backend APIs."
