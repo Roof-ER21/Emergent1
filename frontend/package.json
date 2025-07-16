@@ -5,6 +5,7 @@
   "dependencies": {
     "axios": "^1.10.0",
     "cra-template": "1.2.0",
+    "qrcode.js": "^0.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.6.3",
