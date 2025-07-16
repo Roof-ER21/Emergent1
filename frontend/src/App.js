@@ -382,6 +382,21 @@ const HRRecruitmentApp = () => {
   });
   const [ptoBalance, setPtoBalance] = useState(null);
   
+  // Hiring Flow Management
+  const [hiringFlows, setHiringFlows] = useState([]);
+  const [hiringCandidates, setHiringCandidates] = useState([]);
+  const [selectedHiringType, setSelectedHiringType] = useState('all');
+  const [selectedCandidate, setSelectedCandidate] = useState(null);
+  const [candidateModalOpen, setCandidateModalOpen] = useState(false);
+  const [newCandidate, setNewCandidate] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    position: '',
+    hiring_type: 'insurance',
+    notes: ''
+  });
+  
   // Safety & Compliance
   const [safetyTrainings, setSafetyTrainings] = useState([]);
   const [workersCompSubmissions, setWorkersCompSubmissions] = useState([]);
