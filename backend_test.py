@@ -488,7 +488,7 @@ class RoofHRTester:
             # Check for job status workflow components
             workflow_components = [
                 'status: str = "lead"',  # Default status
-                '"lead", "scheduled", "in_progress", "completed", "cancelled"',  # Status options
+                'lead, scheduled, in_progress, completed, cancelled',  # Status options in comment
                 'old_status != new_status',  # Status change detection
                 'new_status == "completed"'  # Completion trigger
             ]
