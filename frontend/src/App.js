@@ -549,111 +549,184 @@ const QRGeneratorApp = () => {
     );
   };
 
-  const RepLandingPage = ({ rep, onClose }) => (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-gray-900">Landing Page Preview</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-2xl"
-          >
-            ×
-          </button>
-        </div>
-        
-        {/* Mobile-optimized landing page */}
-        <div className="p-6 bg-gray-50">
-          <div className="max-w-sm mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-            {/* Header with picture and video */}
-            <div className="bg-red-600 text-white p-4">
-              <div className="flex justify-between items-start">
-                <div className="flex items-center space-x-3">
-                  <img 
-                    src={rep.picture} 
-                    alt={rep.name}
-                    className="w-16 h-16 rounded-full border-2 border-white"
-                  />
-                  <div>
-                    <h1 className="text-xl font-bold">{rep.name}</h1>
-                    <p className="text-red-100">{rep.territory}</p>
+  const RepLandingPage = ({ rep, onClose }) => {
+    const [submittingLead, setSubmittingLead] = useState(false);
+    const [leadSuccess, setLeadSuccess] = useState(false);
+    const [leadData, setLeadData] = useState({
+      name: '',
+      email: '',
+      phone: '',
+      address: '',
+      message: ''
+    });
+
+    const handleLeadSubmit = async (e) => {
+      e.preventDefault();
+      setSubmittingLead(true);
+      
+      try {
+        const response = await axios.post(`${API}/qr-generator/leads`, {
+          ...leadData,
+          rep_id: rep.id
+        });
+        setLeadSuccess(true);
+        setLeadData({ name: '', email: '', phone: '', address: '', message: '' });
+        setTimeout(() => setLeadSuccess(false), 3000);
+      } catch (error) {
+        console.error('Error submitting lead:', error);
+        alert('Error submitting lead. Please try again.');
+      } finally {
+        setSubmittingLead(false);
+      }
+    };
+
+    const handleInputChange = (e) => {
+      setLeadData({
+        ...leadData,
+        [e.target.name]: e.target.value
+      });
+    };
+
+    return (
+      <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+            <h2 className="text-xl font-semibold text-gray-900">Landing Page Preview</h2>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 text-2xl"
+            >
+              ×
+            </button>
+          </div>
+          
+          {/* Mobile-optimized landing page */}
+          <div className="p-6 bg-gray-50">
+            <div className="max-w-sm mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+              {/* Header with picture and video */}
+              <div className="bg-red-600 text-white p-4">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center space-x-3">
+                    <img 
+                      src={rep.picture?.startsWith('data:') ? rep.picture : `https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face`}
+                      alt={rep.name}
+                      className="w-16 h-16 rounded-full border-2 border-white object-cover"
+                    />
+                    <div>
+                      <h1 className="text-xl font-bold">{rep.name}</h1>
+                      <p className="text-red-100">{rep.territory}</p>
+                    </div>
+                  </div>
+                  <div className="w-24 h-16 bg-black rounded">
+                    {rep.welcome_video?.startsWith('data:') ? (
+                      <video
+                        width="96"
+                        height="64"
+                        src={rep.welcome_video}
+                        controls
+                        className="rounded"
+                      />
+                    ) : (
+                      <iframe
+                        width="96"
+                        height="64"
+                        src={rep.welcome_video || 'https://www.youtube.com/embed/dQw4w9WgXcQ'}
+                        title="Welcome Video"
+                        className="rounded"
+                      />
+                    )}
                   </div>
                 </div>
-                <div className="w-24 h-16 bg-black rounded">
-                  <iframe
-                    width="96"
-                    height="64"
-                    src={rep.welcomeVideo}
-                    title="Welcome Video"
-                    className="rounded"
-                  />
+              </div>
+
+              {/* About Me Section */}
+              <div className="p-4">
+                <h2 className="text-lg font-semibold text-gray-900 mb-2">About Me</h2>
+                <p className="text-gray-600 mb-4">{rep.about_me || 'Professional roofing expert dedicated to quality service.'}</p>
+                
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center text-gray-700">
+                    <span className="text-red-600 mr-2">📞</span>
+                    {rep.phone || 'Contact for phone'}
+                  </div>
+                  <div className="flex items-center text-gray-700">
+                    <span className="text-red-600 mr-2">✉️</span>
+                    {rep.email}
+                  </div>
+                  <div className="flex items-center text-gray-700">
+                    <span className="text-red-600 mr-2">📍</span>
+                    {rep.territory}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* About Me Section */}
-            <div className="p-4">
-              <h2 className="text-lg font-semibold text-gray-900 mb-2">About Me</h2>
-              <p className="text-gray-600 mb-4">{rep.aboutMe}</p>
-              
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center text-gray-700">
-                  <span className="text-red-600 mr-2">📞</span>
-                  {rep.phone}
-                </div>
-                <div className="flex items-center text-gray-700">
-                  <span className="text-red-600 mr-2">✉️</span>
-                  {rep.email}
-                </div>
-                <div className="flex items-center text-gray-700">
-                  <span className="text-red-600 mr-2">📍</span>
-                  {rep.territory}
-                </div>
+              {/* Call to Action */}
+              <div className="p-4 bg-gray-50">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Get Your Free Roof Estimate</h3>
+                {leadSuccess ? (
+                  <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+                    Thank you! Your request has been submitted successfully.
+                  </div>
+                ) : (
+                  <form onSubmit={handleLeadSubmit} className="space-y-3">
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Your Name"
+                      value={leadData.name}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    />
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="Your Email"
+                      value={leadData.email}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    />
+                    <input
+                      type="tel"
+                      name="phone"
+                      placeholder="Your Phone"
+                      value={leadData.phone}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    />
+                    <input
+                      type="text"
+                      name="address"
+                      placeholder="Your Address"
+                      value={leadData.address}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    />
+                    <textarea
+                      name="message"
+                      placeholder="Tell us about your roofing needs..."
+                      rows="3"
+                      value={leadData.message}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    />
+                    <button
+                      type="submit"
+                      disabled={submittingLead}
+                      className="w-full bg-red-600 text-white py-3 px-4 rounded-md hover:bg-red-700 transition-colors font-semibold disabled:opacity-50"
+                    >
+                      {submittingLead ? 'Submitting...' : 'Get My Free Estimate'}
+                    </button>
+                  </form>
+                )}
               </div>
-            </div>
-
-            {/* Call to Action */}
-            <div className="p-4 bg-gray-50">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Get Your Free Roof Estimate</h3>
-              <form className="space-y-3">
-                <input
-                  type="text"
-                  placeholder="Your Name"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                />
-                <input
-                  type="email"
-                  placeholder="Your Email"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                />
-                <input
-                  type="tel"
-                  placeholder="Your Phone"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                />
-                <input
-                  type="text"
-                  placeholder="Your Address"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                />
-                <textarea
-                  placeholder="Tell us about your roofing needs..."
-                  rows="3"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                />
-                <button
-                  type="submit"
-                  className="w-full bg-red-600 text-white py-3 px-4 rounded-md hover:bg-red-700 transition-colors font-semibold"
-                >
-                  Get My Free Estimate
-                </button>
-              </form>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const OverviewTab = () => (
     <div className="space-y-6">
