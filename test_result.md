@@ -439,6 +439,7 @@ test_plan:
     - "QR Code Generator Backend APIs"
     - "Sales Rep Management System"
     - "Lead Capture and Distribution"
+    - "Google Sheets Integration with Import Functionality"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
