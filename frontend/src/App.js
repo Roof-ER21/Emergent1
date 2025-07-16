@@ -1513,6 +1513,197 @@ const HRRecruitmentApp = () => {
             </div>
           </div>
         )}
+
+        {activeTab === 'hiring' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-xl font-bold text-gray-900">Hiring Flow Management</h3>
+              <div className="flex space-x-3">
+                <button
+                  onClick={initializeSampleHiringFlows}
+                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 shadow-lg transition-all duration-200 transform hover:scale-105"
+                >
+                  Initialize Sample Flows
+                </button>
+                <button
+                  onClick={() => setCandidateModalOpen(true)}
+                  className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 shadow-lg transition-all duration-200 transform hover:scale-105"
+                >
+                  Add Candidate
+                </button>
+              </div>
+            </div>
+
+            {/* Modern Hiring Flow Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {hiringFlows.map((flow) => (
+                <div key={flow.id} className="bg-gradient-to-br from-white to-gray-50 rounded-xl p-6 border border-gray-200 hover:shadow-xl transition-all duration-300 hover:scale-105 hover:rotate-1">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={`p-3 rounded-xl shadow-lg ${
+                      flow.type === 'insurance' ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white' :
+                      flow.type === 'retail' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' :
+                      flow.type === 'office' ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white' :
+                      'bg-gradient-to-r from-orange-500 to-orange-600 text-white'
+                    }`}>
+                      <div className="text-2xl">
+                        {flow.type === 'insurance' ? '🛡️' :
+                         flow.type === 'retail' ? '🛒' :
+                         flow.type === 'office' ? '💼' : '🏭'}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-medium text-gray-500">{flow.timeline_days} days</div>
+                      <div className="text-xs text-gray-400">Timeline</div>
+                    </div>
+                  </div>
+                  
+                  <h4 className="text-lg font-bold text-gray-900 mb-2">{flow.name}</h4>
+                  <p className="text-sm text-gray-600 mb-4 line-clamp-2">{flow.description}</p>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-gray-500">Stages</span>
+                      <span className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full">
+                        {flow.stages?.length || 0}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-gray-500">Requirements</span>
+                      <span className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full">
+                        {flow.requirements?.length || 0}
+                      </span>
+                    </div>
+                    
+                    {/* Mini Progress Stages */}
+                    <div className="mt-4">
+                      <div className="text-xs text-gray-500 mb-1">Process Flow</div>
+                      <div className="flex space-x-1">
+                        {flow.stages?.slice(0, 5).map((stage, index) => (
+                          <div key={index} className={`h-2 flex-1 rounded-full ${
+                            flow.type === 'insurance' ? 'bg-blue-200' :
+                            flow.type === 'retail' ? 'bg-green-200' :
+                            flow.type === 'office' ? 'bg-purple-200' :
+                            'bg-orange-200'
+                          }`}></div>
+                        ))}
+                        {flow.stages?.length > 5 && (
+                          <div className="text-xs text-gray-400">+{flow.stages.length - 5}</div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Candidate Management Section */}
+            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+              <div className="flex items-center justify-between mb-6">
+                <h4 className="text-lg font-semibold text-gray-900">Candidate Pipeline</h4>
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-gray-500">Filter by type:</span>
+                    <select
+                      value={selectedHiringType}
+                      onChange={(e) => setSelectedHiringType(e.target.value)}
+                      className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm"
+                    >
+                      <option value="all">All Types</option>
+                      <option value="insurance">🛡️ Insurance</option>
+                      <option value="retail">🛒 Retail</option>
+                      <option value="office">💼 Office</option>
+                      <option value="production">🏭 Production</option>
+                    </select>
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {hiringCandidates.filter(c => selectedHiringType === 'all' || c.hiring_type === selectedHiringType).length} candidates
+                  </div>
+                </div>
+              </div>
+
+              {/* Candidates Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {hiringCandidates
+                  .filter(candidate => selectedHiringType === 'all' || candidate.hiring_type === selectedHiringType)
+                  .map((candidate) => (
+                    <div key={candidate.id} className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-5 border border-gray-200 hover:shadow-md transition-all duration-200">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <h5 className="font-semibold text-gray-900 mb-1">{candidate.name}</h5>
+                          <p className="text-sm text-gray-600 mb-1">{candidate.email}</p>
+                          <p className="text-sm text-gray-500">{candidate.position}</p>
+                        </div>
+                        <div className={`p-2 rounded-lg ${
+                          candidate.hiring_type === 'insurance' ? 'bg-blue-100 text-blue-600' :
+                          candidate.hiring_type === 'retail' ? 'bg-green-100 text-green-600' :
+                          candidate.hiring_type === 'office' ? 'bg-purple-100 text-purple-600' :
+                          'bg-orange-100 text-orange-600'
+                        }`}>
+                          {candidate.hiring_type === 'insurance' ? '🛡️' :
+                           candidate.hiring_type === 'retail' ? '🛒' :
+                           candidate.hiring_type === 'office' ? '💼' : '🏭'}
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-medium text-gray-500">Current Stage</span>
+                          <span className="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded-full">
+                            {candidate.current_stage?.replace('_', ' ') || 'application'}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-medium text-gray-500">Status</span>
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            candidate.status === 'active' ? 'bg-green-100 text-green-800' :
+                            candidate.status === 'hired' ? 'bg-blue-100 text-blue-800' :
+                            'bg-red-100 text-red-800'
+                          }`}>
+                            {candidate.status}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-between items-center">
+                        {candidate.status === 'active' && (
+                          <button
+                            onClick={() => handleAdvanceCandidate(candidate.id)}
+                            className="px-3 py-1 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 transform hover:scale-105"
+                          >
+                            Advance Stage
+                          </button>
+                        )}
+                        <button
+                          onClick={() => setSelectedCandidate(candidate)}
+                          className="px-3 py-1 bg-gray-600 text-white text-xs rounded-lg hover:bg-gray-700 transition-all duration-200"
+                        >
+                          View Details
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+              
+              {hiringCandidates.filter(c => selectedHiringType === 'all' || c.hiring_type === selectedHiringType).length === 0 && (
+                <div className="text-center py-12">
+                  <div className="text-gray-400 text-6xl mb-4">👥</div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No candidates found</h3>
+                  <p className="text-gray-600 mb-4">
+                    {selectedHiringType === 'all' 
+                      ? 'No candidates in the system yet.' 
+                      : `No candidates for ${selectedHiringType} hiring type.`}
+                  </p>
+                  <button
+                    onClick={() => setCandidateModalOpen(true)}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    Add First Candidate
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Google Sheets Import Modal */}
