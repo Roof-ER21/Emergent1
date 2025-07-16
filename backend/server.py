@@ -1947,15 +1947,14 @@ async def get_hiring_flows(current_user: User = Depends(get_current_user)):
     flows = await db.hiring_flows.find().to_list(1000)
     return [HiringFlow(**flow) for flow in flows]
 
-@api_router.post("/safety/trainings", response_model=SafetyTraining)
-async def create_safety_training(training_create: SafetyTrainingCreate, current_user: User = Depends(get_current_user)):
-    """Create new safety training"""
+@api_router.post("/hiring/flows", response_model=HiringFlow)
+async def create_hiring_flow(flow: HiringFlow, current_user: User = Depends(get_current_user)):
+    """Create a new hiring flow"""
     if current_user.role not in ["super_admin", "hr_manager"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
-    training = SafetyTraining(**training_create.model_dump())
-    await db.safety_trainings.insert_one(training.model_dump())
-    return training
+    await db.hiring_flows.insert_one(flow.model_dump())
+    return flow
 
 @api_router.get("/safety/employee/{employee_id}/progress")
 async def get_employee_safety_progress(employee_id: str, current_user: User = Depends(get_current_user)):
