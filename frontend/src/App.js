@@ -343,12 +343,17 @@ const SalesLeaderboardApp = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterTerritory, setFilterTerritory] = useState('all');
   const [selectedRep, setSelectedRep] = useState(null);
+  
+  // Real data from API
   const [competitions, setCompetitions] = useState([]);
   const [goals, setGoals] = useState([]);
   const [signups, setSignups] = useState([]);
-  const [qrLeads, setQrLeads] = useState([]);
-  const [teamMembers, setTeamMembers] = useState([]);
+  const [metrics, setMetrics] = useState([]);
   const [bonusTiers, setBonusTiers] = useState([]);
+  const [teamAssignments, setTeamAssignments] = useState([]);
+  const [salesReps, setSalesReps] = useState([]);
+  
+  // Modal states
   const [newCompetition, setNewCompetition] = useState({
     name: '',
     description: '',
@@ -366,7 +371,197 @@ const SalesLeaderboardApp = () => {
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [showCompetitionModal, setShowCompetitionModal] = useState(false);
 
-  // Enhanced mock data with comprehensive tracking
+  // API Functions
+  const fetchCompetitions = async () => {
+    try {
+      const response = await axios.get(`${API}/leaderboard/competitions`);
+      setCompetitions(response.data);
+    } catch (error) {
+      console.error('Error fetching competitions:', error);
+    }
+  };
+
+  const fetchGoals = async () => {
+    try {
+      const response = await axios.get(`${API}/leaderboard/goals`);
+      setGoals(response.data);
+    } catch (error) {
+      console.error('Error fetching goals:', error);
+    }
+  };
+
+  const fetchSignups = async () => {
+    try {
+      const response = await axios.get(`${API}/leaderboard/signups`);
+      setSignups(response.data);
+    } catch (error) {
+      console.error('Error fetching signups:', error);
+    }
+  };
+
+  const fetchMetrics = async () => {
+    try {
+      const response = await axios.get(`${API}/leaderboard/metrics`);
+      setMetrics(response.data);
+    } catch (error) {
+      console.error('Error fetching metrics:', error);
+    }
+  };
+
+  const fetchBonusTiers = async () => {
+    try {
+      const response = await axios.get(`${API}/leaderboard/bonus-tiers`);
+      setBonusTiers(response.data);
+    } catch (error) {
+      console.error('Error fetching bonus tiers:', error);
+    }
+  };
+
+  const fetchTeamAssignments = async () => {
+    try {
+      const response = await axios.get(`${API}/leaderboard/team-assignments`);
+      setTeamAssignments(response.data);
+    } catch (error) {
+      console.error('Error fetching team assignments:', error);
+    }
+  };
+
+  const fetchSalesReps = async () => {
+    try {
+      const response = await axios.get(`${API}/qr-generator/reps`);
+      setSalesReps(response.data);
+    } catch (error) {
+      console.error('Error fetching sales reps:', error);
+    }
+  };
+
+  const initializeSampleData = async () => {
+    try {
+      await axios.post(`${API}/leaderboard/initialize-sample-data`);
+      await loadAllData();
+    } catch (error) {
+      console.error('Error initializing sample data:', error);
+    }
+  };
+
+  const loadAllData = async () => {
+    setLoading(true);
+    try {
+      await Promise.all([
+        fetchCompetitions(),
+        fetchGoals(),
+        fetchSignups(),
+        fetchMetrics(),
+        fetchBonusTiers(),
+        fetchTeamAssignments(),
+        fetchSalesReps()
+      ]);
+    } catch (error) {
+      console.error('Error loading data:', error);
+      setError('Failed to load leaderboard data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const initializeData = async () => {
+      // First try to load existing data
+      await loadAllData();
+      
+      // If no data exists, initialize sample data
+      if (bonusTiers.length === 0 && competitions.length === 0) {
+        await initializeSampleData();
+      }
+    };
+    
+    initializeData();
+  }, []);
+
+  // Transform and compute leaderboard data
+  const computeLeaderboardData = () => {
+    return salesReps.map(rep => {
+      const repGoals = goals.filter(goal => goal.rep_id === rep.id);
+      const repSignups = signups.filter(signup => signup.rep_id === rep.id);
+      const repMetrics = metrics.find(metric => metric.rep_id === rep.id);
+      
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth() + 1;
+      const currentYear = currentDate.getFullYear();
+      
+      const monthlySignups = repSignups.filter(signup => {
+        const signupDate = new Date(signup.signup_date);
+        return signupDate.getMonth() + 1 === currentMonth && signupDate.getFullYear() === currentYear;
+      }).length;
+      
+      const yearlySignups = repSignups.filter(signup => {
+        const signupDate = new Date(signup.signup_date);
+        return signupDate.getFullYear() === currentYear;
+      }).length;
+      
+      const monthlyRevenue = repSignups.filter(signup => {
+        const signupDate = new Date(signup.signup_date);
+        return signupDate.getMonth() + 1 === currentMonth && signupDate.getFullYear() === currentYear;
+      }).reduce((sum, signup) => sum + signup.deal_value, 0);
+      
+      const yearlyRevenue = repSignups.filter(signup => {
+        const signupDate = new Date(signup.signup_date);
+        return signupDate.getFullYear() === currentYear;
+      }).reduce((sum, signup) => sum + signup.deal_value, 0);
+      
+      const monthlyGoal = repGoals.find(goal => goal.month === currentMonth && goal.year === currentYear);
+      
+      // Determine current tier
+      let currentTier = bonusTiers.find(tier => monthlySignups >= tier.signup_threshold);
+      if (!currentTier && bonusTiers.length > 0) {
+        currentTier = bonusTiers[0]; // Default to lowest tier
+      }
+      
+      return {
+        ...rep,
+        metrics: {
+          monthly_signups: monthlySignups,
+          yearly_signups: yearlySignups,
+          monthly_revenue: monthlyRevenue,
+          yearly_revenue: yearlyRevenue,
+          monthly_goal: monthlyGoal?.signup_goal || 0,
+          yearly_goal: monthlyGoal?.revenue_goal || 0,
+          conversion_rate: repMetrics?.conversions || 0,
+          avg_deal_size: monthlySignups > 0 ? monthlyRevenue / monthlySignups : 0,
+          calls_made: repMetrics?.calls_made || 0,
+          meetings_held: repMetrics?.meetings_held || 0,
+          proposals_sent: repMetrics?.proposals_sent || 0,
+          current_tier: currentTier?.tier_number || 1,
+          tier_name: currentTier?.tier_name || 'Bronze',
+          response_time: 2.5,
+          customer_satisfaction: 4.5
+        },
+        goals: {
+          monthly_signup_goal: monthlyGoal?.signup_goal || 0,
+          yearly_revenue_goal: monthlyGoal?.revenue_goal || 0,
+          monthly_revenue_goal: monthlyGoal?.revenue_goal ? monthlyGoal.revenue_goal / 12 : 0
+        },
+        rank: 1, // Will be calculated after sorting
+        trend: monthlySignups > (monthlyGoal?.signup_goal || 0) * 0.8 ? 'up' : 'down',
+        streak: Math.floor(Math.random() * 10) + 1,
+        badges: monthlySignups > (monthlyGoal?.signup_goal || 0) ? ['Top Performer'] : []
+      };
+    });
+  };
+
+  const leaderboardData = computeLeaderboardData().sort((a, b) => b.metrics.monthly_signups - a.metrics.monthly_signups);
+  
+  // Update ranks after sorting
+  leaderboardData.forEach((rep, index) => {
+    rep.rank = index + 1;
+  });
+
+  const currentUser = leaderboardData.find(rep => rep.email === user?.email) || leaderboardData[0] || {};
+  const userTeamMembers = currentUser.role === 'team_lead' ? 
+    leaderboardData.filter(rep => {
+      const assignment = teamAssignments.find(ta => ta.team_member_id === rep.id);
+      return assignment?.team_lead_id === currentUser.id;
+    }) : [];
   const mockSalesData = [
     {
       id: '1',
