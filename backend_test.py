@@ -1305,6 +1305,101 @@ class RoofHRTester:
         else:
             self.log_result("google_sheets_integration", "sales_rep_import_disabled_check", False, "No response received")
 
+    def test_google_sheets_error_handling(self):
+        """Test Google Sheets error handling and validation"""
+        print("\n⚠️ Testing Google Sheets Error Handling...")
+        
+        # Set development token
+        self.auth_token = "dev-token-super_admin"
+        
+        # Test 1: Missing required fields
+        print("Testing import with missing spreadsheet_id...")
+        incomplete_data = {
+            "range_name": "Employees!A2:E",
+            "data_type": "employees"
+        }
+        response = self.make_request("POST", "/employees/import-from-sheets", incomplete_data, auth_required=True)
+        
+        if response is not None and response.status_code == 422:
+            self.log_result("google_sheets_integration", "missing_spreadsheet_id_validation", True, 
+                           "Correctly validates missing spreadsheet_id")
+        elif response is not None:
+            self.log_result("google_sheets_integration", "missing_spreadsheet_id_validation", False, f"Expected 422, got {response.status_code}")
+        else:
+            self.log_result("google_sheets_integration", "missing_spreadsheet_id_validation", False, "No response received")
+        
+        # Test 2: Invalid data type for employee import
+        print("Testing employee import with invalid data type...")
+        invalid_import_data = {
+            "spreadsheet_id": "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms",
+            "range_name": "Employees!A2:E",
+            "data_type": "invalid_type"
+        }
+        response = self.make_request("POST", "/employees/import-from-sheets", invalid_import_data, auth_required=True)
+        
+        if response is not None and response.status_code == 400:
+            try:
+                error_data = response.json()
+                if "Invalid data type" in error_data.get("detail", ""):
+                    self.log_result("google_sheets_integration", "employee_import_data_type_validation", True, 
+                                   "Employee import correctly validates data type")
+                else:
+                    self.log_result("google_sheets_integration", "employee_import_data_type_validation", False, 
+                                   f"Unexpected error for invalid data type: {error_data.get('detail')}")
+            except json.JSONDecodeError:
+                self.log_result("google_sheets_integration", "employee_import_data_type_validation", False, "Invalid JSON error response")
+        elif response is not None:
+            self.log_result("google_sheets_integration", "employee_import_data_type_validation", False, f"Expected 400, got {response.status_code}")
+        else:
+            self.log_result("google_sheets_integration", "employee_import_data_type_validation", False, "No response received")
+
+    def test_google_sheets_role_based_access(self):
+        """Test role-based access control for Google Sheets endpoints"""
+        print("\n🔐 Testing Google Sheets Role-Based Access...")
+        
+        # Test data
+        import_data = {
+            "spreadsheet_id": "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms",
+            "range_name": "Employees!A2:E",
+            "data_type": "employees"
+        }
+        
+        # Test 1: HR Manager access to employee import
+        print("Testing employee import with hr_manager role...")
+        self.auth_token = "dev-token-hr_manager"
+        response = self.make_request("POST", "/employees/import-from-sheets", import_data, auth_required=True)
+        
+        if response is not None and response.status_code == 400:
+            try:
+                error_data = response.json()
+                if "Google Sheets integration is disabled" in error_data.get("detail", ""):
+                    self.log_result("google_sheets_integration", "hr_manager_employee_access", True, 
+                                   "HR manager can access employee import (correctly fails due to disabled integration)")
+                else:
+                    self.log_result("google_sheets_integration", "hr_manager_employee_access", False, 
+                                   f"Unexpected error for HR manager: {error_data.get('detail')}")
+            except json.JSONDecodeError:
+                self.log_result("google_sheets_integration", "hr_manager_employee_access", False, "Invalid JSON error response")
+        elif response is not None and response.status_code == 403:
+            self.log_result("google_sheets_integration", "hr_manager_employee_access", False, "HR manager incorrectly denied access to employee import")
+        elif response is not None:
+            self.log_result("google_sheets_integration", "hr_manager_employee_access", False, f"Unexpected status code for HR manager: {response.status_code}")
+        else:
+            self.log_result("google_sheets_integration", "hr_manager_employee_access", False, "No response received")
+        
+        # Test 2: Sales rep access to employee import (should fail)
+        print("Testing employee import with sales_rep role...")
+        self.auth_token = "dev-token-sales_rep"
+        response = self.make_request("POST", "/employees/import-from-sheets", import_data, auth_required=True)
+        
+        if response is not None and response.status_code == 403:
+            self.log_result("google_sheets_integration", "sales_rep_employee_access_denied", True, 
+                           "Sales rep correctly denied access to employee import")
+        elif response is not None:
+            self.log_result("google_sheets_integration", "sales_rep_employee_access_denied", False, f"Expected 403, got {response.status_code}")
+        else:
+            self.log_result("google_sheets_integration", "sales_rep_employee_access_denied", False, "No response received")
+
     def test_cors_configuration(self):
         print("\n🌐 Testing CORS Configuration...")
         
