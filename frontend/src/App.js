@@ -1499,15 +1499,15 @@ const SalesLeaderboardApp = () => {
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
               <h4 className="text-lg font-semibold text-gray-900 mb-4">Bonus Tiers Management</h4>
               <div className="space-y-3">
-                {mockBonusTiers.map((tier) => (
-                  <div key={tier.tier} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                {bonusTiers.map((tier) => (
+                  <div key={tier.tier_number} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div>
-                      <div className="font-medium">{tier.name}</div>
+                      <div className="font-medium">{tier.tier_name}</div>
                       <div className="text-sm text-gray-600">{tier.description}</div>
                     </div>
                     <div className="text-right">
-                      <div className="font-medium">{tier.threshold}</div>
-                      <div className="text-sm text-gray-600">signups</div>
+                      <div className="font-medium">{tier.signup_threshold} signups</div>
+                      <div className="text-sm text-gray-600">Tier {tier.tier_number}</div>
                     </div>
                   </div>
                 ))}
