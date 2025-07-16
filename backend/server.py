@@ -1744,6 +1744,614 @@ async def get_qr_analytics(current_user: User = Depends(get_current_user)):
             "conversion_rate": (total_conversions / total_leads * 100) if total_leads > 0 else 0
         }
 
+# ===== HR MODULE ENDPOINTS =====
+
+# Employee Onboarding Management
+@api_router.get("/onboarding/stages", response_model=List[OnboardingStage])
+async def get_onboarding_stages(current_user: User = Depends(get_current_user)):
+    """Get all onboarding stages"""
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    stages = await db.onboarding_stages.find({"is_active": True}).sort("order", 1).to_list(100)
+    return [OnboardingStage(**stage) for stage in stages]
+
+@api_router.post("/onboarding/stages", response_model=OnboardingStage)
+async def create_onboarding_stage(stage_create: OnboardingStageCreate, current_user: User = Depends(get_current_user)):
+    """Create new onboarding stage"""
+    if current_user.role not in ["super_admin", "hr_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    stage = OnboardingStage(**stage_create.model_dump())
+    await db.onboarding_stages.insert_one(stage.model_dump())
+    return stage
+
+@api_router.put("/onboarding/stages/{stage_id}", response_model=OnboardingStage)
+async def update_onboarding_stage(stage_id: str, stage_update: OnboardingStageUpdate, current_user: User = Depends(get_current_user)):
+    """Update onboarding stage"""
+    if current_user.role not in ["super_admin", "hr_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    update_data = {k: v for k, v in stage_update.model_dump().items() if v is not None}
+    result = await db.onboarding_stages.update_one({"id": stage_id}, {"$set": update_data})
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Stage not found")
+    
+    stage = await db.onboarding_stages.find_one({"id": stage_id})
+    return OnboardingStage(**stage)
+
+@api_router.get("/onboarding/employee/{employee_id}")
+async def get_employee_onboarding(employee_id: str, current_user: User = Depends(get_current_user)):
+    """Get onboarding progress for an employee"""
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"] and current_user.id != employee_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    progress = await get_employee_onboarding_progress(employee_id)
+    return progress
+
+@api_router.post("/onboarding/employee/{employee_id}/stage/{stage_id}/complete")
+async def complete_onboarding_stage(employee_id: str, stage_id: str, background_tasks: BackgroundTasks, current_user: User = Depends(get_current_user)):
+    """Mark onboarding stage as complete"""
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"] and current_user.id != employee_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Update progress
+    result = await db.onboarding_progress.update_one(
+        {"employee_id": employee_id, "stage_id": stage_id},
+        {"$set": {"status": "completed", "completed_at": datetime.utcnow()}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Progress record not found")
+    
+    # Send notification
+    stage = await db.onboarding_stages.find_one({"id": stage_id})
+    if stage:
+        await send_onboarding_notification(employee_id, stage["name"], background_tasks)
+    
+    return {"message": "Stage marked as complete"}
+
+# PTO Management (W2 employees only)
+@api_router.get("/pto/requests", response_model=List[PTORequest])
+async def get_pto_requests(current_user: User = Depends(get_current_user)):
+    """Get PTO requests"""
+    if current_user.role == "employee" or current_user.role == "sales_rep":
+        requests = await db.pto_requests.find({"employee_id": current_user.id}).to_list(100)
+    else:
+        requests = await db.pto_requests.find({}).to_list(100)
+    
+    return [PTORequest(**req) for req in requests]
+
+@api_router.post("/pto/requests", response_model=PTORequest)
+async def create_pto_request(pto_request: PTORequestCreate, current_user: User = Depends(get_current_user)):
+    """Create PTO request"""
+    # Check if employee is W2
+    employee = await db.employees.find_one({"id": current_user.id})
+    if not employee or employee.get("employee_type") != "w2":
+        raise HTTPException(status_code=403, detail="PTO requests are only available for W2 employees")
+    
+    # Calculate days requested
+    days_requested = await calculate_pto_days(pto_request.start_date, pto_request.end_date)
+    
+    # Check available balance
+    balance = await db.pto_balances.find_one({"employee_id": current_user.id, "year": pto_request.start_date.year})
+    if balance and balance["available_days"] < days_requested:
+        raise HTTPException(status_code=400, detail="Insufficient PTO balance")
+    
+    request = PTORequest(
+        employee_id=current_user.id,
+        start_date=pto_request.start_date,
+        end_date=pto_request.end_date,
+        days_requested=days_requested,
+        reason=pto_request.reason
+    )
+    
+    await db.pto_requests.insert_one(request.model_dump())
+    
+    # Update pending days in balance
+    if balance:
+        await db.pto_balances.update_one(
+            {"employee_id": current_user.id, "year": pto_request.start_date.year},
+            {"$inc": {"pending_days": days_requested}}
+        )
+    
+    return request
+
+@api_router.put("/pto/requests/{request_id}", response_model=PTORequest)
+async def update_pto_request(request_id: str, pto_update: PTORequestUpdate, current_user: User = Depends(get_current_user)):
+    """Update PTO request (approve/deny)"""
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    request = await db.pto_requests.find_one({"id": request_id})
+    if not request:
+        raise HTTPException(status_code=404, detail="Request not found")
+    
+    update_data = {k: v for k, v in pto_update.model_dump().items() if v is not None}
+    update_data["approved_by"] = current_user.id
+    update_data["approved_at"] = datetime.utcnow()
+    
+    result = await db.pto_requests.update_one({"id": request_id}, {"$set": update_data})
+    
+    # Update PTO balance based on approval/denial
+    if pto_update.status == "approved":
+        await update_pto_balance(request["employee_id"], request["days_requested"], request["start_date"].year)
+    
+    # Update pending days
+    await db.pto_balances.update_one(
+        {"employee_id": request["employee_id"], "year": request["start_date"].year},
+        {"$inc": {"pending_days": -request["days_requested"]}}
+    )
+    
+    updated_request = await db.pto_requests.find_one({"id": request_id})
+    return PTORequest(**updated_request)
+
+@api_router.get("/pto/balance/{employee_id}")
+async def get_pto_balance(employee_id: str, current_user: User = Depends(get_current_user)):
+    """Get PTO balance for employee"""
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"] and current_user.id != employee_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    current_year = datetime.utcnow().year
+    balance = await db.pto_balances.find_one({"employee_id": employee_id, "year": current_year})
+    
+    if not balance:
+        # Create initial balance
+        balance = PTOBalance(
+            employee_id=employee_id,
+            year=current_year,
+            accrued_days=15.0,  # Default annual PTO
+            available_days=15.0
+        )
+        await db.pto_balances.insert_one(balance.model_dump())
+    
+    return balance
+
+# Safety & Compliance Management
+@api_router.get("/safety/trainings", response_model=List[SafetyTraining])
+async def get_safety_trainings(current_user: User = Depends(get_current_user)):
+    """Get all safety trainings"""
+    trainings = await db.safety_trainings.find({"is_active": True}).to_list(100)
+    return [SafetyTraining(**training) for training in trainings]
+
+@api_router.post("/safety/trainings", response_model=SafetyTraining)
+async def create_safety_training(training_create: SafetyTrainingCreate, current_user: User = Depends(get_current_user)):
+    """Create new safety training"""
+    if current_user.role not in ["super_admin", "hr_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    training = SafetyTraining(**training_create.model_dump())
+    await db.safety_trainings.insert_one(training.model_dump())
+    return training
+
+@api_router.get("/safety/employee/{employee_id}/progress")
+async def get_employee_safety_progress(employee_id: str, current_user: User = Depends(get_current_user)):
+    """Get safety training progress for employee"""
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"] and current_user.id != employee_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    employee = await db.employees.find_one({"id": employee_id})
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    employee_type = employee.get("employee_type", "w2")
+    
+    # Get required trainings for this employee type
+    trainings = await db.safety_trainings.find({
+        "$or": [
+            {"required_for": "all"},
+            {"required_for": employee_type}
+        ]
+    }).to_list(100)
+    
+    progress_list = []
+    for training in trainings:
+        progress = await db.safety_training_progress.find_one({
+            "employee_id": employee_id,
+            "training_id": training["id"]
+        })
+        
+        if not progress:
+            progress = SafetyTrainingProgress(
+                employee_id=employee_id,
+                training_id=training["id"]
+            )
+            await db.safety_training_progress.insert_one(progress.model_dump())
+        
+        progress_list.append({
+            "training": training,
+            "progress": progress
+        })
+    
+    return progress_list
+
+@api_router.post("/safety/employee/{employee_id}/training/{training_id}/complete")
+async def complete_safety_training(employee_id: str, training_id: str, score: float, current_user: User = Depends(get_current_user)):
+    """Mark safety training as complete"""
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"] and current_user.id != employee_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    training = await db.safety_trainings.find_one({"id": training_id})
+    if not training:
+        raise HTTPException(status_code=404, detail="Training not found")
+    
+    # Calculate expiration date if renewal is required
+    expires_at = None
+    if training.get("renewal_months"):
+        expires_at = datetime.utcnow() + timedelta(days=training["renewal_months"] * 30)
+    
+    result = await db.safety_training_progress.update_one(
+        {"employee_id": employee_id, "training_id": training_id},
+        {"$set": {
+            "status": "completed",
+            "completed_at": datetime.utcnow(),
+            "expires_at": expires_at,
+            "score": score
+        }}
+    )
+    
+    return {"message": "Training marked as complete"}
+
+# Workers Compensation Management
+@api_router.get("/compliance/workers-comp", response_model=List[WorkersCompSubmission])
+async def get_workers_comp_submissions(current_user: User = Depends(get_current_user)):
+    """Get workers compensation submissions"""
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    submissions = await db.workers_comp_submissions.find({}).to_list(100)
+    return [WorkersCompSubmission(**sub) for sub in submissions]
+
+@api_router.post("/compliance/workers-comp", response_model=WorkersCompSubmission)
+async def create_workers_comp_submission(employee_id: str, background_tasks: BackgroundTasks, current_user: User = Depends(get_current_user)):
+    """Create workers compensation submission record"""
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    employee = await db.employees.find_one({"id": employee_id})
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    if employee.get("employee_type") != "1099":
+        raise HTTPException(status_code=400, detail="Workers comp only required for 1099 employees")
+    
+    hire_date = employee.get("hire_date", datetime.utcnow())
+    deadline = hire_date + timedelta(days=14)
+    
+    submission = WorkersCompSubmission(
+        employee_id=employee_id,
+        submission_date=datetime.utcnow(),
+        submission_deadline=deadline,
+        submitted_by=current_user.id
+    )
+    
+    await db.workers_comp_submissions.insert_one(submission.model_dump())
+    
+    # Send reminder if approaching deadline
+    if await check_workers_comp_deadline(employee_id):
+        await send_workers_comp_reminder(employee_id, background_tasks)
+    
+    return submission
+
+@api_router.get("/compliance/workers-comp/overdue")
+async def get_overdue_workers_comp(current_user: User = Depends(get_current_user)):
+    """Get overdue workers compensation submissions"""
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Find all 1099 employees hired more than 14 days ago without submissions
+    cutoff_date = datetime.utcnow() - timedelta(days=14)
+    
+    employees = await db.employees.find({
+        "employee_type": "1099",
+        "hire_date": {"$lte": cutoff_date}
+    }).to_list(100)
+    
+    overdue_employees = []
+    for employee in employees:
+        submission = await db.workers_comp_submissions.find_one({"employee_id": employee["id"]})
+        if not submission:
+            overdue_employees.append({
+                "employee": employee,
+                "days_overdue": (datetime.utcnow() - (employee["hire_date"] + timedelta(days=14))).days
+            })
+    
+    return overdue_employees
+
+# Incident Reporting
+@api_router.get("/safety/incidents", response_model=List[IncidentReport])
+async def get_incident_reports(current_user: User = Depends(get_current_user)):
+    """Get incident reports"""
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    incidents = await db.incident_reports.find({}).to_list(100)
+    return [IncidentReport(**incident) for incident in incidents]
+
+@api_router.post("/safety/incidents", response_model=IncidentReport)
+async def create_incident_report(incident_create: IncidentReportCreate, current_user: User = Depends(get_current_user)):
+    """Create new incident report"""
+    incident = IncidentReport(
+        employee_id=current_user.id,
+        incident_date=incident_create.incident_date,
+        location=incident_create.location,
+        description=incident_create.description,
+        injury_type=incident_create.injury_type,
+        severity=incident_create.severity,
+        witnesses=incident_create.witnesses,
+        actions_taken=incident_create.actions_taken,
+        reported_by=current_user.id
+    )
+    
+    await db.incident_reports.insert_one(incident.model_dump())
+    return incident
+
+# Project Assignment Management
+@api_router.get("/assignments", response_model=List[ProjectAssignment])
+async def get_project_assignments(current_user: User = Depends(get_current_user)):
+    """Get project assignments"""
+    if current_user.role == "sales_rep":
+        assignments = await db.project_assignments.find({"assigned_rep_id": current_user.id}).to_list(100)
+    else:
+        assignments = await db.project_assignments.find({}).to_list(100)
+    
+    return [ProjectAssignment(**assignment) for assignment in assignments]
+
+@api_router.post("/assignments", response_model=ProjectAssignment)
+async def create_project_assignment(assignment_create: ProjectAssignmentCreate, background_tasks: BackgroundTasks, current_user: User = Depends(get_current_user)):
+    """Create new project assignment"""
+    if current_user.role not in ["super_admin", "sales_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    assignment = ProjectAssignment(
+        lead_id=assignment_create.lead_id,
+        assigned_rep_id=assignment_create.assigned_rep_id,
+        assigned_by=current_user.id,
+        priority=assignment_create.priority,
+        notes=assignment_create.notes,
+        due_date=assignment_create.due_date
+    )
+    
+    await db.project_assignments.insert_one(assignment.model_dump())
+    
+    # Send notification to rep
+    await send_assignment_notification(assignment, background_tasks)
+    
+    return assignment
+
+@api_router.get("/assignments/qr-scans")
+async def get_qr_scan_analytics(current_user: User = Depends(get_current_user)):
+    """Get QR code scan analytics for assignment"""
+    if current_user.role not in ["super_admin", "sales_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Get all QR scans with lead generation info
+    scans = await db.qr_scans.find({}).to_list(1000)
+    
+    # Group by rep
+    rep_stats = {}
+    for scan in scans:
+        rep_id = scan["rep_id"]
+        if rep_id not in rep_stats:
+            rep_stats[rep_id] = {
+                "total_scans": 0,
+                "leads_generated": 0,
+                "recent_scans": []
+            }
+        
+        rep_stats[rep_id]["total_scans"] += 1
+        if scan.get("lead_generated"):
+            rep_stats[rep_id]["leads_generated"] += 1
+        
+        # Add recent scan info
+        if len(rep_stats[rep_id]["recent_scans"]) < 5:
+            rep_stats[rep_id]["recent_scans"].append(scan)
+    
+    # Get rep names
+    for rep_id, stats in rep_stats.items():
+        rep = await db.sales_reps.find_one({"id": rep_id})
+        stats["rep_name"] = rep["name"] if rep else "Unknown"
+    
+    return rep_stats
+
+@api_router.post("/assignments/qr-scan/{rep_id}")
+async def log_qr_code_scan(rep_id: str, request: Dict[str, Any], current_user: User = Depends(get_current_user)):
+    """Log QR code scan event"""
+    scan = await log_qr_scan(rep_id, request)
+    
+    # Notify admin/sales managers about the scan
+    if current_user.role in ["super_admin", "sales_manager"]:
+        rep = await db.sales_reps.find_one({"id": rep_id})
+        if rep:
+            return {
+                "message": f"QR code scan logged for {rep['name']}",
+                "scan_id": scan.id,
+                "rep_name": rep["name"]
+            }
+    
+    return {"message": "QR code scan logged", "scan_id": scan.id}
+
+# Appointment Management
+@api_router.get("/appointments", response_model=List[AppointmentRequest])
+async def get_appointment_requests(current_user: User = Depends(get_current_user)):
+    """Get appointment requests"""
+    if current_user.role == "sales_rep":
+        appointments = await db.appointment_requests.find({"rep_id": current_user.id}).to_list(100)
+    else:
+        appointments = await db.appointment_requests.find({}).to_list(100)
+    
+    return [AppointmentRequest(**appointment) for appointment in appointments]
+
+@api_router.post("/appointments", response_model=AppointmentRequest)
+async def create_appointment_request(appointment_create: AppointmentRequestCreate, background_tasks: BackgroundTasks, current_user: User = Depends(get_current_user)):
+    """Create new appointment request"""
+    appointment = AppointmentRequest(**appointment_create.model_dump())
+    await db.appointment_requests.insert_one(appointment.model_dump())
+    
+    # Log QR scan with lead generation
+    await log_qr_scan(appointment.rep_id, {
+        "lead_generated": True,
+        "lead_id": appointment.id
+    })
+    
+    # Create lead record
+    lead = Lead(
+        rep_id=appointment.rep_id,
+        name=appointment.customer_name,
+        email=appointment.customer_email,
+        phone=appointment.customer_phone,
+        address=appointment.customer_address,
+        message=appointment.message or "",
+        status="new",
+        priority="medium",
+        rep_name="",  # Will be filled by system
+        territory="",  # Will be filled by system
+        department="Sales"
+    )
+    
+    await db.leads.insert_one(lead.model_dump())
+    
+    # Send notification to rep
+    rep = await db.sales_reps.find_one({"id": appointment.rep_id})
+    if rep:
+        await send_assignment_notification(
+            ProjectAssignment(
+                lead_id=lead.id,
+                assigned_rep_id=appointment.rep_id,
+                assigned_by="system",
+                priority="medium"
+            ),
+            background_tasks
+        )
+    
+    return appointment
+
+# Employee Self-Service
+@api_router.get("/self-service/dashboard")
+async def get_employee_dashboard(current_user: User = Depends(get_current_user)):
+    """Get employee self-service dashboard"""
+    employee = await db.employees.find_one({"id": current_user.id})
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    dashboard_data = {
+        "employee": employee,
+        "employee_type": employee.get("employee_type", "w2"),
+        "onboarding_progress": await get_employee_onboarding_progress(current_user.id),
+        "recent_requests": await db.employee_requests.find({"employee_id": current_user.id}).limit(5).to_list(5),
+        "documents": await db.employee_documents.find({"employee_id": current_user.id}).to_list(10)
+    }
+    
+    # Add PTO info for W2 employees
+    if employee.get("employee_type") == "w2":
+        dashboard_data["pto_balance"] = await db.pto_balances.find_one({
+            "employee_id": current_user.id,
+            "year": datetime.utcnow().year
+        })
+        dashboard_data["pto_requests"] = await db.pto_requests.find({
+            "employee_id": current_user.id
+        }).limit(5).to_list(5)
+    
+    # Add compliance info for 1099 employees
+    if employee.get("employee_type") == "1099":
+        dashboard_data["safety_progress"] = await get_employee_safety_progress(current_user.id, current_user)
+        dashboard_data["workers_comp"] = await db.workers_comp_submissions.find_one({
+            "employee_id": current_user.id
+        })
+    
+    return dashboard_data
+
+@api_router.get("/self-service/documents", response_model=List[EmployeeDocument])
+async def get_employee_documents(current_user: User = Depends(get_current_user)):
+    """Get employee documents"""
+    documents = await db.employee_documents.find({"employee_id": current_user.id}).to_list(100)
+    return [EmployeeDocument(**doc) for doc in documents]
+
+@api_router.post("/self-service/requests", response_model=EmployeeRequest)
+async def create_employee_request(request_create: EmployeeRequestCreate, current_user: User = Depends(get_current_user)):
+    """Create new employee request"""
+    request = EmployeeRequest(
+        employee_id=current_user.id,
+        request_type=request_create.request_type,
+        title=request_create.title,
+        description=request_create.description,
+        priority=request_create.priority
+    )
+    
+    await db.employee_requests.insert_one(request.model_dump())
+    return request
+
+@api_router.get("/self-service/requests", response_model=List[EmployeeRequest])
+async def get_employee_requests(current_user: User = Depends(get_current_user)):
+    """Get employee requests"""
+    if current_user.role in ["super_admin", "hr_manager", "sales_manager"]:
+        requests = await db.employee_requests.find({}).to_list(100)
+    else:
+        requests = await db.employee_requests.find({"employee_id": current_user.id}).to_list(100)
+    
+    return [EmployeeRequest(**req) for req in requests]
+
+@api_router.put("/self-service/requests/{request_id}")
+async def update_employee_request(request_id: str, status: str, resolution: str, current_user: User = Depends(get_current_user)):
+    """Update employee request status"""
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    result = await db.employee_requests.update_one(
+        {"id": request_id},
+        {"$set": {
+            "status": status,
+            "resolution": resolution,
+            "assigned_to": current_user.id,
+            "updated_at": datetime.utcnow()
+        }}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Request not found")
+    
+    return {"message": "Request updated successfully"}
+
+# Initialize sample HR data
+@api_router.post("/hr/initialize-sample-data")
+async def initialize_hr_sample_data(current_user: User = Depends(get_current_user)):
+    """Initialize sample HR data"""
+    if current_user.role not in ["super_admin"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Create sample onboarding stages
+    stages = [
+        {"name": "Personal Information", "description": "Complete personal information and contact details", "order": 1, "employee_type": "all"},
+        {"name": "Tax Documents", "description": "Submit W-2 or 1099 tax documents", "order": 2, "employee_type": "all"},
+        {"name": "Safety Training", "description": "Complete basic safety training", "order": 3, "employee_type": "1099"},
+        {"name": "Workers Compensation", "description": "Submit workers compensation documentation", "order": 4, "employee_type": "1099"},
+        {"name": "Company Handbook", "description": "Read and acknowledge company handbook", "order": 5, "employee_type": "all"},
+        {"name": "Equipment Assignment", "description": "Receive and sign for assigned equipment", "order": 6, "employee_type": "all"}
+    ]
+    
+    for stage_data in stages:
+        stage = OnboardingStage(**stage_data)
+        existing = await db.onboarding_stages.find_one({"name": stage.name})
+        if not existing:
+            await db.onboarding_stages.insert_one(stage.model_dump())
+    
+    # Create sample safety trainings
+    trainings = [
+        {"name": "Basic Safety Training", "description": "Fundamental safety practices for roofing work", "required_for": "1099", "duration_hours": 4.0, "certification_required": True},
+        {"name": "Fall Protection", "description": "Proper use of fall protection equipment", "required_for": "1099", "duration_hours": 2.0, "certification_required": True, "renewal_months": 12},
+        {"name": "Ladder Safety", "description": "Safe ladder usage and positioning", "required_for": "all", "duration_hours": 1.0, "certification_required": False},
+        {"name": "Emergency Procedures", "description": "Emergency response and first aid basics", "required_for": "all", "duration_hours": 2.0, "certification_required": False}
+    ]
+    
+    for training_data in trainings:
+        training = SafetyTraining(**training_data)
+        existing = await db.safety_trainings.find_one({"name": training.name})
+        if not existing:
+            await db.safety_trainings.insert_one(training.model_dump())
+    
+    return {"message": "Sample HR data initialized successfully"}
+
 # Include the router in the main app
 app.include_router(api_router)
 
