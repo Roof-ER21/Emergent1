@@ -856,7 +856,8 @@ const HRRecruitmentApp = () => {
             { id: 'employees', name: 'Employees' },
             { id: 'onboarding', name: 'Onboarding' },
             { id: 'pto', name: 'PTO Management' },
-            { id: 'safety', name: 'Safety & Compliance' },
+            { id: 'hiring', name: 'Hiring Flows' },
+            { id: 'compliance', name: 'Compliance' },
             { id: 'assignments', name: 'Project Assignments' },
             { id: 'requests', name: 'Employee Requests' }
           ].map(tab => (
