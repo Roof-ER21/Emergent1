@@ -2181,6 +2181,12 @@ const QRGeneratorApp = () => {
     const totalConversions = leads.filter(lead => lead.status === 'converted').length;
     const totalLeads = leads.length;
     const conversionRate = totalLeads > 0 ? ((totalConversions / totalLeads) * 100).toFixed(1) : 0;
+    const activeLeads = leads.filter(lead => lead.status === 'new' || lead.status === 'contacted').length;
+    const monthlyLeads = leads.filter(lead => {
+      const leadDate = new Date(lead.created_at);
+      const currentDate = new Date();
+      return leadDate.getMonth() === currentDate.getMonth() && leadDate.getFullYear() === currentDate.getFullYear();
+    }).length;
     
     return (
       <div className="space-y-6">
