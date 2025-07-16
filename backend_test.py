@@ -566,6 +566,16 @@ class RoofHRTester:
         self.test_data_models()
         self.test_cors_configuration()
         
+        # Additional comprehensive tests
+        self.test_commission_calculation_logic()
+        self.test_email_template_structure()
+        self.test_database_models()
+        self.test_role_based_access_implementation()
+        self.test_google_sheets_integration()
+        self.test_smtp_email_configuration()
+        self.test_job_status_workflow()
+        self.test_emergent_oauth_integration()
+        
         return self.test_results
 
     def print_summary(self):
