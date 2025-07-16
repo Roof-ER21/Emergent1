@@ -1376,6 +1376,8 @@ class RoofHRTester:
         self.test_traditional_employee_import()
         self.test_google_sheets_employee_import()
         self.test_google_sheets_sales_rep_import()
+        self.test_google_sheets_error_handling()
+        self.test_google_sheets_role_based_access()
         
         return self.test_results
 
