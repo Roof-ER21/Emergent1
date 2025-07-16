@@ -130,8 +130,10 @@ class RoofHRTester:
         
         if response and response.status_code in [401, 403]:
             self.log_result("employee_management", "get_employees_no_auth", True, "Correctly requires authentication")
+        elif response:
+            self.log_result("employee_management", "get_employees_no_auth", False, f"Expected 401/403, got {response.status_code}")
         else:
-            self.log_result("employee_management", "get_employees_no_auth", False, f"Expected 401/403, got {response.status_code if response else 'No response'}")
+            self.log_result("employee_management", "get_employees_no_auth", False, "No response received")
         
         # Test 2: Create employee without auth
         print("Testing POST /employees without auth...")
@@ -147,8 +149,10 @@ class RoofHRTester:
         
         if response and response.status_code in [401, 403]:
             self.log_result("employee_management", "create_employee_no_auth", True, "Correctly requires authentication")
+        elif response:
+            self.log_result("employee_management", "create_employee_no_auth", False, f"Expected 401/403, got {response.status_code}")
         else:
-            self.log_result("employee_management", "create_employee_no_auth", False, f"Expected 401/403, got {response.status_code if response else 'No response'}")
+            self.log_result("employee_management", "create_employee_no_auth", False, "No response received")
 
     def test_job_management_without_auth(self):
         """Test job management endpoints without authentication"""
@@ -160,8 +164,10 @@ class RoofHRTester:
         
         if response and response.status_code in [401, 403]:
             self.log_result("job_management", "get_jobs_no_auth", True, "Correctly requires authentication")
+        elif response:
+            self.log_result("job_management", "get_jobs_no_auth", False, f"Expected 401/403, got {response.status_code}")
         else:
-            self.log_result("job_management", "get_jobs_no_auth", False, f"Expected 401/403, got {response.status_code if response else 'No response'}")
+            self.log_result("job_management", "get_jobs_no_auth", False, "No response received")
         
         # Test 2: Create job without auth
         print("Testing POST /jobs without auth...")
@@ -178,8 +184,10 @@ class RoofHRTester:
         
         if response and response.status_code in [401, 403]:
             self.log_result("job_management", "create_job_no_auth", True, "Correctly requires authentication")
+        elif response:
+            self.log_result("job_management", "create_job_no_auth", False, f"Expected 401/403, got {response.status_code}")
         else:
-            self.log_result("job_management", "create_job_no_auth", False, f"Expected 401/403, got {response.status_code if response else 'No response'}")
+            self.log_result("job_management", "create_job_no_auth", False, "No response received")
 
     def test_commission_system_without_auth(self):
         """Test commission endpoints without authentication"""
@@ -191,8 +199,10 @@ class RoofHRTester:
         
         if response and response.status_code in [401, 403]:
             self.log_result("commission_system", "get_commissions_no_auth", True, "Correctly requires authentication")
+        elif response:
+            self.log_result("commission_system", "get_commissions_no_auth", False, f"Expected 401/403, got {response.status_code}")
         else:
-            self.log_result("commission_system", "get_commissions_no_auth", False, f"Expected 401/403, got {response.status_code if response else 'No response'}")
+            self.log_result("commission_system", "get_commissions_no_auth", False, "No response received")
 
     def test_analytics_without_auth(self):
         """Test analytics endpoints without authentication"""
@@ -204,8 +214,10 @@ class RoofHRTester:
         
         if response and response.status_code in [401, 403]:
             self.log_result("analytics", "get_dashboard_no_auth", True, "Correctly requires authentication")
+        elif response:
+            self.log_result("analytics", "get_dashboard_no_auth", False, f"Expected 401/403, got {response.status_code}")
         else:
-            self.log_result("analytics", "get_dashboard_no_auth", False, f"Expected 401/403, got {response.status_code if response else 'No response'}")
+            self.log_result("analytics", "get_dashboard_no_auth", False, "No response received")
 
     def test_google_sheets_import_without_auth(self):
         """Test Google Sheets import without authentication"""
@@ -219,8 +231,10 @@ class RoofHRTester:
         
         if response and response.status_code in [401, 403]:
             self.log_result("employee_management", "google_sheets_import_no_auth", True, "Correctly requires authentication")
+        elif response:
+            self.log_result("employee_management", "google_sheets_import_no_auth", False, f"Expected 401/403, got {response.status_code}")
         else:
-            self.log_result("employee_management", "google_sheets_import_no_auth", False, f"Expected 401/403, got {response.status_code if response else 'No response'}")
+            self.log_result("employee_management", "google_sheets_import_no_auth", False, "No response received")
 
     def test_endpoint_structure(self):
         """Test that all expected endpoints are properly structured"""
