@@ -286,6 +286,41 @@ def calculate_commission(job_value: float, commission_rate: float) -> float:
     """Calculate commission based on job value and rate"""
     return job_value * commission_rate
 
+def generate_qr_code(rep_id: str, base_url: str = "https://theroofdocs.com") -> str:
+    """Generate QR code data for sales rep"""
+    import hashlib
+    import time
+    
+    # Create a unique code based on rep_id and timestamp
+    data = f"{rep_id}-{int(time.time())}"
+    qr_code = hashlib.md5(data.encode()).hexdigest()[:8].upper()
+    return f"QR{qr_code}"
+
+def generate_landing_page_url(rep_name: str, base_url: str = "https://theroofdocs.com") -> str:
+    """Generate landing page URL for sales rep"""
+    # Convert name to URL-friendly format
+    url_name = rep_name.lower().replace(" ", "-").replace(".", "")
+    return f"{base_url}/rep/{url_name}"
+
+async def send_lead_notification(lead: Lead, rep_email: str, background_tasks: BackgroundTasks):
+    """Send email notification to sales rep about new lead"""
+    template_data = {
+        "recipient_name": lead.rep_name,
+        "message": f"You have received a new lead from {lead.name}.",
+        "job_id": lead.id,
+        "job_title": f"New Lead - {lead.name}",
+        "job_status": lead.status,
+        "job_value": "TBD",
+        "action_url": f"https://theroofdocs.com/leads/{lead.id}"
+    }
+    
+    await send_email(
+        rep_email,
+        f"New Lead Alert - {lead.name}",
+        template_data,
+        background_tasks
+    )
+
 async def import_from_google_sheets(spreadsheet_id: str, sheet_range: str):
     """Import employee data from Google Sheets"""
     try:
