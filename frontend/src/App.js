@@ -798,6 +798,41 @@ const SalesLeaderboardApp = () => {
     }
   };
 
+  const getTrendIcon = (trend) => {
+    switch (trend) {
+      case 'up':
+        return <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
+        </svg>;
+      case 'down':
+        return <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 13l-5 5m0 0l-5-5m5 5V6" />
+        </svg>;
+      default:
+        return <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h8" />
+        </svg>;
+    }
+  };
+
+  const getProgressColor = (current, goal) => {
+    const percentage = (current / goal) * 100;
+    if (percentage >= 100) return 'bg-green-500';
+    if (percentage >= 75) return 'bg-blue-500';
+    if (percentage >= 50) return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
+
+  const getYearlyPaceColor = (current, goal, daysInMonth, dayOfMonth) => {
+    const expectedDaily = goal / daysInMonth;
+    const expectedToDate = expectedDaily * dayOfMonth;
+    const percentage = (current / expectedToDate) * 100;
+    if (percentage >= 100) return 'bg-green-300';
+    if (percentage >= 75) return 'bg-blue-300';
+    if (percentage >= 50) return 'bg-yellow-300';
+    return 'bg-red-300';
+  };
+
   const canAssignGoals = () => {
     const today = new Date();
     const dayOfMonth = today.getDate();
