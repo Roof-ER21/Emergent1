@@ -2,21 +2,32 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-/* Custom styles */
+/* Custom styles for Roof-HR with theroofdocs.com color scheme */
+:root {
+  --roof-red: #ef4444;
+  --roof-red-dark: #dc2626;
+  --roof-red-light: #fef2f2;
+  --roof-black: #1f2937;
+  --roof-white: #ffffff;
+  --roof-gray: #6b7280;
+  --roof-gray-light: #f9fafb;
+  --roof-gray-dark: #374151;
+}
+
 .App {
   min-height: 100vh;
-  background-color: #f8fafc;
+  background-color: var(--roof-gray-light);
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: var(--roof-black);
   padding: 20px;
-  color: white;
+  color: var(--roof-white);
   text-align: center;
 }
 
 .App-link {
-  color: #61dafb;
+  color: var(--roof-red);
 }
 
 /* Dashboard specific styles */
@@ -29,23 +40,19 @@
 }
 
 .metric-card {
-  @apply bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200;
+  @apply bg-gradient-to-r from-red-50 to-red-100 rounded-lg p-6 border border-red-200;
 }
 
-.metric-card.green {
-  @apply from-green-50 to-green-100 border-green-200;
-}
-
-.metric-card.purple {
-  @apply from-purple-50 to-purple-100 border-purple-200;
-}
-
-.metric-card.yellow {
-  @apply from-yellow-50 to-yellow-100 border-yellow-200;
+.metric-card.gray {
+  @apply from-gray-50 to-gray-100 border-gray-200;
 }
 
 .metric-card.red {
   @apply from-red-50 to-red-100 border-red-200;
+}
+
+.metric-card.black {
+  @apply from-gray-900 to-gray-800 border-gray-700 text-white;
 }
 
 /* Table styles */
@@ -55,19 +62,19 @@
 
 /* Status badge styles */
 .status-badge-lead {
-  @apply bg-blue-100 text-blue-800;
+  @apply bg-gray-100 text-gray-800;
 }
 
 .status-badge-scheduled {
-  @apply bg-yellow-100 text-yellow-800;
+  @apply bg-gray-100 text-gray-800;
 }
 
 .status-badge-in-progress {
-  @apply bg-purple-100 text-purple-800;
+  @apply bg-red-100 text-red-800;
 }
 
 .status-badge-completed {
-  @apply bg-green-100 text-green-800;
+  @apply bg-gray-100 text-gray-800;
 }
 
 .status-badge-cancelled {
@@ -76,11 +83,11 @@
 
 /* Form styles */
 .form-input {
-  @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent;
 }
 
 .form-select {
-  @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent;
 }
 
 .form-label {
@@ -89,15 +96,15 @@
 
 /* Button styles */
 .btn-primary {
-  @apply bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+  @apply bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2;
 }
 
 .btn-secondary {
-  @apply bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+  @apply bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
 }
 
 .btn-success {
-  @apply bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2;
+  @apply bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
 }
 
 .btn-danger {
@@ -106,7 +113,7 @@
 
 /* Loading animation */
 .spinner {
-  @apply animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600;
+  @apply animate-spin rounded-full h-8 w-8 border-b-2 border-red-600;
 }
 
 /* Navigation styles */
@@ -115,7 +122,7 @@
 }
 
 .nav-item.active {
-  @apply bg-blue-100 text-blue-700;
+  @apply bg-red-100 text-red-700;
 }
 
 .nav-item:hover {
@@ -128,7 +135,7 @@
 }
 
 .modal-content {
-  @apply bg-white rounded-lg shadow-xl p-6 w-full max-w-md;
+  @apply bg-white rounded-lg shadow-xl p-6 w-full max-w-md border border-gray-200;
 }
 
 /* Alert styles */
@@ -137,7 +144,7 @@
 }
 
 .alert-success {
-  @apply bg-green-50 border-green-200 text-green-800;
+  @apply bg-gray-50 border-gray-200 text-gray-800;
 }
 
 .alert-error {
@@ -145,11 +152,11 @@
 }
 
 .alert-warning {
-  @apply bg-yellow-50 border-yellow-200 text-yellow-800;
+  @apply bg-gray-50 border-gray-200 text-gray-800;
 }
 
 .alert-info {
-  @apply bg-blue-50 border-blue-200 text-blue-800;
+  @apply bg-gray-50 border-gray-200 text-gray-800;
 }
 
 /* Card styles */
@@ -179,19 +186,19 @@
 }
 
 .role-badge-hr-manager {
-  @apply bg-blue-100 text-blue-800;
+  @apply bg-gray-100 text-gray-800;
 }
 
 .role-badge-sales-manager {
-  @apply bg-green-100 text-green-800;
+  @apply bg-red-100 text-red-800;
 }
 
 .role-badge-project-manager {
-  @apply bg-purple-100 text-purple-800;
+  @apply bg-gray-100 text-gray-800;
 }
 
 .role-badge-sales-rep {
-  @apply bg-yellow-100 text-yellow-800;
+  @apply bg-red-100 text-red-800;
 }
 
 .role-badge-field-worker {
@@ -238,12 +245,49 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #888;
+  background: var(--roof-gray);
   border-radius: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: var(--roof-gray-dark);
+}
+
+/* Brand colors for theroofdocs.com */
+.brand-red {
+  color: var(--roof-red);
+}
+
+.brand-red-bg {
+  background-color: var(--roof-red);
+}
+
+.brand-red-border {
+  border-color: var(--roof-red);
+}
+
+.brand-gray {
+  color: var(--roof-gray);
+}
+
+.brand-gray-bg {
+  background-color: var(--roof-gray);
+}
+
+.brand-black {
+  color: var(--roof-black);
+}
+
+.brand-black-bg {
+  background-color: var(--roof-black);
+}
+
+.brand-white {
+  color: var(--roof-white);
+}
+
+.brand-white-bg {
+  background-color: var(--roof-white);
 }
 
 /* Print styles */
@@ -255,4 +299,37 @@
   .page-break {
     page-break-before: always;
   }
+}
+
+/* Focus styles for accessibility */
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--roof-red);
+  outline-offset: 2px;
+}
+
+/* Hover effects */
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading states */
+.loading {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Error states */
+.error-state {
+  border-color: var(--roof-red);
+  background-color: var(--roof-red-light);
+}
+
+/* Success states */
+.success-state {
+  border-color: var(--roof-gray);
+  background-color: var(--roof-gray-light);
 }
