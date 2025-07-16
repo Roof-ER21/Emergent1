@@ -101,3 +101,146 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Build Roof-HR MVP - an enterprise-level HR management system for roofing companies with user authentication, employee management, job management, sales rep dashboard, and commission tracking with email notifications"
+
+backend:
+  - task: "User Authentication System with Emergent OAuth"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "About to implement Emergent OAuth integration with session management"
+
+  - task: "Employee Management CRUD with Google Sheets Import"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Will implement Google Sheets import for employees and sales reps"
+
+  - task: "Job Management System with Workflow Stages"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Job creation, status tracking, and workflow stages to be implemented"
+
+  - task: "Commission Calculation Engine"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Automated commission calculations based on job completion"
+
+  - task: "Gmail SMTP Email Notifications"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Email notifications for job status changes using Gmail SMTP"
+
+frontend:
+  - task: "User Authentication UI with Login/Logout"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Login page with Emergent OAuth integration"
+
+  - task: "Employee Management Dashboard"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Employee directory, profiles, and Google Sheets import interface"
+
+  - task: "Job Management Dashboard"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Job creation, status tracking, and workflow management"
+
+  - task: "Sales Rep Dashboard with Commission Tracking"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Personal dashboard for sales reps with commission calculations"
+
+  - task: "Admin Dashboard with Analytics"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Admin overview with employee and job analytics"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 0
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "User Authentication System with Emergent OAuth"
+    - "Employee Management CRUD with Google Sheets Import"
+    - "Job Management System with Workflow Stages"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Starting Roof-HR MVP implementation with authentication, employee management, job management, and commission tracking. Will build complete system using bulk_file_writer then test incrementally."
