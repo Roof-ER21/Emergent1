@@ -237,10 +237,12 @@ test_plan:
     - "User Authentication System with Emergent OAuth"
     - "Employee Management CRUD with Google Sheets Import"
     - "Job Management System with Workflow Stages"
+    - "Commission Calculation Engine"
+    - "Gmail SMTP Email Notifications"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
-    message: "Starting Roof-HR MVP implementation with authentication, employee management, job management, and commission tracking. Will build complete system using bulk_file_writer then test incrementally."
+    message: "Successfully implemented all core MVP features for Roof-HR system. Backend includes authentication, employee management, job management, commission calculations, and email notifications. Frontend includes complete dashboard with role-based access. Ready for backend testing."
