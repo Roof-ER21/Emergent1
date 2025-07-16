@@ -336,11 +336,668 @@ const AppWrapper = ({ app, onBack }) => {
 // Sales Leaderboard App (placeholder)
 const SalesLeaderboardApp = () => {
   const { user } = useAuth();
-  
+  const [activeTab, setActiveTab] = useState('leaderboard');
+  const [salesData, setSalesData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [timeRange, setTimeRange] = useState('month');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterTerritory, setFilterTerritory] = useState('all');
+  const [filterDepartment, setFilterDepartment] = useState('all');
+  const [selectedRep, setSelectedRep] = useState(null);
+  const [competitions, setCompetitions] = useState([]);
+  const [achievements, setAchievements] = useState([]);
+
+  // Mock data for demonstration - in real app, this would come from API
+  const mockSalesData = [
+    {
+      id: 1,
+      name: 'John Smith',
+      email: 'john.smith@theroofdocs.com',
+      territory: 'North',
+      department: 'Sales',
+      picture: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+      metrics: {
+        revenue: 125000,
+        leads: 48,
+        conversions: 12,
+        calls: 156,
+        meetings: 24,
+        proposals: 18,
+        closedDeals: 12,
+        avgDealSize: 10417,
+        conversionRate: 25.0,
+        responseTime: 2.5
+      },
+      badges: ['Top Performer', 'Revenue Leader', 'Customer Champion'],
+      streak: 7,
+      rank: 1,
+      trend: 'up',
+      quarterlyGoal: 150000,
+      monthlyGoal: 50000
+    },
+    {
+      id: 2,
+      name: 'Sarah Johnson',
+      email: 'sarah.j@theroofdocs.com',
+      territory: 'South',
+      department: 'Sales',
+      picture: 'https://images.unsplash.com/photo-1494790108755-2616b6374e88?w=150&h=150&fit=crop&crop=face',
+      metrics: {
+        revenue: 118000,
+        leads: 52,
+        conversions: 14,
+        calls: 148,
+        meetings: 26,
+        proposals: 20,
+        closedDeals: 14,
+        avgDealSize: 8429,
+        conversionRate: 26.9,
+        responseTime: 1.8
+      },
+      badges: ['Conversion Master', 'Speed Demon', 'Lead Generator'],
+      streak: 5,
+      rank: 2,
+      trend: 'up',
+      quarterlyGoal: 140000,
+      monthlyGoal: 45000
+    },
+    {
+      id: 3,
+      name: 'Mike Davis',
+      email: 'mike.d@theroofdocs.com',
+      territory: 'East',
+      department: 'Sales',
+      picture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+      metrics: {
+        revenue: 108000,
+        leads: 45,
+        conversions: 11,
+        calls: 132,
+        meetings: 22,
+        proposals: 15,
+        closedDeals: 11,
+        avgDealSize: 9818,
+        conversionRate: 24.4,
+        responseTime: 3.2
+      },
+      badges: ['Steady Performer', 'Team Player'],
+      streak: 3,
+      rank: 3,
+      trend: 'stable',
+      quarterlyGoal: 130000,
+      monthlyGoal: 40000
+    },
+    {
+      id: 4,
+      name: 'Lisa Chen',
+      email: 'lisa.c@theroofdocs.com',
+      territory: 'West',
+      department: 'Sales',
+      picture: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+      metrics: {
+        revenue: 95000,
+        leads: 41,
+        conversions: 9,
+        calls: 119,
+        meetings: 18,
+        proposals: 12,
+        closedDeals: 9,
+        avgDealSize: 10556,
+        conversionRate: 22.0,
+        responseTime: 2.1
+      },
+      badges: ['Quality Focus', 'High Value Deals'],
+      streak: 2,
+      rank: 4,
+      trend: 'down',
+      quarterlyGoal: 120000,
+      monthlyGoal: 35000
+    },
+    {
+      id: 5,
+      name: 'Tom Wilson',
+      email: 'tom.w@theroofdocs.com',
+      territory: 'Central',
+      department: 'Sales',
+      picture: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+      metrics: {
+        revenue: 87000,
+        leads: 38,
+        conversions: 8,
+        calls: 105,
+        meetings: 16,
+        proposals: 10,
+        closedDeals: 8,
+        avgDealSize: 10875,
+        conversionRate: 21.1,
+        responseTime: 4.1
+      },
+      badges: ['Rising Star', 'Potential Leader'],
+      streak: 1,
+      rank: 5,
+      trend: 'up',
+      quarterlyGoal: 110000,
+      monthlyGoal: 32000
+    }
+  ];
+
+  const mockCompetitions = [
+    {
+      id: 1,
+      name: 'Q1 Revenue Challenge',
+      type: 'revenue',
+      startDate: '2025-01-01',
+      endDate: '2025-03-31',
+      prize: '$5000 Bonus',
+      participants: 12,
+      leader: 'John Smith',
+      status: 'active'
+    },
+    {
+      id: 2,
+      name: 'Monthly Conversion Contest',
+      type: 'conversion',
+      startDate: '2025-01-01',
+      endDate: '2025-01-31',
+      prize: 'Weekend Getaway',
+      participants: 8,
+      leader: 'Sarah Johnson',
+      status: 'active'
+    },
+    {
+      id: 3,
+      name: 'Lead Generation Sprint',
+      type: 'leads',
+      startDate: '2025-01-15',
+      endDate: '2025-01-31',
+      prize: '$1000 Gift Card',
+      participants: 10,
+      leader: 'Mike Davis',
+      status: 'active'
+    }
+  ];
+
+  useEffect(() => {
+    // Simulate API call
+    setTimeout(() => {
+      setSalesData(mockSalesData);
+      setCompetitions(mockCompetitions);
+      setLoading(false);
+    }, 1000);
+  }, []);
+
+  const filteredSalesData = salesData.filter(rep => {
+    const matchesSearch = rep.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         rep.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesTerritory = filterTerritory === 'all' || rep.territory === filterTerritory;
+    const matchesDepartment = filterDepartment === 'all' || rep.department === filterDepartment;
+    return matchesSearch && matchesTerritory && matchesDepartment;
+  });
+
+  const getTrendIcon = (trend) => {
+    switch (trend) {
+      case 'up':
+        return <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
+        </svg>;
+      case 'down':
+        return <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 13l-5 5m0 0l-5-5m5 5V6" />
+        </svg>;
+      default:
+        return <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h8" />
+        </svg>;
+    }
+  };
+
+  const getPerformanceColor = (percentage) => {
+    if (percentage >= 90) return 'text-green-500';
+    if (percentage >= 70) return 'text-blue-500';
+    if (percentage >= 50) return 'text-yellow-500';
+    return 'text-red-500';
+  };
+
+  const getPerformanceBg = (percentage) => {
+    if (percentage >= 90) return 'bg-green-500';
+    if (percentage >= 70) return 'bg-blue-500';
+    if (percentage >= 50) return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading Sales Leaderboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white rounded-lg shadow-sm p-8 border border-gray-200">
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">Sales Leaderboard</h2>
-      <p className="text-gray-600">Performance tracking and competitions coming soon...</p>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-xl p-6 text-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold mb-2">Sales Leaderboard</h1>
+            <p className="text-red-100">Track performance, compete, and achieve excellence</p>
+          </div>
+          <div className="flex items-center space-x-4">
+            <select
+              value={timeRange}
+              onChange={(e) => setTimeRange(e.target.value)}
+              className="px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/50"
+            >
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+              <option value="quarter">This Quarter</option>
+              <option value="year">This Year</option>
+            </select>
+            <div className="text-right">
+              <div className="text-sm text-red-100">Total Team Revenue</div>
+              <div className="text-2xl font-bold">
+                ${salesData.reduce((sum, rep) => sum + rep.metrics.revenue, 0).toLocaleString()}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation Tabs */}
+      <div className="border-b border-gray-200 dark:border-gray-700">
+        <nav className="flex space-x-8">
+          <button
+            onClick={() => setActiveTab('leaderboard')}
+            className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
+              activeTab === 'leaderboard'
+                ? 'border-red-500 text-red-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            Leaderboard
+          </button>
+          <button
+            onClick={() => setActiveTab('competitions')}
+            className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
+              activeTab === 'competitions'
+                ? 'border-red-500 text-red-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            Competitions
+          </button>
+          <button
+            onClick={() => setActiveTab('analytics')}
+            className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
+              activeTab === 'analytics'
+                ? 'border-red-500 text-red-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            Analytics
+          </button>
+        </nav>
+      </div>
+
+      {/* Tab Content */}
+      {activeTab === 'leaderboard' && (
+        <div className="space-y-6">
+          {/* Top Performers Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {filteredSalesData.slice(0, 3).map((rep, index) => (
+              <div
+                key={rep.id}
+                className={`relative overflow-hidden rounded-xl p-6 text-white ${
+                  index === 0 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600' :
+                  index === 1 ? 'bg-gradient-to-br from-gray-400 to-gray-600' :
+                  'bg-gradient-to-br from-orange-400 to-orange-600'
+                }`}
+              >
+                <div className="absolute top-4 right-4">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold ${
+                    index === 0 ? 'bg-yellow-300 text-yellow-800' :
+                    index === 1 ? 'bg-gray-300 text-gray-800' :
+                    'bg-orange-300 text-orange-800'
+                  }`}>
+                    {index + 1}
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-4 mb-4">
+                  <img
+                    src={rep.picture}
+                    alt={rep.name}
+                    className="w-16 h-16 rounded-full border-4 border-white shadow-lg"
+                  />
+                  <div>
+                    <h3 className="text-lg font-bold">{rep.name}</h3>
+                    <p className="text-sm opacity-90">{rep.territory}</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm opacity-90">Revenue</span>
+                    <span className="font-bold">${rep.metrics.revenue.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm opacity-90">Conversions</span>
+                    <span className="font-bold">{rep.metrics.conversions}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm opacity-90">Rate</span>
+                    <span className="font-bold">{rep.metrics.conversionRate}%</span>
+                  </div>
+                </div>
+                
+                <div className="mt-4 flex items-center space-x-2">
+                  {rep.badges.slice(0, 2).map((badge, i) => (
+                    <span key={i} className="px-2 py-1 bg-white/20 rounded-full text-xs font-medium">
+                      {badge}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Filters */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Team Performance</h3>
+              <div className="flex items-center space-x-4">
+                <input
+                  type="text"
+                  placeholder="Search representatives..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                />
+                <select
+                  value={filterTerritory}
+                  onChange={(e) => setFilterTerritory(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                >
+                  <option value="all">All Territories</option>
+                  <option value="North">North</option>
+                  <option value="South">South</option>
+                  <option value="East">East</option>
+                  <option value="West">West</option>
+                  <option value="Central">Central</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Leaderboard Table */}
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-200">
+                    <th className="text-left py-3 px-4 font-medium text-gray-900">Rank</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900">Representative</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900">Revenue</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900">Leads</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900">Conversions</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900">Rate</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900">Goal Progress</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900">Trend</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredSalesData.map((rep, index) => {
+                    const goalProgress = (rep.metrics.revenue / rep.monthlyGoal) * 100;
+                    return (
+                      <tr
+                        key={rep.id}
+                        className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+                        onClick={() => setSelectedRep(rep)}
+                      >
+                        <td className="py-4 px-4">
+                          <div className="flex items-center">
+                            <span className="text-2xl font-bold text-gray-900">#{rep.rank}</span>
+                            {rep.streak > 0 && (
+                              <span className="ml-2 px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">
+                                🔥 {rep.streak}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="flex items-center space-x-3">
+                            <img
+                              src={rep.picture}
+                              alt={rep.name}
+                              className="w-10 h-10 rounded-full border-2 border-red-300"
+                            />
+                            <div>
+                              <div className="font-medium text-gray-900">{rep.name}</div>
+                              <div className="text-sm text-gray-500">{rep.territory}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="text-lg font-bold text-gray-900">
+                            ${rep.metrics.revenue.toLocaleString()}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            Avg: ${rep.metrics.avgDealSize.toLocaleString()}
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="text-lg font-bold text-gray-900">{rep.metrics.leads}</div>
+                          <div className="text-sm text-gray-500">
+                            {rep.metrics.calls} calls
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="text-lg font-bold text-gray-900">{rep.metrics.conversions}</div>
+                          <div className="text-sm text-gray-500">
+                            {rep.metrics.meetings} meetings
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className={`text-lg font-bold ${getPerformanceColor(rep.metrics.conversionRate)}`}>
+                            {rep.metrics.conversionRate}%
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {rep.metrics.responseTime}h avg
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="w-20">
+                            <div className="flex justify-between text-sm text-gray-600 mb-1">
+                              <span>{Math.round(goalProgress)}%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div
+                                className={`h-2 rounded-full transition-all duration-300 ${getPerformanceBg(goalProgress)}`}
+                                style={{ width: `${Math.min(goalProgress, 100)}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="flex items-center">
+                            {getTrendIcon(rep.trend)}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'competitions' && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Active Competitions</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {competitions.map((competition) => (
+                <div
+                  key={competition.id}
+                  className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="text-lg font-semibold text-gray-900">{competition.name}</h4>
+                    <span className="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-medium">
+                      {competition.status}
+                    </span>
+                  </div>
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <div className="flex justify-between">
+                      <span>Type:</span>
+                      <span className="font-medium">{competition.type}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Participants:</span>
+                      <span className="font-medium">{competition.participants}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Leader:</span>
+                      <span className="font-medium">{competition.leader}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Prize:</span>
+                      <span className="font-medium text-red-600">{competition.prize}</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="text-xs text-gray-500">
+                      Ends: {new Date(competition.endDate).toLocaleDateString()}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'analytics' && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Analytics</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4">
+                <div className="text-sm text-blue-600 font-medium">Total Revenue</div>
+                <div className="text-2xl font-bold text-blue-700">
+                  ${salesData.reduce((sum, rep) => sum + rep.metrics.revenue, 0).toLocaleString()}
+                </div>
+              </div>
+              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4">
+                <div className="text-sm text-green-600 font-medium">Total Conversions</div>
+                <div className="text-2xl font-bold text-green-700">
+                  {salesData.reduce((sum, rep) => sum + rep.metrics.conversions, 0)}
+                </div>
+              </div>
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4">
+                <div className="text-sm text-purple-600 font-medium">Total Leads</div>
+                <div className="text-2xl font-bold text-purple-700">
+                  {salesData.reduce((sum, rep) => sum + rep.metrics.leads, 0)}
+                </div>
+              </div>
+              <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-4">
+                <div className="text-sm text-orange-600 font-medium">Team Average Rate</div>
+                <div className="text-2xl font-bold text-orange-700">
+                  {(salesData.reduce((sum, rep) => sum + rep.metrics.conversionRate, 0) / salesData.length).toFixed(1)}%
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rep Detail Modal */}
+      {selectedRep && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold text-gray-900">Performance Details</h3>
+              <button
+                onClick={() => setSelectedRep(null)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="flex items-center space-x-4">
+                <img
+                  src={selectedRep.picture}
+                  alt={selectedRep.name}
+                  className="w-16 h-16 rounded-full border-4 border-red-300"
+                />
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-900">{selectedRep.name}</h4>
+                  <p className="text-gray-600">{selectedRep.email}</p>
+                  <p className="text-sm text-gray-500">{selectedRep.territory} Territory</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="text-sm text-gray-600">Revenue</div>
+                  <div className="text-lg font-bold text-gray-900">
+                    ${selectedRep.metrics.revenue.toLocaleString()}
+                  </div>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="text-sm text-gray-600">Conversions</div>
+                  <div className="text-lg font-bold text-gray-900">
+                    {selectedRep.metrics.conversions}
+                  </div>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="text-sm text-gray-600">Leads</div>
+                  <div className="text-lg font-bold text-gray-900">
+                    {selectedRep.metrics.leads}
+                  </div>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="text-sm text-gray-600">Rate</div>
+                  <div className="text-lg font-bold text-gray-900">
+                    {selectedRep.metrics.conversionRate}%
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <h5 className="font-medium text-gray-900">Achievements</h5>
+                <div className="flex flex-wrap gap-2">
+                  {selectedRep.badges.map((badge, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium"
+                    >
+                      {badge}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
