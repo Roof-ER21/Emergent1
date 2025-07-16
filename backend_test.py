@@ -2153,6 +2153,9 @@ class RoofHRTester:
         self.test_hr_modules_comprehensive()
         self.test_hr_authentication_requirements()
         
+        # Hiring Flow Management System tests
+        self.test_hiring_flow_management_system()
+        
         return self.test_results
 
     def print_summary(self):
