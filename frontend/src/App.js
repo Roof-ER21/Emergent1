@@ -35,21 +35,6 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (sessionId) => {
-    try {
-      const response = await axios.post(`${API}/auth/login`, { session_id: sessionId });
-      const { access_token, user } = response.data;
-      
-      localStorage.setItem('token', access_token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      setUser(user);
-      return user;
-    } catch (error) {
-      console.error('Login failed:', error);
-      throw error;
-    }
-  };
-
   const loginDev = async (role = 'super_admin') => {
     // Development login bypass
     const devUser = {
@@ -69,19 +54,13 @@ const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    try {
-      await axios.post(`${API}/auth/logout`);
-    } catch (error) {
-      console.error('Logout failed:', error);
-    } finally {
-      localStorage.removeItem('token');
-      delete axios.defaults.headers.common['Authorization'];
-      setUser(null);
-    }
+    localStorage.removeItem('token');
+    delete axios.defaults.headers.common['Authorization'];
+    setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, loginDev, logout, loading }}>
+    <AuthContext.Provider value={{ user, loginDev, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
@@ -97,15 +76,8 @@ const useAuth = () => {
 
 // Login Component
 const Login = () => {
-  const { login, loginDev } = useAuth();
+  const { loginDev } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [devMode, setDevMode] = useState(false);
-
-  const handleLogin = () => {
-    setLoading(true);
-    const redirectUrl = encodeURIComponent(window.location.origin + '/auth/callback');
-    window.location.href = `https://auth.emergentagent.com/?redirect=${redirectUrl}`;
-  };
 
   const handleDevLogin = async (role) => {
     setLoading(true);
@@ -122,104 +94,105 @@ const Login = () => {
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-gray-100 flex items-center justify-center">
       <div className="bg-white p-8 rounded-lg shadow-lg w-96 border-2 border-red-600">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-red-600 mb-2">Roof-HR</h1>
-          <p className="text-gray-600">Enterprise HR Management System</p>
+          <h1 className="text-3xl font-bold text-red-600 mb-2">Roof-HR Suite</h1>
+          <p className="text-gray-600">4-in-1 Enterprise Management System</p>
         </div>
         
-        {!devMode ? (
-          <div className="space-y-4">
-            <button
-              onClick={handleLogin}
-              disabled={loading}
-              className="w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {loading ? 'Redirecting...' : 'Login with Google'}
-            </button>
-            
-            <button
-              onClick={() => setDevMode(true)}
-              className="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors text-sm"
-            >
-              Development Login
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3">Select Role:</h3>
-            
-            <button
-              onClick={() => handleDevLogin('super_admin')}
-              disabled={loading}
-              className="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
-            >
-              Super Admin
-            </button>
-            
-            <button
-              onClick={() => handleDevLogin('hr_manager')}
-              disabled={loading}
-              className="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors"
-            >
-              HR Manager
-            </button>
-            
-            <button
-              onClick={() => handleDevLogin('sales_manager')}
-              disabled={loading}
-              className="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors"
-            >
-              Sales Manager
-            </button>
-            
-            <button
-              onClick={() => handleDevLogin('sales_rep')}
-              disabled={loading}
-              className="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors"
-            >
-              Sales Rep
-            </button>
-            
-            <button
-              onClick={() => setDevMode(false)}
-              className="w-full bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors"
-            >
-              Back
-            </button>
-          </div>
-        )}
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold text-gray-800 mb-3">Select Your Role:</h3>
+          
+          <button
+            onClick={() => handleDevLogin('super_admin')}
+            disabled={loading}
+            className="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+          >
+            Super Admin
+          </button>
+          
+          <button
+            onClick={() => handleDevLogin('hr_manager')}
+            disabled={loading}
+            className="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors"
+          >
+            HR Manager
+          </button>
+          
+          <button
+            onClick={() => handleDevLogin('sales_manager')}
+            disabled={loading}
+            className="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors"
+          >
+            Sales Manager
+          </button>
+          
+          <button
+            onClick={() => handleDevLogin('sales_rep')}
+            disabled={loading}
+            className="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors"
+          >
+            Sales Rep
+          </button>
+        </div>
         
         <div className="mt-6 text-center text-sm text-gray-500">
-          <p>Secure authentication powered by Emergent</p>
+          <p>© 2025 TheRoofDocs - Enterprise Suite</p>
         </div>
       </div>
     </div>
   );
 };
 
-// Dashboard Layout
-const DashboardLayout = ({ children }) => {
+// Central Hub/Launcher
+const AppHub = () => {
   const { user, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [selectedApp, setSelectedApp] = useState(null);
 
-  const navigation = [
-    { id: 'dashboard', name: 'Dashboard', icon: '📊' },
-    { id: 'employees', name: 'Employees', icon: '👥' },
-    { id: 'jobs', name: 'Jobs', icon: '🔨' },
-    { id: 'commissions', name: 'Commissions', icon: '💰' },
+  const apps = [
+    {
+      id: 'sales-leaderboard',
+      name: 'Sales Leaderboard',
+      description: 'Track performance, competitions, and sales metrics',
+      icon: '🏆',
+      color: 'red',
+      roles: ['super_admin', 'sales_manager', 'sales_rep']
+    },
+    {
+      id: 'hr-recruitment',
+      name: 'HR Recruitment',
+      description: 'Manage applicants, interviews, and onboarding',
+      icon: '👥',
+      color: 'gray',
+      roles: ['super_admin', 'hr_manager']
+    },
+    {
+      id: 'qr-generator',
+      name: 'QR Code Generator',
+      description: 'Generate QR codes with individual landing pages',
+      icon: '📱',
+      color: 'red',
+      roles: ['super_admin', 'sales_manager', 'sales_rep']
+    }
   ];
+
+  const availableApps = apps.filter(app => app.roles.includes(user?.role));
 
   const getRoleDisplay = (role) => {
     const roleMap = {
       'super_admin': 'Super Admin',
       'hr_manager': 'HR Manager',
       'sales_manager': 'Sales Manager',
-      'project_manager': 'Project Manager',
-      'sales_rep': 'Sales Rep',
-      'field_worker': 'Field Worker',
-      'employee': 'Employee'
+      'sales_rep': 'Sales Rep'
     };
     return roleMap[role] || role;
   };
+
+  if (selectedApp) {
+    return (
+      <div className="min-h-screen bg-gray-100">
+        <AppWrapper app={selectedApp} onBack={() => setSelectedApp(null)} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -228,18 +201,13 @@ const DashboardLayout = ({ children }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-red-600">Roof-HR</h1>
+              <h1 className="text-2xl font-bold text-red-600">Roof-HR Suite</h1>
               <span className="ml-3 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
                 {getRoleDisplay(user?.role)}
               </span>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                {user?.picture && (
-                  <img src={user.picture} alt="Profile" className="w-8 h-8 rounded-full" />
-                )}
-                <span className="text-gray-700">{user?.name}</span>
-              </div>
+              <span className="text-gray-700">{user?.name}</span>
               <button
                 onClick={logout}
                 className="text-gray-500 hover:text-red-600 px-3 py-1 rounded-md text-sm transition-colors"
@@ -251,803 +219,601 @@ const DashboardLayout = ({ children }) => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex space-x-8">
-          {/* Sidebar */}
-          <nav className="w-64 bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-            <ul className="space-y-2">
-              {navigation.map((item) => (
-                <li key={item.id}>
-                  <button
-                    onClick={() => setActiveTab(item.id)}
-                    className={`w-full flex items-center px-3 py-2 text-left rounded-md transition-colors ${
-                      activeTab === item.id
-                        ? 'bg-red-100 text-red-700'
-                        : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    <span className="mr-3">{item.icon}</span>
-                    {item.name}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          {/* Main Content */}
-          <main className="flex-1">
-            {React.cloneElement(children, { activeTab, setActiveTab })}
-          </main>
+      {/* App Hub */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Choose Your Application</h2>
+          <p className="text-gray-600 text-lg">Select the tool you need to access</p>
         </div>
-      </div>
-    </div>
-  );
-};
 
-// Dashboard Component
-const Dashboard = () => {
-  const { user } = useAuth();
-  const [analytics, setAnalytics] = useState({
-    total_jobs: 25,
-    completed_jobs: 18,
-    total_commission: 15420.50,
-    completion_rate: 72.0,
-    total_employees: 12,
-    total_commissions: 8
-  });
-  const [loading, setLoading] = useState(false);
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {availableApps.map((app) => (
+            <div
+              key={app.id}
+              className="bg-white rounded-lg shadow-sm border-2 border-gray-200 hover:border-red-500 transition-all duration-200 cursor-pointer transform hover:scale-105"
+              onClick={() => setSelectedApp(app)}
+            >
+              <div className="p-8 text-center">
+                <div className="text-6xl mb-4">{app.icon}</div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{app.name}</h3>
+                <p className="text-gray-600 mb-6">{app.description}</p>
+                <button
+                  className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors ${
+                    app.color === 'red' 
+                      ? 'bg-red-600 text-white hover:bg-red-700' 
+                      : 'bg-gray-600 text-white hover:bg-gray-700'
+                  }`}
+                >
+                  Launch App
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
 
-  return (
-    <div className="bg-white rounded-lg shadow-sm p-8 border border-gray-200">
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome back, {user?.name}!</h2>
-        <p className="text-gray-600">Here's what's happening in your workspace.</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {user?.role === 'sales_rep' ? (
-          <>
-            <div className="bg-red-50 rounded-lg p-6 border border-red-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-red-600 text-sm font-medium">Total Jobs</p>
-                  <p className="text-2xl font-bold text-red-900">{analytics?.total_jobs || 0}</p>
-                </div>
-                <div className="text-red-400 text-2xl">🔨</div>
-              </div>
-            </div>
-            
-            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm font-medium">Completed Jobs</p>
-                  <p className="text-2xl font-bold text-gray-900">{analytics?.completed_jobs || 0}</p>
-                </div>
-                <div className="text-gray-400 text-2xl">✅</div>
-              </div>
-            </div>
-            
-            <div className="bg-red-50 rounded-lg p-6 border border-red-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-red-600 text-sm font-medium">Total Commission</p>
-                  <p className="text-2xl font-bold text-red-900">${analytics?.total_commission?.toFixed(2) || '0.00'}</p>
-                </div>
-                <div className="text-red-400 text-2xl">💰</div>
-              </div>
-            </div>
-            
-            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm font-medium">Completion Rate</p>
-                  <p className="text-2xl font-bold text-gray-900">{analytics?.completion_rate?.toFixed(1) || '0.0'}%</p>
-                </div>
-                <div className="text-gray-400 text-2xl">📈</div>
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="bg-red-50 rounded-lg p-6 border border-red-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-red-600 text-sm font-medium">Total Employees</p>
-                  <p className="text-2xl font-bold text-red-900">{analytics?.total_employees || 0}</p>
-                </div>
-                <div className="text-red-400 text-2xl">👥</div>
-              </div>
-            </div>
-            
-            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm font-medium">Total Jobs</p>
-                  <p className="text-2xl font-bold text-gray-900">{analytics?.total_jobs || 0}</p>
-                </div>
-                <div className="text-gray-400 text-2xl">🔨</div>
-              </div>
-            </div>
-            
-            <div className="bg-red-50 rounded-lg p-6 border border-red-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-red-600 text-sm font-medium">Completed Jobs</p>
-                  <p className="text-2xl font-bold text-red-900">{analytics?.completed_jobs || 0}</p>
-                </div>
-                <div className="text-red-400 text-2xl">✅</div>
-              </div>
-            </div>
-            
-            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm font-medium">Total Commissions</p>
-                  <p className="text-2xl font-bold text-gray-900">{analytics?.total_commissions || 0}</p>
-                </div>
-                <div className="text-gray-400 text-2xl">💰</div>
-              </div>
-            </div>
-          </>
+        {availableApps.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-gray-400 text-6xl mb-4">🔒</div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No Applications Available</h3>
+            <p className="text-gray-600">Your role doesn't have access to any applications.</p>
+          </div>
         )}
       </div>
     </div>
   );
 };
 
-// Employees Component
-const Employees = () => {
+// App Wrapper Component
+const AppWrapper = ({ app, onBack }) => {
   const { user } = useAuth();
-  const [employees, setEmployees] = useState([
-    { id: '1', name: 'John Smith', email: 'john.smith@theroofdocs.com', role: 'sales_rep', territory: 'North VA', commission_rate: 0.05, is_active: true },
-    { id: '2', name: 'Sarah Johnson', email: 'sarah.johnson@theroofdocs.com', role: 'sales_rep', territory: 'South VA', commission_rate: 0.05, is_active: true },
-    { id: '3', name: 'Mike Wilson', email: 'mike.wilson@theroofdocs.com', role: 'project_manager', territory: 'MD', commission_rate: 0.03, is_active: true },
-    { id: '4', name: 'Lisa Davis', email: 'lisa.davis@theroofdocs.com', role: 'field_worker', territory: 'PA', commission_rate: 0.02, is_active: true },
-    { id: '5', name: 'Ahmed Mahmoud', email: 'ahmed.mahmoud@theroofdocs.com', role: 'super_admin', territory: 'All', commission_rate: 0.10, is_active: true }
-  ]);
-  const [loading, setLoading] = useState(false);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [importing, setImporting] = useState(false);
 
-  const handleImport = async () => {
-    setImporting(true);
-    // Simulate import
-    setTimeout(() => {
-      setImporting(false);
-      alert('Employees imported successfully!');
-    }, 2000);
-  };
-
-  const getRoleDisplay = (role) => {
-    const roleMap = {
-      'super_admin': 'Super Admin',
-      'hr_manager': 'HR Manager',
-      'sales_manager': 'Sales Manager',
-      'project_manager': 'Project Manager',
-      'sales_rep': 'Sales Rep',
-      'field_worker': 'Field Worker',
-      'employee': 'Employee'
-    };
-    return roleMap[role] || role;
-  };
-
-  const getRoleBadgeColor = (role) => {
-    const colorMap = {
-      'super_admin': 'bg-red-100 text-red-800',
-      'hr_manager': 'bg-gray-100 text-gray-800',
-      'sales_manager': 'bg-red-100 text-red-800',
-      'project_manager': 'bg-gray-100 text-gray-800',
-      'sales_rep': 'bg-red-100 text-red-800',
-      'field_worker': 'bg-gray-100 text-gray-800',
-      'employee': 'bg-gray-100 text-gray-800'
-    };
-    return colorMap[role] || 'bg-gray-100 text-gray-800';
+  const renderApp = () => {
+    switch (app.id) {
+      case 'sales-leaderboard':
+        return <SalesLeaderboardApp />;
+      case 'hr-recruitment':
+        return <HRRecruitmentApp />;
+      case 'qr-generator':
+        return <QRGeneratorApp />;
+      default:
+        return <div>App not found</div>;
+    }
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <div className="flex justify-between items-center">
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900">Employee Management</h2>
-            <p className="text-gray-600">Manage your team members and their roles</p>
-          </div>
-          {(user?.role === 'super_admin' || user?.role === 'hr_manager') && (
-            <div className="flex space-x-3">
+    <div className="min-h-screen bg-gray-100">
+      {/* App Header */}
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-4">
               <button
-                onClick={handleImport}
-                disabled={importing}
-                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                onClick={onBack}
+                className="text-gray-500 hover:text-red-600 transition-colors"
               >
-                {importing ? 'Importing...' : 'Import from Sheets'}
+                ← Back to Hub
               </button>
-              <button
-                onClick={() => setShowAddForm(true)}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-              >
-                Add Employee
-              </button>
+              <div className="flex items-center">
+                <span className="text-2xl mr-3">{app.icon}</span>
+                <h1 className="text-2xl font-bold text-red-600">{app.name}</h1>
+              </div>
             </div>
-          )}
+            <div className="flex items-center space-x-4">
+              <span className="text-gray-700">{user?.name}</span>
+            </div>
+          </div>
         </div>
-      </div>
+      </header>
 
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Name
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Email
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Role
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Territory
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Commission Rate
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {employees.map((employee) => (
-              <tr key={employee.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0 h-10 w-10">
-                      <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
-                        <span className="text-red-600 font-medium">
-                          {employee.name?.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900">{employee.name}</div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{employee.email}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(employee.role)}`}>
-                    {getRoleDisplay(employee.role)}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{employee.territory || 'N/A'}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{(employee.commission_rate * 100).toFixed(1)}%</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    employee.is_active ? 'bg-gray-100 text-gray-800' : 'bg-red-100 text-red-800'
-                  }`}>
-                    {employee.is_active ? 'Active' : 'Inactive'}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {employees.length === 0 && (
-        <div className="text-center py-12">
-          <div className="text-gray-400 mb-4">👥</div>
-          <p className="text-gray-500">No employees found. Click "Import from Sheets" to get started.</p>
-        </div>
-      )}
+      {/* App Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {renderApp()}
+      </main>
     </div>
   );
 };
 
-// Jobs Component
-const Jobs = () => {
+// Sales Leaderboard App
+const SalesLeaderboardApp = () => {
   const { user } = useAuth();
-  const [jobs, setJobs] = useState([
-    { id: '1', title: 'Roof Repair - Main Street', description: 'Complete roof repair', customer_name: 'Alice Johnson', customer_email: 'alice@email.com', status: 'lead', value: 5000, assigned_rep_id: '1' },
-    { id: '2', title: 'New Roof Installation', description: 'Full roof replacement', customer_name: 'Bob Smith', customer_email: 'bob@email.com', status: 'in_progress', value: 12000, assigned_rep_id: '2' },
-    { id: '3', title: 'Roof Inspection', description: 'Annual inspection', customer_name: 'Carol Davis', customer_email: 'carol@email.com', status: 'completed', value: 800, assigned_rep_id: '1' },
-  ]);
-  const [loading, setLoading] = useState(false);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [employees] = useState([
-    { id: '1', name: 'John Smith', role: 'sales_rep' },
-    { id: '2', name: 'Sarah Johnson', role: 'sales_rep' },
+  const [leaderboard, setLeaderboard] = useState([
+    { id: 1, name: 'John Smith', sales: 125000, deals: 15, rank: 1, growth: 12.5 },
+    { id: 2, name: 'Sarah Johnson', sales: 98000, deals: 12, rank: 2, growth: 8.3 },
+    { id: 3, name: 'Mike Wilson', sales: 87000, deals: 10, rank: 3, growth: -2.1 },
+    { id: 4, name: 'Lisa Davis', sales: 76000, deals: 8, rank: 4, growth: 15.7 },
+    { id: 5, name: 'Tom Brown', sales: 65000, deals: 7, rank: 5, growth: 5.2 }
   ]);
 
-  const updateJobStatus = (jobId, newStatus) => {
-    setJobs(jobs.map(job => 
-      job.id === jobId ? { ...job, status: newStatus } : job
-    ));
-  };
+  const [competitions, setCompetitions] = useState([
+    { id: 1, name: 'Q1 Sales Challenge', period: 'Jan - Mar 2025', status: 'active', prize: '$5,000' },
+    { id: 2, name: 'Monthly Deal Closer', period: 'January 2025', status: 'completed', prize: '$1,000' },
+    { id: 3, name: 'New Customer Acquisition', period: 'Feb - Apr 2025', status: 'upcoming', prize: '$3,000' }
+  ]);
 
-  const getStatusColor = (status) => {
-    const colorMap = {
-      'lead': 'bg-gray-100 text-gray-800',
-      'scheduled': 'bg-gray-100 text-gray-800',
-      'in_progress': 'bg-red-100 text-red-800',
-      'completed': 'bg-gray-100 text-gray-800',
-      'cancelled': 'bg-red-100 text-red-800'
-    };
-    return colorMap[status] || 'bg-gray-100 text-gray-800';
-  };
-
-  const getStatusDisplay = (status) => {
-    const statusMap = {
-      'lead': 'Lead',
-      'scheduled': 'Scheduled',
-      'in_progress': 'In Progress',
-      'completed': 'Completed',
-      'cancelled': 'Cancelled'
-    };
-    return statusMap[status] || status;
-  };
-
-  const AddJobForm = () => {
-    const [formData, setFormData] = useState({
-      title: '',
-      description: '',
-      customer_name: '',
-      customer_email: '',
-      customer_phone: '',
-      customer_address: '',
-      assigned_rep_id: '',
-      value: 0
-    });
-
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      const newJob = {
-        id: Date.now().toString(),
-        ...formData,
-        status: 'lead'
-      };
-      setJobs([...jobs, newJob]);
-      setShowAddForm(false);
-      setFormData({
-        title: '',
-        description: '',
-        customer_name: '',
-        customer_email: '',
-        customer_phone: '',
-        customer_address: '',
-        assigned_rep_id: '',
-        value: 0
-      });
-    };
-
-    return (
-      <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md border border-gray-200">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Add New Job</h3>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Job Title</label>
-              <input
-                type="text"
-                required
-                value={formData.title}
-                onChange={(e) => setFormData({...formData, title: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Customer Name</label>
-              <input
-                type="text"
-                required
-                value={formData.customer_name}
-                onChange={(e) => setFormData({...formData, customer_name: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Customer Email</label>
-              <input
-                type="email"
-                value={formData.customer_email}
-                onChange={(e) => setFormData({...formData, customer_email: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Assigned Rep</label>
-              <select
-                value={formData.assigned_rep_id}
-                onChange={(e) => setFormData({...formData, assigned_rep_id: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-              >
-                <option value="">Select Rep</option>
-                {employees.filter(emp => emp.role === 'sales_rep').map(emp => (
-                  <option key={emp.id} value={emp.id}>{emp.name}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Job Value ($)</label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={formData.value}
-                onChange={(e) => setFormData({...formData, value: parseFloat(e.target.value) || 0})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-            </div>
-            <div className="flex space-x-3 pt-4">
-              <button
-                type="submit"
-                className="flex-1 bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors"
-              >
-                Add Job
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowAddForm(false)}
-                className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    );
+  const userStats = leaderboard.find(rep => rep.name === user?.name) || {
+    sales: 45000, deals: 6, rank: 8, growth: 3.2
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <div className="flex justify-between items-center">
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900">Job Management</h2>
-            <p className="text-gray-600">Track and manage roofing jobs</p>
+    <div className="space-y-8">
+      {/* Personal Stats */}
+      <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">Your Performance</h2>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-red-50 rounded-lg p-4 border border-red-200">
+            <div className="text-red-600 text-sm font-medium">Total Sales</div>
+            <div className="text-2xl font-bold text-red-900">${userStats.sales.toLocaleString()}</div>
           </div>
-          {(user?.role !== 'field_worker') && (
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-            >
-              Add Job
-            </button>
-          )}
-        </div>
-      </div>
-
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Job Title
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Customer
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Assigned Rep
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Value
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {jobs.map((job) => {
-              const assignedRep = employees.find(emp => emp.id === job.assigned_rep_id);
-              return (
-                <tr key={job.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{job.title}</div>
-                    <div className="text-sm text-gray-500">{job.description}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{job.customer_name}</div>
-                    <div className="text-sm text-gray-500">{job.customer_email}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{assignedRep?.name || 'Unassigned'}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">${job.value.toFixed(2)}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(job.status)}`}>
-                      {getStatusDisplay(job.status)}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <select
-                      value={job.status}
-                      onChange={(e) => updateJobStatus(job.id, e.target.value)}
-                      className="text-sm border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                    >
-                      <option value="lead">Lead</option>
-                      <option value="scheduled">Scheduled</option>
-                      <option value="in_progress">In Progress</option>
-                      <option value="completed">Completed</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      {jobs.length === 0 && (
-        <div className="text-center py-12">
-          <div className="text-gray-400 mb-4">🔨</div>
-          <p className="text-gray-500">No jobs found. Click "Add Job" to create your first job.</p>
-        </div>
-      )}
-
-      {showAddForm && <AddJobForm />}
-    </div>
-  );
-};
-
-// Commissions Component
-const Commissions = () => {
-  const { user } = useAuth();
-  const [commissions] = useState([
-    { id: '1', employee_id: '1', job_id: '1', amount: 250.00, rate: 0.05, status: 'pending', created_at: '2025-01-15T10:00:00Z' },
-    { id: '2', employee_id: '2', job_id: '2', amount: 600.00, rate: 0.05, status: 'paid', created_at: '2025-01-14T14:30:00Z' },
-    { id: '3', employee_id: '1', job_id: '3', amount: 40.00, rate: 0.05, status: 'paid', created_at: '2025-01-13T16:45:00Z' },
-  ]);
-  const [loading, setLoading] = useState(false);
-  const [employees] = useState([
-    { id: '1', name: 'John Smith', email: 'john.smith@theroofdocs.com' },
-    { id: '2', name: 'Sarah Johnson', email: 'sarah.johnson@theroofdocs.com' },
-  ]);
-
-  const getStatusColor = (status) => {
-    const colorMap = {
-      'pending': 'bg-gray-100 text-gray-800',
-      'paid': 'bg-gray-100 text-gray-800',
-      'cancelled': 'bg-red-100 text-red-800'
-    };
-    return colorMap[status] || 'bg-gray-100 text-gray-800';
-  };
-
-  const getTotalCommissions = () => {
-    return commissions.reduce((total, comm) => total + comm.amount, 0);
-  };
-
-  const getPaidCommissions = () => {
-    return commissions.filter(comm => comm.status === 'paid').reduce((total, comm) => total + comm.amount, 0);
-  };
-
-  const getPendingCommissions = () => {
-    return commissions.filter(comm => comm.status === 'pending').reduce((total, comm) => total + comm.amount, 0);
-  };
-
-  return (
-    <div className="space-y-6">
-      {/* Commission Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Commissions</p>
-              <p className="text-2xl font-bold text-gray-900">${getTotalCommissions().toFixed(2)}</p>
-            </div>
-            <div className="text-red-400 text-2xl">💰</div>
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div className="text-gray-600 text-sm font-medium">Deals Closed</div>
+            <div className="text-2xl font-bold text-gray-900">{userStats.deals}</div>
           </div>
-        </div>
-        
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Paid Commissions</p>
-              <p className="text-2xl font-bold text-gray-600">${getPaidCommissions().toFixed(2)}</p>
-            </div>
-            <div className="text-gray-400 text-2xl">✅</div>
+          <div className="bg-red-50 rounded-lg p-4 border border-red-200">
+            <div className="text-red-600 text-sm font-medium">Current Rank</div>
+            <div className="text-2xl font-bold text-red-900">#{userStats.rank}</div>
           </div>
-        </div>
-        
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Pending Commissions</p>
-              <p className="text-2xl font-bold text-red-600">${getPendingCommissions().toFixed(2)}</p>
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div className="text-gray-600 text-sm font-medium">Growth Rate</div>
+            <div className={`text-2xl font-bold ${userStats.growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {userStats.growth >= 0 ? '+' : ''}{userStats.growth.toFixed(1)}%
             </div>
-            <div className="text-red-400 text-2xl">⏳</div>
           </div>
         </div>
       </div>
 
-      {/* Commissions Table */}
+      {/* Leaderboard */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">Commission History</h2>
-          <p className="text-gray-600">Track commission earnings and payments</p>
+          <h2 className="text-xl font-semibold text-gray-900">Sales Leaderboard</h2>
+          <p className="text-gray-600">Current month rankings</p>
         </div>
-
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Employee
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Job ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Commission Rate
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Amount
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sales</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deals</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Growth</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {commissions.map((commission) => {
-                const employee = employees.find(emp => emp.id === commission.employee_id);
-                return (
-                  <tr key={commission.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10">
-                          <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
-                            <span className="text-red-600 font-medium">
-                              {employee?.name?.charAt(0).toUpperCase() || 'U'}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{employee?.name || 'Unknown'}</div>
-                          <div className="text-sm text-gray-500">{employee?.email}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{commission.job_id}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{(commission.rate * 100).toFixed(1)}%</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">${commission.amount.toFixed(2)}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(commission.status)}`}>
-                        {commission.status.charAt(0).toUpperCase() + commission.status.slice(1)}
+              {leaderboard.map((rep, index) => (
+                <tr key={rep.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <span className={`text-lg font-bold ${
+                        index === 0 ? 'text-yellow-500' : 
+                        index === 1 ? 'text-gray-400' : 
+                        index === 2 ? 'text-yellow-600' : 'text-gray-600'
+                      }`}>
+                        {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${rep.rank}`}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {new Date(commission.created_at).toLocaleDateString()}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">{rep.name}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">${rep.sales.toLocaleString()}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{rep.deals}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className={`text-sm font-medium ${rep.growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {rep.growth >= 0 ? '+' : ''}{rep.growth.toFixed(1)}%
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
+      </div>
 
-        {commissions.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-gray-400 mb-4">💰</div>
-            <p className="text-gray-500">No commissions found. Complete some jobs to start earning commissions!</p>
+      {/* Competitions */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900">Active Competitions</h2>
+          <p className="text-gray-600">Compete for prizes and recognition</p>
+        </div>
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {competitions.map((competition) => (
+              <div key={competition.id} className="border border-gray-200 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-semibold text-gray-900">{competition.name}</h3>
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    competition.status === 'active' ? 'bg-green-100 text-green-800' :
+                    competition.status === 'completed' ? 'bg-gray-100 text-gray-800' :
+                    'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {competition.status.charAt(0).toUpperCase() + competition.status.slice(1)}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-600 mb-2">{competition.period}</p>
+                <div className="text-lg font-bold text-red-600">{competition.prize}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// HR Recruitment App
+const HRRecruitmentApp = () => {
+  const [applicants, setApplicants] = useState([
+    { id: 1, name: 'Alex Johnson', position: 'Sales Representative', status: 'interview', applied: '2025-01-15', email: 'alex.johnson@email.com' },
+    { id: 2, name: 'Maria Garcia', position: 'Project Manager', status: 'review', applied: '2025-01-14', email: 'maria.garcia@email.com' },
+    { id: 3, name: 'David Wilson', position: 'Field Worker', status: 'hired', applied: '2025-01-13', email: 'david.wilson@email.com' },
+    { id: 4, name: 'Jennifer Lee', position: 'Sales Representative', status: 'rejected', applied: '2025-01-12', email: 'jennifer.lee@email.com' },
+    { id: 5, name: 'Robert Brown', position: 'HR Assistant', status: 'new', applied: '2025-01-16', email: 'robert.brown@email.com' }
+  ]);
+
+  const [interviews, setInterviews] = useState([
+    { id: 1, applicant: 'Alex Johnson', position: 'Sales Representative', date: '2025-01-20', time: '10:00 AM', interviewer: 'Sales Manager' },
+    { id: 2, applicant: 'Maria Garcia', position: 'Project Manager', date: '2025-01-21', time: '2:00 PM', interviewer: 'HR Manager' },
+    { id: 3, applicant: 'Robert Brown', position: 'HR Assistant', date: '2025-01-22', time: '11:00 AM', interviewer: 'HR Manager' }
+  ]);
+
+  const getStatusColor = (status) => {
+    const colors = {
+      'new': 'bg-blue-100 text-blue-800',
+      'review': 'bg-yellow-100 text-yellow-800',
+      'interview': 'bg-purple-100 text-purple-800',
+      'hired': 'bg-green-100 text-green-800',
+      'rejected': 'bg-red-100 text-red-800'
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
+  };
+
+  const updateApplicantStatus = (id, newStatus) => {
+    setApplicants(applicants.map(app => 
+      app.id === id ? { ...app, status: newStatus } : app
+    ));
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+          <div className="text-gray-600 text-sm font-medium">Total Applicants</div>
+          <div className="text-2xl font-bold text-gray-900">{applicants.length}</div>
+        </div>
+        <div className="bg-red-50 rounded-lg p-4 border border-red-200">
+          <div className="text-red-600 text-sm font-medium">New Applications</div>
+          <div className="text-2xl font-bold text-red-900">{applicants.filter(a => a.status === 'new').length}</div>
+        </div>
+        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+          <div className="text-gray-600 text-sm font-medium">In Review</div>
+          <div className="text-2xl font-bold text-gray-900">{applicants.filter(a => a.status === 'review').length}</div>
+        </div>
+        <div className="bg-red-50 rounded-lg p-4 border border-red-200">
+          <div className="text-red-600 text-sm font-medium">Interviews</div>
+          <div className="text-2xl font-bold text-red-900">{applicants.filter(a => a.status === 'interview').length}</div>
+        </div>
+        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+          <div className="text-gray-600 text-sm font-medium">Hired</div>
+          <div className="text-2xl font-bold text-gray-900">{applicants.filter(a => a.status === 'hired').length}</div>
+        </div>
+      </div>
+
+      {/* Applicants */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900">Applicant Management</h2>
+          <p className="text-gray-600">Track and manage job applications</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applied</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {applicants.map((applicant) => (
+                <tr key={applicant.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
+                        <span className="text-red-600 font-medium">{applicant.name.charAt(0)}</span>
+                      </div>
+                      <div className="ml-4">
+                        <div className="text-sm font-medium text-gray-900">{applicant.name}</div>
+                        <div className="text-sm text-gray-500">{applicant.email}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{applicant.position}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{applicant.applied}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(applicant.status)}`}>
+                      {applicant.status.charAt(0).toUpperCase() + applicant.status.slice(1)}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <select
+                      value={applicant.status}
+                      onChange={(e) => updateApplicantStatus(applicant.id, e.target.value)}
+                      className="text-sm border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    >
+                      <option value="new">New</option>
+                      <option value="review">Review</option>
+                      <option value="interview">Interview</option>
+                      <option value="hired">Hired</option>
+                      <option value="rejected">Rejected</option>
+                    </select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Interviews */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900">Scheduled Interviews</h2>
+          <p className="text-gray-600">Upcoming interview appointments</p>
+        </div>
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {interviews.map((interview) => (
+              <div key={interview.id} className="border border-gray-200 rounded-lg p-4">
+                <h3 className="font-semibold text-gray-900 mb-2">{interview.applicant}</h3>
+                <p className="text-sm text-gray-600 mb-1">{interview.position}</p>
+                <p className="text-sm text-gray-600 mb-1">{interview.date} at {interview.time}</p>
+                <p className="text-sm text-gray-600">Interviewer: {interview.interviewer}</p>
+                <button className="mt-3 w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors">
+                  Join Interview
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// QR Generator App
+const QRGeneratorApp = () => {
+  const { user } = useAuth();
+  const [qrCodes, setQrCodes] = useState([
+    { id: 1, name: 'Main Sales Page', url: 'https://theroofdocs.com/sales/john-smith', views: 145, leads: 12, created: '2025-01-10' },
+    { id: 2, name: 'Emergency Services', url: 'https://theroofdocs.com/emergency/john-smith', views: 89, leads: 8, created: '2025-01-12' },
+    { id: 3, name: 'Free Estimate', url: 'https://theroofdocs.com/estimate/john-smith', views: 203, leads: 18, created: '2025-01-08' }
+  ]);
+
+  const [newQR, setNewQR] = useState({
+    name: '',
+    pageType: 'sales',
+    customMessage: '',
+    contactInfo: true,
+    leadCapture: true
+  });
+
+  const [showGenerator, setShowGenerator] = useState(false);
+
+  const generateQR = () => {
+    const newQRCode = {
+      id: Date.now(),
+      name: newQR.name,
+      url: `https://theroofdocs.com/${newQR.pageType}/${user?.name?.toLowerCase().replace(' ', '-')}`,
+      views: 0,
+      leads: 0,
+      created: new Date().toISOString().split('T')[0]
+    };
+    
+    setQrCodes([...qrCodes, newQRCode]);
+    setNewQR({ name: '', pageType: 'sales', customMessage: '', contactInfo: true, leadCapture: true });
+    setShowGenerator(false);
+  };
+
+  const QRCodeSVG = ({ size = 100 }) => (
+    <svg width={size} height={size} viewBox="0 0 100 100" className="border border-gray-300">
+      <rect width="100" height="100" fill="white"/>
+      <g fill="black">
+        <rect x="10" y="10" width="30" height="30"/>
+        <rect x="60" y="10" width="30" height="30"/>
+        <rect x="10" y="60" width="30" height="30"/>
+        <rect x="50" y="50" width="10" height="10"/>
+        <rect x="70" y="50" width="10" height="10"/>
+        <rect x="50" y="70" width="10" height="10"/>
+        <rect x="70" y="70" width="10" height="10"/>
+      </g>
+    </svg>
+  );
+
+  return (
+    <div className="space-y-8">
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+          <div className="text-gray-600 text-sm font-medium">Total QR Codes</div>
+          <div className="text-2xl font-bold text-gray-900">{qrCodes.length}</div>
+        </div>
+        <div className="bg-red-50 rounded-lg p-4 border border-red-200">
+          <div className="text-red-600 text-sm font-medium">Total Views</div>
+          <div className="text-2xl font-bold text-red-900">{qrCodes.reduce((sum, qr) => sum + qr.views, 0)}</div>
+        </div>
+        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+          <div className="text-gray-600 text-sm font-medium">Total Leads</div>
+          <div className="text-2xl font-bold text-gray-900">{qrCodes.reduce((sum, qr) => sum + qr.leads, 0)}</div>
+        </div>
+      </div>
+
+      {/* Generate New QR */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900">QR Code Generator</h2>
+              <p className="text-gray-600">Create custom QR codes with landing pages</p>
+            </div>
+            <button
+              onClick={() => setShowGenerator(!showGenerator)}
+              className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
+            >
+              {showGenerator ? 'Cancel' : 'Generate New QR'}
+            </button>
+          </div>
+        </div>
+
+        {showGenerator && (
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">QR Code Name</label>
+                  <input
+                    type="text"
+                    value={newQR.name}
+                    onChange={(e) => setNewQR({...newQR, name: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    placeholder="e.g., Main Sales Page"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Page Type</label>
+                  <select
+                    value={newQR.pageType}
+                    onChange={(e) => setNewQR({...newQR, pageType: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  >
+                    <option value="sales">Sales Page</option>
+                    <option value="emergency">Emergency Services</option>
+                    <option value="estimate">Free Estimate</option>
+                    <option value="contact">Contact Form</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Custom Message</label>
+                  <textarea
+                    value={newQR.customMessage}
+                    onChange={(e) => setNewQR({...newQR, customMessage: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    rows={3}
+                    placeholder="Optional custom message for your landing page"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={newQR.contactInfo}
+                      onChange={(e) => setNewQR({...newQR, contactInfo: e.target.checked})}
+                      className="mr-2"
+                    />
+                    <span className="text-sm text-gray-700">Include contact information</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={newQR.leadCapture}
+                      onChange={(e) => setNewQR({...newQR, leadCapture: e.target.checked})}
+                      className="mr-2"
+                    />
+                    <span className="text-sm text-gray-700">Enable lead capture form</span>
+                  </label>
+                </div>
+
+                <button
+                  onClick={generateQR}
+                  disabled={!newQR.name}
+                  className="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 disabled:opacity-50 transition-colors"
+                >
+                  Generate QR Code
+                </button>
+              </div>
+
+              <div className="flex items-center justify-center">
+                <div className="text-center">
+                  <QRCodeSVG size={200} />
+                  <p className="mt-4 text-sm text-gray-600">QR Code Preview</p>
+                </div>
+              </div>
+            </div>
           </div>
         )}
+      </div>
+
+      {/* Existing QR Codes */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900">Your QR Codes</h2>
+          <p className="text-gray-600">Manage and track your QR code performance</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">QR Code</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Views</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Leads</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {qrCodes.map((qr) => (
+                <tr key={qr.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <QRCodeSVG size={50} />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">{qr.name}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{qr.url}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{qr.views}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{qr.leads}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{qr.created}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex space-x-2">
+                      <button className="text-red-600 hover:text-red-800 text-sm">Download</button>
+                      <button className="text-gray-600 hover:text-gray-800 text-sm">Edit</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
 };
 
 // Main App Component
-const MainApp = ({ activeTab, setActiveTab }) => {
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'dashboard':
-        return <Dashboard />;
-      case 'employees':
-        return <Employees />;
-      case 'jobs':
-        return <Jobs />;
-      case 'commissions':
-        return <Commissions />;
-      default:
-        return <Dashboard />;
-    }
-  };
-
-  return renderContent();
-};
-
-// Auth Callback Component
-const AuthCallback = () => {
-  const { login } = useAuth();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const handleCallback = async () => {
-      try {
-        const hash = window.location.hash;
-        const params = new URLSearchParams(hash.substring(1));
-        const sessionId = params.get('session_id');
-        
-        if (sessionId) {
-          await login(sessionId);
-          window.location.href = '/';
-        } else {
-          throw new Error('No session ID found');
-        }
-      } catch (error) {
-        console.error('Auth callback failed:', error);
-        window.location.href = '/';
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    handleCallback();
-  }, [login]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-red-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Completing authentication...</p>
-        </div>
-      </div>
-    );
-  }
-
-  return null;
-};
-
-// Main App
 function App() {
-  const [currentPath, setCurrentPath] = useState(window.location.pathname);
-
-  useEffect(() => {
-    const handleLocationChange = () => {
-      setCurrentPath(window.location.pathname);
-    };
-
-    window.addEventListener('popstate', handleLocationChange);
-    return () => window.removeEventListener('popstate', handleLocationChange);
-  }, []);
-
-  return (
-    <AuthProvider>
-      <div className="App">
-        <AppContent currentPath={currentPath} />
-      </div>
-    </AuthProvider>
-  );
-}
-
-const AppContent = ({ currentPath }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -1061,19 +827,20 @@ const AppContent = ({ currentPath }) => {
     );
   }
 
-  if (currentPath === '/auth/callback') {
-    return <AuthCallback />;
-  }
-
   if (!user) {
     return <Login />;
   }
 
-  return (
-    <DashboardLayout>
-      <MainApp />
-    </DashboardLayout>
-  );
-};
+  return <AppHub />;
+}
 
-export default App;
+// Wrap the App with AuthProvider
+function AppWrapper() {
+  return (
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  );
+}
+
+export default AppWrapper;
