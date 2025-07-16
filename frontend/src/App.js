@@ -345,14 +345,333 @@ const SalesLeaderboardApp = () => {
   );
 };
 
-// HR Recruitment App (placeholder)
+// HR Recruitment App - Employee Management with Google Sheets Import
 const HRRecruitmentApp = () => {
   const { user } = useAuth();
-  
+  const [activeTab, setActiveTab] = useState('employees');
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [importModalOpen, setImportModalOpen] = useState(false);
+  const [importData, setImportData] = useState({
+    spreadsheet_id: '',
+    range_name: '',
+    data_type: 'employees'
+  });
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState(null);
+  const [importStatus, setImportStatus] = useState(null);
+
+  // Fetch employees from API
+  const fetchEmployees = async () => {
+    try {
+      const response = await axios.get(`${API}/employees`);
+      setEmployees(response.data);
+    } catch (error) {
+      console.error('Error fetching employees:', error);
+      setError('Failed to load employees');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch import status
+  const fetchImportStatus = async () => {
+    try {
+      const response = await axios.get(`${API}/import/status`);
+      setImportStatus(response.data);
+    } catch (error) {
+      console.error('Error fetching import status:', error);
+    }
+  };
+
+  // Handle traditional import (with sample data)
+  const handleTraditionalImport = async () => {
+    try {
+      setImporting(true);
+      const response = await axios.post(`${API}/employees/import`, {});
+      setImportResult({
+        success: true,
+        message: response.data.message,
+        type: 'traditional'
+      });
+      await fetchEmployees();
+    } catch (error) {
+      setImportResult({
+        success: false,
+        message: error.response?.data?.detail || 'Import failed',
+        type: 'traditional'
+      });
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  // Handle Google Sheets import
+  const handleGoogleSheetsImport = async () => {
+    try {
+      setImporting(true);
+      const endpoint = importData.data_type === 'employees' 
+        ? '/employees/import-from-sheets'
+        : '/sales-reps/import-from-sheets';
+      
+      const response = await axios.post(`${API}${endpoint}`, importData);
+      setImportResult({
+        success: true,
+        data: response.data,
+        type: 'google_sheets'
+      });
+      await fetchEmployees();
+      setImportModalOpen(false);
+    } catch (error) {
+      setImportResult({
+        success: false,
+        message: error.response?.data?.detail || 'Google Sheets import failed',
+        type: 'google_sheets'
+      });
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEmployees();
+    fetchImportStatus();
+  }, []);
+
+  const isAuthorized = user?.role === 'super_admin' || user?.role === 'hr_manager';
+
+  if (!isAuthorized) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm p-8 border border-gray-200">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">HR Recruitment</h2>
+        <p className="text-gray-600">Access denied. HR Manager or Admin role required.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white rounded-lg shadow-sm p-8 border border-gray-200">
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">HR Recruitment</h2>
-      <p className="text-gray-600">Applicant tracking and interview management coming soon...</p>
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      {/* Header */}
+      <div className="border-b border-gray-200 p-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold text-gray-900">HR Management</h2>
+          <div className="flex space-x-3">
+            <button
+              onClick={handleTraditionalImport}
+              disabled={importing}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+            >
+              {importing ? 'Importing...' : 'Import Sample Data'}
+            </button>
+            <button
+              onClick={() => setImportModalOpen(true)}
+              disabled={importing}
+              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
+            >
+              Import from Google Sheets
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Import Status */}
+      {importStatus && (
+        <div className="p-6 border-b border-gray-200">
+          <div className="bg-gray-50 rounded-lg p-4">
+            <h3 className="font-semibold text-gray-900 mb-2">Import Configuration</h3>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="font-medium">Google Sheets Enabled:</span>
+                <span className={`ml-2 ${importStatus.google_sheets_enabled ? 'text-green-600' : 'text-red-600'}`}>
+                  {importStatus.google_sheets_enabled ? 'Yes' : 'No'}
+                </span>
+              </div>
+              <div>
+                <span className="font-medium">Credentials Configured:</span>
+                <span className={`ml-2 ${importStatus.credentials_configured ? 'text-green-600' : 'text-red-600'}`}>
+                  {importStatus.credentials_configured ? 'Yes' : 'No'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Import Result */}
+      {importResult && (
+        <div className="p-6 border-b border-gray-200">
+          <div className={`rounded-lg p-4 ${importResult.success ? 'bg-green-50' : 'bg-red-50'}`}>
+            <h3 className={`font-semibold ${importResult.success ? 'text-green-800' : 'text-red-800'}`}>
+              Import Result
+            </h3>
+            {importResult.success ? (
+              <div className="mt-2 text-sm text-green-700">
+                {importResult.type === 'google_sheets' ? (
+                  <div>
+                    <p>Successfully imported {importResult.data.imported} out of {importResult.data.total_rows} records</p>
+                    {importResult.data.errors && importResult.data.errors.length > 0 && (
+                      <div className="mt-2">
+                        <p className="font-medium">Errors:</p>
+                        <ul className="list-disc pl-5">
+                          {importResult.data.errors.map((error, index) => (
+                            <li key={index}>{error}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p>{importResult.message}</p>
+                )}
+              </div>
+            ) : (
+              <p className="mt-2 text-sm text-red-700">{importResult.message}</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Employees Table */}
+      <div className="p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Employees ({employees.length})</h3>
+        
+        {loading ? (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
+            <p className="mt-2 text-gray-600">Loading employees...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-8">
+            <p className="text-red-600">{error}</p>
+          </div>
+        ) : employees.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-600">No employees found. Import some data to get started.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Territory</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Commission Rate</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {employees.map((employee) => (
+                  <tr key={employee.id}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">{employee.name}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{employee.email}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                        {employee.role}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {employee.territory || 'N/A'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {(employee.commission_rate * 100).toFixed(1)}%
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        employee.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {employee.is_active ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Google Sheets Import Modal */}
+      {importModalOpen && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div className="mt-3">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Import from Google Sheets</h3>
+              
+              {!importStatus?.google_sheets_enabled && (
+                <div className="mb-4 p-3 bg-yellow-50 rounded-md">
+                  <p className="text-sm text-yellow-700">
+                    Google Sheets integration is disabled. Please configure your service account credentials.
+                  </p>
+                </div>
+              )}
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Data Type</label>
+                  <select
+                    value={importData.data_type}
+                    onChange={(e) => setImportData({...importData, data_type: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  >
+                    <option value="employees">Employees</option>
+                    <option value="sales_reps">Sales Reps</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Spreadsheet ID</label>
+                  <input
+                    type="text"
+                    value={importData.spreadsheet_id}
+                    onChange={(e) => setImportData({...importData, spreadsheet_id: e.target.value})}
+                    placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Range</label>
+                  <input
+                    type="text"
+                    value={importData.range_name}
+                    onChange={(e) => setImportData({...importData, range_name: e.target.value})}
+                    placeholder="Sheet1!A:E"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  />
+                </div>
+                
+                <div className="text-xs text-gray-500">
+                  <p>Expected columns for employees: Name, Email, Role, Territory, Commission Rate</p>
+                  <p>Expected columns for sales reps: Name, Email, Phone, Territory, About Me, Commission Rate</p>
+                </div>
+              </div>
+              
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  onClick={() => setImportModalOpen(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleGoogleSheetsImport}
+                  disabled={importing || !importData.spreadsheet_id || !importData.range_name || !importStatus?.google_sheets_enabled}
+                  className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50"
+                >
+                  {importing ? 'Importing...' : 'Import'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
