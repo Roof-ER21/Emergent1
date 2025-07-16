@@ -1326,38 +1326,186 @@ const QRGeneratorApp = () => {
   const MyPageTab = () => {
     const [uploading, setUploading] = useState(false);
     const [uploadType, setUploadType] = useState('');
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [dragOver, setDragOver] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState(null);
+    const [uploadError, setUploadError] = useState(null);
 
-    const handleFileUpload = async (e, type) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      setUploading(true);
-      setUploadType(type);
-
-      try {
-        // Convert file to base64
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-          const base64String = reader.result;
+    // Enhanced file upload with drag & drop support
+    const EnhancedFileUpload = ({ type, accept, children }) => {
+      const isUploading = uploading && uploadType === type;
+      
+      const validateFile = (file) => {
+        const maxSize = type === 'picture' ? 10 * 1024 * 1024 : 100 * 1024 * 1024; // 10MB for images, 100MB for videos
+        
+        if (file.size > maxSize) {
+          throw new Error(`File size too large. Maximum size is ${type === 'picture' ? '10MB' : '100MB'}.`);
+        }
+        
+        if (type === 'picture' && !file.type.startsWith('image/')) {
+          throw new Error('Please select a valid image file.');
+        }
+        
+        if (type === 'video' && !file.type.startsWith('video/')) {
+          throw new Error('Please select a valid video file.');
+        }
+        
+        return true;
+      };
+      
+      const handleFileSelect = async (file) => {
+        if (!file) return;
+        
+        try {
+          validateFile(file);
           
-          const fileData = {
-            file_data: base64String,
-            file_type: file.type,
-            file_name: file.name
-          };
-
-          await uploadFile(currentRep.id, fileData, type);
+          setUploading(true);
+          setUploadType(type);
+          setUploadProgress(0);
+          setUploadError(null);
+          
+          // Create preview
+          const preview = URL.createObjectURL(file);
+          setPreviewUrl(preview);
+          
+          // Upload with progress
+          await uploadFile(currentRep.id, file, type, setUploadProgress);
           
           setUploading(false);
           setUploadType('');
-        };
-        reader.readAsDataURL(file);
-      } catch (error) {
-        console.error('Error uploading file:', error);
-        setUploading(false);
-        setUploadType('');
-        alert('Error uploading file. Please try again.');
-      }
+          setUploadProgress(0);
+          setPreviewUrl(null);
+        } catch (error) {
+          console.error('Error uploading file:', error);
+          setUploading(false);
+          setUploadType('');
+          setUploadProgress(0);
+          setUploadError(error.message || 'Error uploading file. Please try again.');
+          setPreviewUrl(null);
+        }
+      };
+      
+      const handleDragOver = (e) => {
+        e.preventDefault();
+        setDragOver(true);
+      };
+      
+      const handleDragLeave = (e) => {
+        e.preventDefault();
+        setDragOver(false);
+      };
+      
+      const handleDrop = (e) => {
+        e.preventDefault();
+        setDragOver(false);
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          handleFileSelect(files[0]);
+        }
+      };
+      
+      return (
+        <div className="space-y-3">
+          {/* Drag & Drop Zone */}
+          <div
+            className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-all duration-200 ${
+              dragOver 
+                ? 'border-blue-500 bg-blue-50' 
+                : 'border-gray-300 hover:border-gray-400'
+            } ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            <input
+              type="file"
+              accept={accept}
+              onChange={(e) => handleFileSelect(e.target.files[0])}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              disabled={isUploading}
+            />
+            
+            <div className="space-y-2">
+              <div className="text-4xl">
+                {type === 'picture' ? '📸' : '🎥'}
+              </div>
+              <div className="text-sm text-gray-600">
+                <span className="font-medium">Click to upload</span> or drag and drop
+              </div>
+              <div className="text-xs text-gray-500">
+                {type === 'picture' ? 'PNG, JPG, GIF up to 10MB' : 'MP4, MOV, AVI up to 100MB'}
+              </div>
+            </div>
+            
+            {isUploading && (
+              <div className="mt-4">
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
+                </div>
+                <div className="text-sm text-gray-600 mt-1">
+                  Uploading... {Math.round(uploadProgress)}%
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {/* Preview */}
+          {previewUrl && !isUploading && (
+            <div className="border rounded-lg p-4 bg-gray-50">
+              <div className="text-sm font-medium text-gray-700 mb-2">Preview:</div>
+              {type === 'picture' ? (
+                <img 
+                  src={previewUrl} 
+                  alt="Preview" 
+                  className="max-w-full h-48 object-cover rounded-md mx-auto"
+                />
+              ) : (
+                <video 
+                  src={previewUrl} 
+                  className="max-w-full h-48 object-cover rounded-md mx-auto"
+                  controls
+                />
+              )}
+            </div>
+          )}
+          
+          {/* Current Content */}
+          {!isUploading && (type === 'picture' ? currentRep.picture : currentRep.video) && (
+            <div className="border rounded-lg p-4 bg-gray-50">
+              <div className="text-sm font-medium text-gray-700 mb-2">Current {type}:</div>
+              {type === 'picture' ? (
+                <img 
+                  src={currentRep.picture} 
+                  alt="Current profile" 
+                  className="max-w-full h-48 object-cover rounded-md mx-auto"
+                />
+              ) : (
+                <video 
+                  src={currentRep.video} 
+                  className="max-w-full h-48 object-cover rounded-md mx-auto"
+                  controls
+                />
+              )}
+            </div>
+          )}
+          
+          {/* Error Message */}
+          {uploadError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <div className="flex items-center">
+                <svg className="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div className="text-sm text-red-700">{uploadError}</div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
     };
 
     const handleUpdateProfile = async (updateData) => {
@@ -1382,22 +1530,32 @@ const QRGeneratorApp = () => {
       <div className="space-y-6">
         {/* Profile Management */}
         <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold text-gray-900">Manage Your Profile</h2>
-            <div className="flex space-x-2">
-              <label className="cursor-pointer bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors text-sm">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleFileUpload(e, 'picture')}
-                  className="hidden"
-                  disabled={uploading}
-                />
-                {uploading && uploadType === 'picture' ? 'Uploading...' : 'Upload Photo'}
-              </label>
-              <label className="cursor-pointer bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors text-sm">
-                <input
-                  type="file"
+          <div className="mb-6">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Manage Your Profile</h2>
+            <p className="text-gray-600">Upload your profile picture and welcome video to personalize your landing page.</p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Profile Picture Upload */}
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Profile Picture</h3>
+              <EnhancedFileUpload type="picture" accept="image/*" />
+            </div>
+            
+            {/* Video Upload */}
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Welcome Video</h3>
+              <EnhancedFileUpload type="video" accept="video/*" />
+            </div>
+          </div>
+        </div>
+
+        {/* Profile Information */}
+        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Profile Form */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Profile Information</h3>
                   accept="video/*"
                   onChange={(e) => handleFileUpload(e, 'video')}
                   className="hidden"
