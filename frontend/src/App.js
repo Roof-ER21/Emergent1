@@ -1369,6 +1369,61 @@ const QRGeneratorApp = () => {
       </div>
     );
   };
+
+  const OverviewTab = () => {
+    const totalConversions = leads.filter(lead => lead.status === 'converted').length;
+    const totalLeads = leads.length;
+    const conversionRate = totalLeads > 0 ? ((totalConversions / totalLeads) * 100).toFixed(1) : 0;
+    
+    return (
+      <div className="space-y-6">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-red-500/20 text-red-400 mr-4">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-white">{salesReps.length}</p>
+                <p className="text-sm text-gray-400">Total Reps</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-blue-500/20 text-blue-400 mr-4">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-white">{totalLeads}</p>
+                <p className="text-sm text-gray-400">Total Leads</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-green-500/20 text-green-400 mr-4">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-white">{salesReps.filter(r => r.qr_code).length}</p>
+                <p className="text-sm text-gray-400">QR Codes</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-yellow-500/20 text-yellow-400 mr-4">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
@@ -1380,6 +1435,9 @@ const QRGeneratorApp = () => {
             </div>
           </div>
         </div>
+      </div>
+    );
+  };
 
           {/* Bulk Actions */}
           <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
