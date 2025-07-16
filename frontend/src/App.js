@@ -1273,6 +1273,7 @@ const HRRecruitmentApp = () => {
                   <option value="production">Production</option>
                 </select>
               </div>
+            </div>
             
             {/* Workers Comp Submissions */}
             <div className="mb-8">
