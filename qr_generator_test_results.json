@@ -1,0 +1,51 @@
+[
+  {
+    "test": "create_sales_rep",
+    "success": false,
+    "message": "Failed to create rep: No response",
+    "response_data": null,
+    "timestamp": "2025-07-16T15:18:19.658944"
+  },
+  {
+    "test": "create_lead_public",
+    "success": false,
+    "message": "Lead creation failed: HTTPSConnectionPool(host='73279c9a-6b56-48ad-95d4-d2efdc02f864.preview.emergentagent.com', port=443): Read timed out. (read timeout=10)",
+    "response_data": null,
+    "timestamp": "2025-07-16T15:18:29.731166"
+  },
+  {
+    "test": "public_landing_page",
+    "success": true,
+    "message": "Public landing page accessible with all required fields",
+    "response_data": null,
+    "timestamp": "2025-07-16T15:18:29.798520"
+  },
+  {
+    "test": "upload_picture",
+    "success": true,
+    "message": "Picture uploaded successfully",
+    "response_data": null,
+    "timestamp": "2025-07-16T15:18:30.973756"
+  },
+  {
+    "test": "upload_video",
+    "success": true,
+    "message": "Video uploaded successfully",
+    "response_data": null,
+    "timestamp": "2025-07-16T15:18:36.923429"
+  },
+  {
+    "test": "file_validation",
+    "success": false,
+    "message": "File validation not working: No response",
+    "response_data": null,
+    "timestamp": "2025-07-16T15:18:36.963618"
+  },
+  {
+    "test": "qr_analytics",
+    "success": true,
+    "message": "QR analytics working: {'total_reps': 4, 'total_leads': 4, 'total_conversions': 0, 'total_qr_codes': 1, 'conversion_rate': 0.0}",
+    "response_data": null,
+    "timestamp": "2025-07-16T15:18:36.989743"
+  }
+]
