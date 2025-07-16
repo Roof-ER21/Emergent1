@@ -1371,8 +1371,94 @@ const QRGeneratorApp = () => {
   };
 
   const LeadsTab = () => {
+    const handleLeadStatusChange = async (leadId, newStatus) => {
+      try {
+        await updateLead(leadId, { status: newStatus });
+      } catch (error) {
+        console.error('Error updating lead status:', error);
+      }
+    };
+
+    const handleLeadAssign = async (leadId, assignedTo) => {
+      try {
+        await updateLead(leadId, { assigned_to: assignedTo, status: 'assigned' });
+      } catch (error) {
+        console.error('Error assigning lead:', error);
+      }
+    };
+
     return (
       <div className="space-y-6">
+        <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-semibold text-white">Lead Management</h2>
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-400">Total Leads: {leads.length}</span>
+              <span className="text-sm text-gray-400">Converted: {leads.filter(l => l.status === 'converted').length}</span>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-700">
+                  <th className="text-left text-sm font-medium text-gray-400 pb-2">Customer</th>
+                  <th className="text-left text-sm font-medium text-gray-400 pb-2">Phone</th>
+                  <th className="text-left text-sm font-medium text-gray-400 pb-2">Address</th>
+                  <th className="text-left text-sm font-medium text-gray-400 pb-2">Status</th>
+                  <th className="text-left text-sm font-medium text-gray-400 pb-2">Assigned To</th>
+                  <th className="text-left text-sm font-medium text-gray-400 pb-2">Date</th>
+                  <th className="text-left text-sm font-medium text-gray-400 pb-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {leads.map((lead) => (
+                  <tr key={lead.id} className="border-b border-gray-700/50 hover:bg-gray-750">
+                    <td className="py-3 text-sm text-white">{lead.name}</td>
+                    <td className="py-3 text-sm text-white">{lead.phone}</td>
+                    <td className="py-3 text-sm text-white">{lead.address}</td>
+                    <td className="py-3">
+                      <select
+                        value={lead.status}
+                        onChange={(e) => handleLeadStatusChange(lead.id, e.target.value)}
+                        className="px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                      >
+                        <option value="new">New</option>
+                        <option value="assigned">Assigned</option>
+                        <option value="contacted">Contacted</option>
+                        <option value="converted">Converted</option>
+                        <option value="lost">Lost</option>
+                      </select>
+                    </td>
+                    <td className="py-3">
+                      <select
+                        value={lead.assigned_to || ''}
+                        onChange={(e) => handleLeadAssign(lead.id, e.target.value)}
+                        className="px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                      >
+                        <option value="">Unassigned</option>
+                        {salesReps.map(rep => (
+                          <option key={rep.id} value={rep.id}>{rep.name}</option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="py-3 text-sm text-white">
+                      {new Date(lead.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="py-3">
+                      <button className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
+                        View
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  };
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
             <div className="flex items-center">
