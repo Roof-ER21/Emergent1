@@ -336,204 +336,282 @@ const AppWrapper = ({ app, onBack }) => {
 // Sales Leaderboard App (placeholder)
 const SalesLeaderboardApp = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('leaderboard');
-  const [salesData, setSalesData] = useState([]);
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [timeRange, setTimeRange] = useState('month');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterTerritory, setFilterTerritory] = useState('all');
-  const [filterDepartment, setFilterDepartment] = useState('all');
   const [selectedRep, setSelectedRep] = useState(null);
   const [competitions, setCompetitions] = useState([]);
-  const [achievements, setAchievements] = useState([]);
+  const [goals, setGoals] = useState([]);
+  const [signups, setSignups] = useState([]);
+  const [qrLeads, setQrLeads] = useState([]);
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [bonusTiers, setBonusTiers] = useState([]);
+  const [newCompetition, setNewCompetition] = useState({
+    name: '',
+    description: '',
+    competition_type: 'signups',
+    start_date: '',
+    end_date: '',
+    prize_description: '',
+    rules: ''
+  });
+  const [newGoal, setNewGoal] = useState({
+    rep_id: '',
+    signup_goal: 0,
+    revenue_goal: 0
+  });
+  const [showGoalModal, setShowGoalModal] = useState(false);
+  const [showCompetitionModal, setShowCompetitionModal] = useState(false);
 
-  // Mock data for demonstration - in real app, this would come from API
+  // Enhanced mock data with comprehensive tracking
   const mockSalesData = [
     {
-      id: 1,
+      id: '1',
       name: 'John Smith',
       email: 'john.smith@theroofdocs.com',
+      role: 'sales_rep',
       territory: 'North',
       department: 'Sales',
       picture: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+      team_lead: 'Sarah Johnson',
       metrics: {
-        revenue: 125000,
-        leads: 48,
-        conversions: 12,
-        calls: 156,
-        meetings: 24,
-        proposals: 18,
-        closedDeals: 12,
-        avgDealSize: 10417,
-        conversionRate: 25.0,
-        responseTime: 2.5
+        monthly_signups: 28,
+        yearly_signups: 156,
+        monthly_qr_leads: 45,
+        yearly_qr_leads: 234,
+        monthly_revenue: 125000,
+        yearly_revenue: 680000,
+        monthly_goal: 25,
+        yearly_goal: 300,
+        conversion_rate: 62.2,
+        avg_deal_size: 4464,
+        calls_made: 89,
+        meetings_held: 28,
+        proposals_sent: 18,
+        current_tier: 4,
+        tier_name: 'Platinum',
+        response_time: 2.1,
+        customer_satisfaction: 4.8
       },
-      badges: ['Top Performer', 'Revenue Leader', 'Customer Champion'],
       streak: 7,
       rank: 1,
       trend: 'up',
-      quarterlyGoal: 150000,
-      monthlyGoal: 50000
+      badges: ['Revenue Leader', 'Top Performer', 'Customer Champion'],
+      goals: {
+        monthly_signup_goal: 25,
+        yearly_revenue_goal: 750000,
+        monthly_revenue_goal: 62500
+      }
     },
     {
-      id: 2,
+      id: '2',
       name: 'Sarah Johnson',
       email: 'sarah.j@theroofdocs.com',
+      role: 'team_lead',
       territory: 'South',
       department: 'Sales',
       picture: 'https://images.unsplash.com/photo-1494790108755-2616b6374e88?w=150&h=150&fit=crop&crop=face',
+      team_lead: null,
       metrics: {
-        revenue: 118000,
-        leads: 52,
-        conversions: 14,
-        calls: 148,
-        meetings: 26,
-        proposals: 20,
-        closedDeals: 14,
-        avgDealSize: 8429,
-        conversionRate: 26.9,
-        responseTime: 1.8
+        monthly_signups: 24,
+        yearly_signups: 142,
+        monthly_qr_leads: 38,
+        yearly_qr_leads: 198,
+        monthly_revenue: 118000,
+        yearly_revenue: 642000,
+        monthly_goal: 22,
+        yearly_goal: 280,
+        conversion_rate: 63.2,
+        avg_deal_size: 4917,
+        calls_made: 76,
+        meetings_held: 24,
+        proposals_sent: 20,
+        current_tier: 3,
+        tier_name: 'Gold',
+        response_time: 1.8,
+        customer_satisfaction: 4.9
       },
-      badges: ['Conversion Master', 'Speed Demon', 'Lead Generator'],
       streak: 5,
       rank: 2,
       trend: 'up',
-      quarterlyGoal: 140000,
-      monthlyGoal: 45000
+      badges: ['Team Leader', 'Mentor', 'Conversion Master'],
+      goals: {
+        monthly_signup_goal: 22,
+        yearly_revenue_goal: 700000,
+        monthly_revenue_goal: 58333
+      }
     },
     {
-      id: 3,
+      id: '3',
       name: 'Mike Davis',
       email: 'mike.d@theroofdocs.com',
+      role: 'sales_rep',
       territory: 'East',
       department: 'Sales',
       picture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+      team_lead: 'Sarah Johnson',
       metrics: {
-        revenue: 108000,
-        leads: 45,
-        conversions: 11,
-        calls: 132,
-        meetings: 22,
-        proposals: 15,
-        closedDeals: 11,
-        avgDealSize: 9818,
-        conversionRate: 24.4,
-        responseTime: 3.2
+        monthly_signups: 19,
+        yearly_signups: 108,
+        monthly_qr_leads: 32,
+        yearly_qr_leads: 165,
+        monthly_revenue: 108000,
+        yearly_revenue: 548000,
+        monthly_goal: 20,
+        yearly_goal: 250,
+        conversion_rate: 59.4,
+        avg_deal_size: 5684,
+        calls_made: 54,
+        meetings_held: 19,
+        proposals_sent: 15,
+        current_tier: 2,
+        tier_name: 'Silver',
+        response_time: 3.2,
+        customer_satisfaction: 4.6
       },
-      badges: ['Steady Performer', 'Team Player'],
       streak: 3,
       rank: 3,
       trend: 'stable',
-      quarterlyGoal: 130000,
-      monthlyGoal: 40000
+      badges: ['Steady Performer', 'Quality Focus'],
+      goals: {
+        monthly_signup_goal: 20,
+        yearly_revenue_goal: 600000,
+        monthly_revenue_goal: 50000
+      }
     },
     {
-      id: 4,
+      id: '4',
       name: 'Lisa Chen',
       email: 'lisa.c@theroofdocs.com',
+      role: 'sales_rep',
       territory: 'West',
       department: 'Sales',
       picture: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+      team_lead: 'Tom Wilson',
       metrics: {
-        revenue: 95000,
-        leads: 41,
-        conversions: 9,
-        calls: 119,
-        meetings: 18,
-        proposals: 12,
-        closedDeals: 9,
-        avgDealSize: 10556,
-        conversionRate: 22.0,
-        responseTime: 2.1
+        monthly_signups: 16,
+        yearly_signups: 89,
+        monthly_qr_leads: 28,
+        yearly_qr_leads: 142,
+        monthly_revenue: 95000,
+        yearly_revenue: 487000,
+        monthly_goal: 18,
+        yearly_goal: 220,
+        conversion_rate: 57.1,
+        avg_deal_size: 5938,
+        calls_made: 49,
+        meetings_held: 16,
+        proposals_sent: 12,
+        current_tier: 2,
+        tier_name: 'Silver',
+        response_time: 2.9,
+        customer_satisfaction: 4.7
       },
-      badges: ['Quality Focus', 'High Value Deals'],
       streak: 2,
       rank: 4,
-      trend: 'down',
-      quarterlyGoal: 120000,
-      monthlyGoal: 35000
+      trend: 'up',
+      badges: ['High Value Deals', 'Rising Star'],
+      goals: {
+        monthly_signup_goal: 18,
+        yearly_revenue_goal: 550000,
+        monthly_revenue_goal: 45833
+      }
     },
     {
-      id: 5,
+      id: '5',
       name: 'Tom Wilson',
       email: 'tom.w@theroofdocs.com',
+      role: 'team_lead',
       territory: 'Central',
       department: 'Sales',
       picture: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+      team_lead: null,
       metrics: {
-        revenue: 87000,
-        leads: 38,
-        conversions: 8,
-        calls: 105,
-        meetings: 16,
-        proposals: 10,
-        closedDeals: 8,
-        avgDealSize: 10875,
-        conversionRate: 21.1,
-        responseTime: 4.1
+        monthly_signups: 13,
+        yearly_signups: 76,
+        monthly_qr_leads: 22,
+        yearly_qr_leads: 118,
+        monthly_revenue: 87000,
+        yearly_revenue: 456000,
+        monthly_goal: 15,
+        yearly_goal: 200,
+        conversion_rate: 59.1,
+        avg_deal_size: 6692,
+        calls_made: 37,
+        meetings_held: 13,
+        proposals_sent: 10,
+        current_tier: 1,
+        tier_name: 'Bronze',
+        response_time: 4.1,
+        customer_satisfaction: 4.5
       },
-      badges: ['Rising Star', 'Potential Leader'],
       streak: 1,
       rank: 5,
-      trend: 'up',
-      quarterlyGoal: 110000,
-      monthlyGoal: 32000
+      trend: 'down',
+      badges: ['Team Builder', 'Mentor'],
+      goals: {
+        monthly_signup_goal: 15,
+        yearly_revenue_goal: 500000,
+        monthly_revenue_goal: 41667
+      }
     }
+  ];
+
+  const mockBonusTiers = [
+    { tier: 1, name: 'Bronze', threshold: 15, description: 'Entry level performance' },
+    { tier: 2, name: 'Silver', threshold: 25, description: 'Solid performance' },
+    { tier: 3, name: 'Gold', threshold: 35, description: 'Strong performance' },
+    { tier: 4, name: 'Platinum', threshold: 50, description: 'Excellent performance' },
+    { tier: 5, name: 'Diamond', threshold: 75, description: 'Outstanding performance' },
+    { tier: 6, name: 'Elite', threshold: 100, description: 'Elite performance' }
   ];
 
   const mockCompetitions = [
     {
-      id: 1,
-      name: 'Q1 Revenue Challenge',
-      type: 'revenue',
-      startDate: '2025-01-01',
-      endDate: '2025-03-31',
-      prize: '$5000 Bonus',
-      participants: 12,
+      id: '1',
+      name: 'Q1 Signup Challenge',
+      description: 'Race to the most signups this quarter',
+      competition_type: 'signups',
+      start_date: '2025-01-01',
+      end_date: '2025-03-31',
+      prize_description: 'Winner takes all bonus pool',
+      participants: ['1', '2', '3', '4', '5'],
       leader: 'John Smith',
-      status: 'active'
+      leader_score: 156,
+      status: 'active',
+      rules: 'Most signups converted to customers wins'
     },
     {
-      id: 2,
-      name: 'Monthly Conversion Contest',
-      type: 'conversion',
-      startDate: '2025-01-01',
-      endDate: '2025-01-31',
-      prize: 'Weekend Getaway',
-      participants: 8,
-      leader: 'Sarah Johnson',
-      status: 'active'
-    },
-    {
-      id: 3,
-      name: 'Lead Generation Sprint',
-      type: 'leads',
-      startDate: '2025-01-15',
-      endDate: '2025-01-31',
-      prize: '$1000 Gift Card',
-      participants: 10,
-      leader: 'Mike Davis',
-      status: 'active'
+      id: '2',
+      name: 'Monthly Revenue Sprint',
+      description: 'Hit your monthly revenue target',
+      competition_type: 'revenue',
+      start_date: '2025-01-01',
+      end_date: '2025-01-31',
+      prize_description: 'Monthly performance bonus',
+      participants: ['1', '2', '3', '4', '5'],
+      leader: 'John Smith',
+      leader_score: 125000,
+      status: 'active',
+      rules: 'First to exceed monthly goal wins'
     }
   ];
 
   useEffect(() => {
     // Simulate API call
     setTimeout(() => {
-      setSalesData(mockSalesData);
       setCompetitions(mockCompetitions);
+      setBonusTiers(mockBonusTiers);
       setLoading(false);
     }, 1000);
   }, []);
 
-  const filteredSalesData = salesData.filter(rep => {
-    const matchesSearch = rep.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         rep.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTerritory = filterTerritory === 'all' || rep.territory === filterTerritory;
-    const matchesDepartment = filterDepartment === 'all' || rep.department === filterDepartment;
-    return matchesSearch && matchesTerritory && matchesDepartment;
-  });
+  const currentUser = mockSalesData.find(rep => rep.email === user?.email) || mockSalesData[0];
+  const userTeamMembers = currentUser.role === 'team_lead' ? 
+    mockSalesData.filter(rep => rep.team_lead === currentUser.name) : [];
 
   const getTrendIcon = (trend) => {
     switch (trend) {
@@ -552,18 +630,65 @@ const SalesLeaderboardApp = () => {
     }
   };
 
-  const getPerformanceColor = (percentage) => {
-    if (percentage >= 90) return 'text-green-500';
-    if (percentage >= 70) return 'text-blue-500';
-    if (percentage >= 50) return 'text-yellow-500';
-    return 'text-red-500';
-  };
-
-  const getPerformanceBg = (percentage) => {
-    if (percentage >= 90) return 'bg-green-500';
-    if (percentage >= 70) return 'bg-blue-500';
+  const getProgressColor = (current, goal) => {
+    const percentage = (current / goal) * 100;
+    if (percentage >= 100) return 'bg-green-500';
+    if (percentage >= 75) return 'bg-blue-500';
     if (percentage >= 50) return 'bg-yellow-500';
     return 'bg-red-500';
+  };
+
+  const getYearlyPaceColor = (current, goal, daysInMonth, dayOfMonth) => {
+    const expectedDaily = goal / daysInMonth;
+    const expectedToDate = expectedDaily * dayOfMonth;
+    const percentage = (current / expectedToDate) * 100;
+    if (percentage >= 100) return 'bg-green-300';
+    if (percentage >= 75) return 'bg-blue-300';
+    if (percentage >= 50) return 'bg-yellow-300';
+    return 'bg-red-300';
+  };
+
+  const canAssignGoals = () => {
+    const today = new Date();
+    const dayOfMonth = today.getDate();
+    return (user?.role === 'team_lead' || user?.role === 'sales_manager' || user?.role === 'super_admin') && dayOfMonth <= 6;
+  };
+
+  const handleCreateCompetition = async (e) => {
+    e.preventDefault();
+    // Simulate API call
+    const competition = {
+      ...newCompetition,
+      id: Date.now().toString(),
+      participants: mockSalesData.map(rep => rep.id),
+      leader: mockSalesData[0].name,
+      leader_score: 0,
+      status: 'active',
+      created_at: new Date().toISOString()
+    };
+    
+    setCompetitions([...competitions, competition]);
+    setShowCompetitionModal(false);
+    setNewCompetition({
+      name: '',
+      description: '',
+      competition_type: 'signups',
+      start_date: '',
+      end_date: '',
+      prize_description: '',
+      rules: ''
+    });
+  };
+
+  const handleAssignGoal = async (e) => {
+    e.preventDefault();
+    // Simulate API call
+    setShowGoalModal(false);
+    setNewGoal({
+      rep_id: '',
+      signup_goal: 0,
+      revenue_goal: 0
+    });
   };
 
   if (loading) {
@@ -571,7 +696,7 @@ const SalesLeaderboardApp = () => {
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading Sales Leaderboard...</p>
+          <p className="text-gray-400">Loading Sales Dashboard...</p>
         </div>
       </div>
     );
@@ -583,8 +708,12 @@ const SalesLeaderboardApp = () => {
       <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-xl p-6 text-white">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold mb-2">Sales Leaderboard</h1>
-            <p className="text-red-100">Track performance, compete, and achieve excellence</p>
+            <h1 className="text-2xl font-bold mb-2">Sales Performance Hub</h1>
+            <p className="text-red-100">
+              {user?.role === 'sales_rep' ? 'Track your performance and compete with your team' :
+               user?.role === 'team_lead' ? 'Manage your team and track performance' :
+               'Comprehensive sales management and analytics'}
+            </p>
           </div>
           <div className="flex items-center space-x-4">
             <select
@@ -592,7 +721,6 @@ const SalesLeaderboardApp = () => {
               onChange={(e) => setTimeRange(e.target.value)}
               className="px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/50"
             >
-              <option value="week">This Week</option>
               <option value="month">This Month</option>
               <option value="quarter">This Quarter</option>
               <option value="year">This Year</option>
@@ -600,64 +728,364 @@ const SalesLeaderboardApp = () => {
             <div className="text-right">
               <div className="text-sm text-red-100">Total Team Revenue</div>
               <div className="text-2xl font-bold">
-                ${salesData.reduce((sum, rep) => sum + rep.metrics.revenue, 0).toLocaleString()}
+                ${mockSalesData.reduce((sum, rep) => sum + rep.metrics.monthly_revenue, 0).toLocaleString()}
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Navigation Tabs */}
-      <div className="border-b border-gray-200 dark:border-gray-700">
+      {/* Role-based Navigation */}
+      <div className="border-b border-gray-200">
         <nav className="flex space-x-8">
-          <button
-            onClick={() => setActiveTab('leaderboard')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
-              activeTab === 'leaderboard'
-                ? 'border-red-500 text-red-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            Leaderboard
-          </button>
-          <button
-            onClick={() => setActiveTab('competitions')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
-              activeTab === 'competitions'
-                ? 'border-red-500 text-red-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-            Competitions
-          </button>
-          <button
-            onClick={() => setActiveTab('analytics')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
-              activeTab === 'analytics'
-                ? 'border-red-500 text-red-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            Analytics
-          </button>
+          {/* Sales Rep Navigation */}
+          {user?.role === 'sales_rep' && (
+            <>
+              <button
+                onClick={() => setActiveTab('dashboard')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
+                  activeTab === 'dashboard'
+                    ? 'border-red-500 text-red-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                My Dashboard
+              </button>
+              <button
+                onClick={() => setActiveTab('leaderboard')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
+                  activeTab === 'leaderboard'
+                    ? 'border-red-500 text-red-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Team Leaderboard
+              </button>
+            </>
+          )}
+
+          {/* Team Lead Navigation */}
+          {user?.role === 'team_lead' && (
+            <>
+              <button
+                onClick={() => setActiveTab('dashboard')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
+                  activeTab === 'dashboard'
+                    ? 'border-red-500 text-red-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                My Dashboard
+              </button>
+              <button
+                onClick={() => setActiveTab('leaderboard')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
+                  activeTab === 'leaderboard'
+                    ? 'border-red-500 text-red-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                Team Leaderboard
+              </button>
+              <button
+                onClick={() => setActiveTab('team-management')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
+                  activeTab === 'team-management'
+                    ? 'border-red-500 text-red-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                </svg>
+                Team Management
+              </button>
+            </>
+          )}
+
+          {/* Admin/Sales Manager Navigation */}
+          {(user?.role === 'super_admin' || user?.role === 'sales_manager') && (
+            <>
+              <button
+                onClick={() => setActiveTab('dashboard')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
+                  activeTab === 'dashboard'
+                    ? 'border-red-500 text-red-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                Overview Dashboard
+              </button>
+              <button
+                onClick={() => setActiveTab('leaderboard')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
+                  activeTab === 'leaderboard'
+                    ? 'border-red-500 text-red-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                Team Leaderboard
+              </button>
+              <button
+                onClick={() => setActiveTab('competitions')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
+                  activeTab === 'competitions'
+                    ? 'border-red-500 text-red-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                Competitions
+              </button>
+              <button
+                onClick={() => setActiveTab('admin')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
+                  activeTab === 'admin'
+                    ? 'border-red-500 text-red-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Admin Settings
+              </button>
+            </>
+          )}
         </nav>
       </div>
 
       {/* Tab Content */}
+      {activeTab === 'dashboard' && (
+        <div className="space-y-6">
+          {/* Personal Performance Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-blue-500 rounded-lg text-white">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-blue-700">{currentUser.metrics.monthly_signups}</div>
+                  <div className="text-sm text-blue-600">Monthly Signups</div>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-blue-600">Goal: {currentUser.goals.monthly_signup_goal}</span>
+                  <span className="text-blue-800 font-medium">
+                    {Math.round((currentUser.metrics.monthly_signups / currentUser.goals.monthly_signup_goal) * 100)}%
+                  </span>
+                </div>
+                <div className="relative">
+                  <div className="w-full bg-blue-200 rounded-full h-3">
+                    <div 
+                      className="bg-blue-500 h-3 rounded-full transition-all duration-500"
+                      style={{ width: `${Math.min((currentUser.metrics.monthly_signups / currentUser.goals.monthly_signup_goal) * 100, 100)}%` }}
+                    ></div>
+                  </div>
+                  <div className="text-xs text-blue-600 mt-1">
+                    Yearly: {currentUser.metrics.yearly_signups} / {currentUser.goals.yearly_revenue_goal / 2500} signups
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-green-500 rounded-lg text-white">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                  </svg>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-green-700">${currentUser.metrics.monthly_revenue.toLocaleString()}</div>
+                  <div className="text-sm text-green-600">Monthly Revenue</div>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-green-600">Goal: ${currentUser.goals.monthly_revenue_goal.toLocaleString()}</span>
+                  <span className="text-green-800 font-medium">
+                    {Math.round((currentUser.metrics.monthly_revenue / currentUser.goals.monthly_revenue_goal) * 100)}%
+                  </span>
+                </div>
+                <div className="relative">
+                  <div className="w-full bg-green-200 rounded-full h-3">
+                    <div 
+                      className="bg-green-500 h-3 rounded-full transition-all duration-500"
+                      style={{ width: `${Math.min((currentUser.metrics.monthly_revenue / currentUser.goals.monthly_revenue_goal) * 100, 100)}%` }}
+                    ></div>
+                  </div>
+                  <div className="text-xs text-green-600 mt-1">
+                    Yearly: ${currentUser.metrics.yearly_revenue.toLocaleString()} / ${currentUser.goals.yearly_revenue_goal.toLocaleString()}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-purple-500 rounded-lg text-white">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-purple-700">{currentUser.metrics.monthly_qr_leads}</div>
+                  <div className="text-sm text-purple-600">QR Leads</div>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-purple-600">Conversion: {currentUser.metrics.conversion_rate}%</span>
+                  <span className="text-purple-800 font-medium">
+                    {Math.round((currentUser.metrics.monthly_qr_leads / 50) * 100)}%
+                  </span>
+                </div>
+                <div className="text-xs text-purple-600">
+                  Yearly: {currentUser.metrics.yearly_qr_leads} QR leads generated
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6 border border-orange-200">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-orange-500 rounded-lg text-white">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                  </svg>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-orange-700">Tier {currentUser.metrics.current_tier}</div>
+                  <div className="text-sm text-orange-600">{currentUser.metrics.tier_name}</div>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="text-sm text-orange-600">
+                  Current: {currentUser.metrics.monthly_signups} signups
+                </div>
+                <div className="text-xs text-orange-600">
+                  Next tier: {mockBonusTiers[currentUser.metrics.current_tier]?.threshold || 'Max tier'} signups
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Detailed Performance Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Monthly Progress Chart */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Monthly Progress Tracking</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Signups Progress</span>
+                  <span className="text-sm font-medium text-gray-900">
+                    {currentUser.metrics.monthly_signups} / {currentUser.goals.monthly_signup_goal}
+                  </span>
+                </div>
+                <div className="relative">
+                  <div className="w-full bg-gray-200 rounded-full h-4">
+                    <div 
+                      className="bg-blue-500 h-4 rounded-full transition-all duration-500"
+                      style={{ width: `${Math.min((currentUser.metrics.monthly_signups / currentUser.goals.monthly_signup_goal) * 100, 100)}%` }}
+                    ></div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between mt-4">
+                  <span className="text-sm text-gray-600">Revenue Progress</span>
+                  <span className="text-sm font-medium text-gray-900">
+                    ${currentUser.metrics.monthly_revenue.toLocaleString()} / ${currentUser.goals.monthly_revenue_goal.toLocaleString()}
+                  </span>
+                </div>
+                <div className="relative">
+                  <div className="w-full bg-gray-200 rounded-full h-4">
+                    <div 
+                      className="bg-green-500 h-4 rounded-full transition-all duration-500"
+                      style={{ width: `${Math.min((currentUser.metrics.monthly_revenue / currentUser.goals.monthly_revenue_goal) * 100, 100)}%` }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Performance Metrics */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Metrics</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">{currentUser.metrics.calls_made}</div>
+                  <div className="text-sm text-gray-600">Calls Made</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">{currentUser.metrics.meetings_held}</div>
+                  <div className="text-sm text-gray-600">Meetings Held</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600">{currentUser.metrics.proposals_sent}</div>
+                  <div className="text-sm text-gray-600">Proposals Sent</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-orange-600">{currentUser.metrics.response_time}h</div>
+                  <div className="text-sm text-gray-600">Avg Response</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bonus Tier Progress */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Bonus Tier Progress</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              {mockBonusTiers.map((tier) => (
+                <div
+                  key={tier.tier}
+                  className={`p-4 rounded-lg border-2 transition-all duration-300 ${
+                    currentUser.metrics.current_tier >= tier.tier
+                      ? 'border-green-500 bg-green-50'
+                      : 'border-gray-200 bg-gray-50'
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className={`text-lg font-bold ${
+                      currentUser.metrics.current_tier >= tier.tier ? 'text-green-600' : 'text-gray-400'
+                    }`}>
+                      {tier.name}
+                    </div>
+                    <div className="text-sm text-gray-600">{tier.threshold} signups</div>
+                    {currentUser.metrics.current_tier >= tier.tier && (
+                      <div className="mt-2">
+                        <svg className="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Continue with other tabs... */}
       {activeTab === 'leaderboard' && (
         <div className="space-y-6">
-          {/* Top Performers Cards */}
+          {/* Top Performers */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {filteredSalesData.slice(0, 3).map((rep, index) => (
+            {mockSalesData.slice(0, 3).map((rep, index) => (
               <div
                 key={rep.id}
                 className={`relative overflow-hidden rounded-xl p-6 text-white ${
@@ -690,81 +1118,60 @@ const SalesLeaderboardApp = () => {
                 
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
+                    <span className="text-sm opacity-90">Signups</span>
+                    <span className="font-bold">{rep.metrics.monthly_signups}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
                     <span className="text-sm opacity-90">Revenue</span>
-                    <span className="font-bold">${rep.metrics.revenue.toLocaleString()}</span>
+                    <span className="font-bold">${rep.metrics.monthly_revenue.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm opacity-90">Conversions</span>
-                    <span className="font-bold">{rep.metrics.conversions}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm opacity-90">Rate</span>
-                    <span className="font-bold">{rep.metrics.conversionRate}%</span>
+                    <span className="text-sm opacity-90">QR Leads</span>
+                    <span className="font-bold">{rep.metrics.monthly_qr_leads}</span>
                   </div>
                 </div>
                 
                 <div className="mt-4 flex items-center space-x-2">
-                  {rep.badges.slice(0, 2).map((badge, i) => (
-                    <span key={i} className="px-2 py-1 bg-white/20 rounded-full text-xs font-medium">
-                      {badge}
+                  <span className="px-2 py-1 bg-white/20 rounded-full text-xs font-medium">
+                    {rep.metrics.tier_name}
+                  </span>
+                  {rep.streak > 0 && (
+                    <span className="px-2 py-1 bg-white/20 rounded-full text-xs font-medium">
+                      🔥 {rep.streak} streak
                     </span>
-                  ))}
+                  )}
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Filters */}
+          {/* Full Leaderboard */}
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Team Performance</h3>
-              <div className="flex items-center space-x-4">
-                <input
-                  type="text"
-                  placeholder="Search representatives..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                />
-                <select
-                  value={filterTerritory}
-                  onChange={(e) => setFilterTerritory(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                >
-                  <option value="all">All Territories</option>
-                  <option value="North">North</option>
-                  <option value="South">South</option>
-                  <option value="East">East</option>
-                  <option value="West">West</option>
-                  <option value="Central">Central</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Leaderboard Table */}
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Full Team Leaderboard</h3>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-200">
                     <th className="text-left py-3 px-4 font-medium text-gray-900">Rank</th>
                     <th className="text-left py-3 px-4 font-medium text-gray-900">Representative</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900">Signups</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900">QR Leads</th>
                     <th className="text-left py-3 px-4 font-medium text-gray-900">Revenue</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900">Leads</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900">Conversions</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900">Rate</th>
                     <th className="text-left py-3 px-4 font-medium text-gray-900">Goal Progress</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-900">Tier</th>
                     <th className="text-left py-3 px-4 font-medium text-gray-900">Trend</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredSalesData.map((rep, index) => {
-                    const goalProgress = (rep.metrics.revenue / rep.monthlyGoal) * 100;
+                  {mockSalesData.map((rep) => {
+                    const currentProgress = (rep.metrics.monthly_signups / rep.goals.monthly_signup_goal) * 100;
+                    const today = new Date();
+                    const dayOfMonth = today.getDate();
+                    const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+                    const expectedProgress = (dayOfMonth / daysInMonth) * 100;
+                    
                     return (
-                      <tr
-                        key={rep.id}
-                        className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
-                        onClick={() => setSelectedRep(rep)}
-                      >
+                      <tr key={rep.id} className="border-b border-gray-100 hover:bg-gray-50">
                         <td className="py-4 px-4">
                           <div className="flex items-center">
                             <span className="text-2xl font-bold text-gray-900">#{rep.rank}</span>
@@ -789,50 +1196,46 @@ const SalesLeaderboardApp = () => {
                           </div>
                         </td>
                         <td className="py-4 px-4">
-                          <div className="text-lg font-bold text-gray-900">
-                            ${rep.metrics.revenue.toLocaleString()}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            Avg: ${rep.metrics.avgDealSize.toLocaleString()}
-                          </div>
+                          <div className="text-lg font-bold text-gray-900">{rep.metrics.monthly_signups}</div>
+                          <div className="text-sm text-gray-500">Goal: {rep.goals.monthly_signup_goal}</div>
                         </td>
                         <td className="py-4 px-4">
-                          <div className="text-lg font-bold text-gray-900">{rep.metrics.leads}</div>
-                          <div className="text-sm text-gray-500">
-                            {rep.metrics.calls} calls
-                          </div>
+                          <div className="text-lg font-bold text-gray-900">{rep.metrics.monthly_qr_leads}</div>
+                          <div className="text-sm text-gray-500">Rate: {rep.metrics.conversion_rate}%</div>
                         </td>
                         <td className="py-4 px-4">
-                          <div className="text-lg font-bold text-gray-900">{rep.metrics.conversions}</div>
-                          <div className="text-sm text-gray-500">
-                            {rep.metrics.meetings} meetings
-                          </div>
+                          <div className="text-lg font-bold text-gray-900">${rep.metrics.monthly_revenue.toLocaleString()}</div>
+                          <div className="text-sm text-gray-500">Avg: ${rep.metrics.avg_deal_size.toLocaleString()}</div>
                         </td>
                         <td className="py-4 px-4">
-                          <div className={`text-lg font-bold ${getPerformanceColor(rep.metrics.conversionRate)}`}>
-                            {rep.metrics.conversionRate}%
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {rep.metrics.responseTime}h avg
-                          </div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="w-20">
+                          <div className="w-24">
                             <div className="flex justify-between text-sm text-gray-600 mb-1">
-                              <span>{Math.round(goalProgress)}%</span>
+                              <span>{Math.round(currentProgress)}%</span>
                             </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div className="w-full bg-gray-200 rounded-full h-3 relative">
+                              {/* Yearly pace indicator */}
                               <div
-                                className={`h-2 rounded-full transition-all duration-300 ${getPerformanceBg(goalProgress)}`}
-                                style={{ width: `${Math.min(goalProgress, 100)}%` }}
+                                className="bg-red-300 h-3 rounded-full absolute top-0 left-0"
+                                style={{ width: `${Math.min(expectedProgress, 100)}%` }}
+                              ></div>
+                              {/* Current progress */}
+                              <div
+                                className={`h-3 rounded-full absolute top-0 left-0 ${getProgressColor(rep.metrics.monthly_signups, rep.goals.monthly_signup_goal)}`}
+                                style={{ width: `${Math.min(currentProgress, 100)}%` }}
                               ></div>
                             </div>
+                            <div className="text-xs text-gray-500 mt-1">
+                              {currentProgress > expectedProgress ? 'Ahead of pace' : 'Behind pace'}
+                            </div>
                           </div>
                         </td>
                         <td className="py-4 px-4">
-                          <div className="flex items-center">
-                            {getTrendIcon(rep.trend)}
-                          </div>
+                          <span className="px-2 py-1 bg-gray-100 text-gray-800 text-sm rounded-full">
+                            {rep.metrics.tier_name}
+                          </span>
+                        </td>
+                        <td className="py-4 px-4">
+                          {getTrendIcon(rep.trend)}
                         </td>
                       </tr>
                     );
@@ -844,157 +1247,354 @@ const SalesLeaderboardApp = () => {
         </div>
       )}
 
+      {/* Team Management Tab (Team Leads only) */}
+      {activeTab === 'team-management' && user?.role === 'team_lead' && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-semibold text-gray-900">Team Management</h3>
+            {canAssignGoals() && (
+              <button
+                onClick={() => setShowGoalModal(true)}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Assign Goals
+              </button>
+            )}
+          </div>
+
+          {!canAssignGoals() && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <div className="text-yellow-800 font-medium">Goal Assignment Period</div>
+              <div className="text-yellow-700">Goals can only be assigned between the 1st and 6th of each month.</div>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {userTeamMembers.map((member) => (
+              <div key={member.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                <div className="flex items-center space-x-4 mb-4">
+                  <img
+                    src={member.picture}
+                    alt={member.name}
+                    className="w-12 h-12 rounded-full border-2 border-red-300"
+                  />
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900">{member.name}</h4>
+                    <p className="text-sm text-gray-600">{member.territory}</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Monthly Signups</span>
+                    <span className="font-medium">{member.metrics.monthly_signups} / {member.goals.monthly_signup_goal}</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                      style={{ width: `${Math.min((member.metrics.monthly_signups / member.goals.monthly_signup_goal) * 100, 100)}%` }}
+                    ></div>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Monthly Revenue</span>
+                    <span className="font-medium">${member.metrics.monthly_revenue.toLocaleString()}</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-green-500 h-2 rounded-full transition-all duration-500"
+                      style={{ width: `${Math.min((member.metrics.monthly_revenue / member.goals.monthly_revenue_goal) * 100, 100)}%` }}
+                    ></div>
+                  </div>
+                  
+                  <div className="pt-2 border-t border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Current Tier</span>
+                      <span className="px-2 py-1 bg-gray-100 text-gray-800 text-sm rounded-full">
+                        {member.metrics.tier_name}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Competitions Tab */}
       {activeTab === 'competitions' && (
         <div className="space-y-6">
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Active Competitions</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {competitions.map((competition) => (
-                <div
-                  key={competition.id}
-                  className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-lg font-semibold text-gray-900">{competition.name}</h4>
-                    <span className="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-medium">
-                      {competition.status}
-                    </span>
-                  </div>
-                  <div className="space-y-2 text-sm text-gray-600">
-                    <div className="flex justify-between">
-                      <span>Type:</span>
-                      <span className="font-medium">{competition.type}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Participants:</span>
-                      <span className="font-medium">{competition.participants}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Leader:</span>
-                      <span className="font-medium">{competition.leader}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Prize:</span>
-                      <span className="font-medium text-red-600">{competition.prize}</span>
-                    </div>
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <div className="text-xs text-gray-500">
-                      Ends: {new Date(competition.endDate).toLocaleDateString()}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'analytics' && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Analytics</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4">
-                <div className="text-sm text-blue-600 font-medium">Total Revenue</div>
-                <div className="text-2xl font-bold text-blue-700">
-                  ${salesData.reduce((sum, rep) => sum + rep.metrics.revenue, 0).toLocaleString()}
-                </div>
-              </div>
-              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4">
-                <div className="text-sm text-green-600 font-medium">Total Conversions</div>
-                <div className="text-2xl font-bold text-green-700">
-                  {salesData.reduce((sum, rep) => sum + rep.metrics.conversions, 0)}
-                </div>
-              </div>
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4">
-                <div className="text-sm text-purple-600 font-medium">Total Leads</div>
-                <div className="text-2xl font-bold text-purple-700">
-                  {salesData.reduce((sum, rep) => sum + rep.metrics.leads, 0)}
-                </div>
-              </div>
-              <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-4">
-                <div className="text-sm text-orange-600 font-medium">Team Average Rate</div>
-                <div className="text-2xl font-bold text-orange-700">
-                  {(salesData.reduce((sum, rep) => sum + rep.metrics.conversionRate, 0) / salesData.length).toFixed(1)}%
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Rep Detail Modal */}
-      {selectedRep && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-gray-900">Performance Details</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-semibold text-gray-900">Competitions & Contests</h3>
+            {(user?.role === 'super_admin' || user?.role === 'sales_manager') && (
               <button
-                onClick={() => setSelectedRep(null)}
-                className="text-gray-400 hover:text-gray-600"
+                onClick={() => setShowCompetitionModal(true)}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                Create Competition
               </button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {competitions.map((competition) => (
+              <div key={competition.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-lg font-semibold text-gray-900">{competition.name}</h4>
+                  <span className="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-medium">
+                    {competition.status}
+                  </span>
+                </div>
+                
+                <p className="text-gray-600 mb-4">{competition.description}</p>
+                
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Type:</span>
+                    <span className="font-medium">{competition.competition_type}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Current Leader:</span>
+                    <span className="font-medium">{competition.leader}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Leading Score:</span>
+                    <span className="font-medium">{competition.leader_score.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Participants:</span>
+                    <span className="font-medium">{competition.participants.length}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Prize:</span>
+                    <span className="font-medium text-red-600">{competition.prize_description}</span>
+                  </div>
+                </div>
+                
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="text-xs text-gray-500">
+                    Ends: {new Date(competition.end_date).toLocaleDateString()}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Admin Tab */}
+      {activeTab === 'admin' && (user?.role === 'super_admin' || user?.role === 'sales_manager') && (
+        <div className="space-y-6">
+          <h3 className="text-xl font-semibold text-gray-900">Admin Settings</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Bonus Tiers Management</h4>
+              <div className="space-y-3">
+                {mockBonusTiers.map((tier) => (
+                  <div key={tier.tier} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div>
+                      <div className="font-medium">{tier.name}</div>
+                      <div className="text-sm text-gray-600">{tier.description}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-medium">{tier.threshold}</div>
+                      <div className="text-sm text-gray-600">signups</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
             
-            <div className="space-y-6">
-              <div className="flex items-center space-x-4">
-                <img
-                  src={selectedRep.picture}
-                  alt={selectedRep.name}
-                  className="w-16 h-16 rounded-full border-4 border-red-300"
-                />
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-900">{selectedRep.name}</h4>
-                  <p className="text-gray-600">{selectedRep.email}</p>
-                  <p className="text-sm text-gray-500">{selectedRep.territory} Territory</p>
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">System Statistics</h4>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Total Team Members</span>
+                  <span className="font-medium">{mockSalesData.length}</span>
                 </div>
-              </div>
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-sm text-gray-600">Revenue</div>
-                  <div className="text-lg font-bold text-gray-900">
-                    ${selectedRep.metrics.revenue.toLocaleString()}
-                  </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Active Competitions</span>
+                  <span className="font-medium">{competitions.filter(c => c.status === 'active').length}</span>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-sm text-gray-600">Conversions</div>
-                  <div className="text-lg font-bold text-gray-900">
-                    {selectedRep.metrics.conversions}
-                  </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Total Monthly Signups</span>
+                  <span className="font-medium">{mockSalesData.reduce((sum, rep) => sum + rep.metrics.monthly_signups, 0)}</span>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-sm text-gray-600">Leads</div>
-                  <div className="text-lg font-bold text-gray-900">
-                    {selectedRep.metrics.leads}
-                  </div>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-sm text-gray-600">Rate</div>
-                  <div className="text-lg font-bold text-gray-900">
-                    {selectedRep.metrics.conversionRate}%
-                  </div>
-                </div>
-              </div>
-              
-              <div className="space-y-4">
-                <h5 className="font-medium text-gray-900">Achievements</h5>
-                <div className="flex flex-wrap gap-2">
-                  {selectedRep.badges.map((badge, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium"
-                    >
-                      {badge}
-                    </span>
-                  ))}
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Total Monthly Revenue</span>
+                  <span className="font-medium">${mockSalesData.reduce((sum, rep) => sum + rep.metrics.monthly_revenue, 0).toLocaleString()}</span>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Goal Assignment Modal */}
+      {showGoalModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Assign Monthly Goals</h3>
+            <form onSubmit={handleAssignGoal} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Team Member</label>
+                <select
+                  value={newGoal.rep_id}
+                  onChange={(e) => setNewGoal({...newGoal, rep_id: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  required
+                >
+                  <option value="">Select team member</option>
+                  {userTeamMembers.map(member => (
+                    <option key={member.id} value={member.id}>{member.name}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Signup Goal</label>
+                <input
+                  type="number"
+                  value={newGoal.signup_goal}
+                  onChange={(e) => setNewGoal({...newGoal, signup_goal: parseInt(e.target.value)})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Revenue Goal</label>
+                <input
+                  type="number"
+                  value={newGoal.revenue_goal}
+                  onChange={(e) => setNewGoal({...newGoal, revenue_goal: parseFloat(e.target.value)})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  required
+                />
+              </div>
+              
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowGoalModal(false)}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                >
+                  Assign Goal
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Competition Creation Modal */}
+      {showCompetitionModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Create New Competition</h3>
+            <form onSubmit={handleCreateCompetition} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Competition Name</label>
+                <input
+                  type="text"
+                  value={newCompetition.name}
+                  onChange={(e) => setNewCompetition({...newCompetition, name: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea
+                  value={newCompetition.description}
+                  onChange={(e) => setNewCompetition({...newCompetition, description: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  rows="3"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Competition Type</label>
+                <select
+                  value={newCompetition.competition_type}
+                  onChange={(e) => setNewCompetition({...newCompetition, competition_type: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  <option value="signups">Signups</option>
+                  <option value="revenue">Revenue</option>
+                  <option value="leads">Leads</option>
+                  <option value="conversions">Conversions</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                <input
+                  type="date"
+                  value={newCompetition.start_date}
+                  onChange={(e) => setNewCompetition({...newCompetition, start_date: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                <input
+                  type="date"
+                  value={newCompetition.end_date}
+                  onChange={(e) => setNewCompetition({...newCompetition, end_date: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Prize Description</label>
+                <input
+                  type="text"
+                  value={newCompetition.prize_description}
+                  onChange={(e) => setNewCompetition({...newCompetition, prize_description: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Rules</label>
+                <textarea
+                  value={newCompetition.rules}
+                  onChange={(e) => setNewCompetition({...newCompetition, rules: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  rows="3"
+                />
+              </div>
+              
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowCompetitionModal(false)}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                >
+                  Create Competition
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
