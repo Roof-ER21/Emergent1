@@ -524,6 +524,43 @@ const HRRecruitmentApp = () => {
     }
   };
 
+  const initializeSampleHiringFlows = async () => {
+    try {
+      await axios.post(`${API}/hiring/initialize-sample-flows`);
+      await fetchHiringFlows();
+    } catch (error) {
+      console.error('Error initializing sample hiring flows:', error);
+    }
+  };
+
+  const handleCreateCandidate = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API}/hiring/candidates`, newCandidate);
+      setNewCandidate({
+        name: '',
+        email: '',
+        phone: '',
+        position: '',
+        hiring_type: 'insurance',
+        notes: ''
+      });
+      setCandidateModalOpen(false);
+      await fetchHiringCandidates();
+    } catch (error) {
+      console.error('Error creating candidate:', error);
+    }
+  };
+
+  const handleAdvanceCandidate = async (candidateId) => {
+    try {
+      await axios.post(`${API}/hiring/candidates/${candidateId}/advance`);
+      await fetchHiringCandidates();
+    } catch (error) {
+      console.error('Error advancing candidate:', error);
+    }
+  };
+
   const initializeSampleData = async () => {
     try {
       await axios.post(`${API}/hr/initialize-sample-data`);
