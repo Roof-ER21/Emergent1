@@ -378,6 +378,8 @@ const QRGeneratorApp = () => {
     message: ''
   });
   const [selectedRep, setSelectedRep] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadType, setUploadType] = useState('');
 
   const isAdmin = user?.role === 'super_admin' || user?.role === 'sales_manager';
   const currentRep = salesReps.find(rep => rep.id === user?.id);
