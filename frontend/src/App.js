@@ -1238,11 +1238,25 @@ const HRRecruitmentApp = () => {
           </div>
         )}
 
-        {activeTab === 'safety' && (
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Safety & Compliance</h3>
-            
-            {/* Safety Trainings */}
+        {activeTab === 'hiring' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-xl font-bold text-gray-900">Hiring Flow Management</h3>
+              <div className="flex space-x-3">
+                <button
+                  onClick={initializeSampleHiringFlows}
+                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 shadow-lg transition-all duration-200"
+                >
+                  Initialize Sample Flows
+                </button>
+                <button
+                  onClick={() => setCandidateModalOpen(true)}
+                  className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 shadow-lg transition-all duration-200"
+                >
+                  Add Candidate
+                </button>
+              </div>
+            </div>
             <div className="mb-8">
               <h4 className="text-md font-medium text-gray-900 mb-4">Safety Trainings</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
