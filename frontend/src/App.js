@@ -1446,7 +1446,7 @@ const SalesLeaderboardApp = () => {
                   </svg>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-green-700">${currentUser.metrics.monthly_revenue.toLocaleString()}</div>
+                  <div className="text-2xl font-bold text-green-700">${(currentUser.metrics?.monthly_revenue || 0).toLocaleString()}</div>
                   <div className="text-sm text-green-600">Monthly Revenue</div>
                 </div>
               </div>
