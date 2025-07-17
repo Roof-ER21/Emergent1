@@ -78,8 +78,8 @@ const AuthProvider = ({ children }) => {
     
     const devUser = devUsers[role] || devUsers['super_admin'];
     
-    // Create a mock token for development
-    const mockToken = 'dev-token-' + Date.now();
+    // Create a mock token for development that matches backend expectations
+    const mockToken = `dev-token-${role}`;
     localStorage.setItem('token', mockToken);
     axios.defaults.headers.common['Authorization'] = `Bearer ${mockToken}`;
     setUser(devUser);
