@@ -229,9 +229,10 @@ const AppHub = () => {
   };
 
   if (selectedApp) {
+    const appData = apps.find(app => app.id === selectedApp);
     return (
       <div className="min-h-screen bg-card">
-        <AppWrapper app={selectedApp} onBack={() => setSelectedApp(null)} />
+        <AppWrapper app={appData} onBack={() => setSelectedApp(null)} />
       </div>
     );
   }
