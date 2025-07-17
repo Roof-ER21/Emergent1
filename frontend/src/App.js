@@ -3282,22 +3282,28 @@ const HRRecruitmentApp = () => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="border-b border-gray-200 p-6">
           <h2 className="text-2xl font-bold text-gray-900">Employee Dashboard</h2>
+          <p className="text-gray-600">Welcome {user?.name || 'Employee'}</p>
         </div>
         
         <div className="p-6">
-          {employeeDashboard ? (
+          {loading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
+              <span className="ml-3 text-gray-600">Loading your dashboard...</span>
+            </div>
+          ) : employeeDashboard ? (
             <div className="space-y-6">
               {/* Personal Info Summary */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-blue-900">Personal Information</h3>
-                  <p className="text-blue-700">Name: {employeeDashboard.employee.name}</p>
-                  <p className="text-blue-700">Email: {employeeDashboard.employee.email}</p>
-                  <p className="text-blue-700">Role: {employeeDashboard.employee.role}</p>
-                  <p className="text-blue-700">Type: {employeeDashboard.employee_type?.toUpperCase()}</p>
+                <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                  <h3 className="font-semibold text-red-900">Personal Information</h3>
+                  <p className="text-red-700">Name: {employeeDashboard.employee?.name || 'N/A'}</p>
+                  <p className="text-red-700">Email: {employeeDashboard.employee?.email || 'N/A'}</p>
+                  <p className="text-red-700">Role: {employeeDashboard.employee?.role || 'N/A'}</p>
+                  <p className="text-red-700">Type: {employeeDashboard.employee_type?.toUpperCase() || 'W2'}</p>
                 </div>
                 
-                <div className="bg-green-50 p-4 rounded-lg">
+                <div className="bg-green-50 p-4 rounded-lg border border-green-200">
                   <h3 className="font-semibold text-green-900">Onboarding Progress</h3>
                   <p className="text-green-700">
                     {employeeDashboard.onboarding_progress?.completed_stages || 0} of {employeeDashboard.onboarding_progress?.total_stages || 0} stages completed
@@ -3306,14 +3312,14 @@ const HRRecruitmentApp = () => {
                     <div 
                       className="bg-green-600 h-2 rounded-full" 
                       style={{ 
-                        width: `${((employeeDashboard.onboarding_progress?.completed_stages || 0) / (employeeDashboard.onboarding_progress?.total_stages || 1)) * 100}%` 
+                        width: `${((employeeDashboard.onboarding_progress?.completed_stages || 0) / Math.max(employeeDashboard.onboarding_progress?.total_stages || 1, 1)) * 100}%` 
                       }}
                     ></div>
                   </div>
                 </div>
                 
                 {employeeDashboard.employee_type === 'w2' && (
-                  <div className="bg-purple-50 p-4 rounded-lg">
+                  <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
                     <h3 className="font-semibold text-purple-900">PTO Balance</h3>
                     <p className="text-purple-700">
                       Available: {employeeDashboard.pto_balance?.available_days || 0} days
@@ -3325,14 +3331,32 @@ const HRRecruitmentApp = () => {
                 )}
               </div>
               
+              {/* Quick Actions */}
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <h3 className="font-semibold text-gray-900 mb-3">Quick Actions</h3>
+                <div className="flex flex-wrap gap-3">
+                  {employeeDashboard.employee_type === 'w2' && (
+                    <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                      Request PTO
+                    </button>
+                  )}
+                  <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                    View Documents
+                  </button>
+                  <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                    Update Profile
+                  </button>
+                </div>
+              </div>
+              
               {/* Recent Requests */}
-              <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                 <h3 className="font-semibold text-gray-900 mb-3">Recent Requests</h3>
                 {employeeDashboard.recent_requests && employeeDashboard.recent_requests.length > 0 ? (
                   <div className="space-y-2">
                     {employeeDashboard.recent_requests.map((request, index) => (
-                      <div key={index} className="flex justify-between items-center p-2 bg-white rounded">
-                        <span>{request.title}</span>
+                      <div key={index} className="flex justify-between items-center p-2 bg-white rounded border">
+                        <span>{request.title || 'Request'}</span>
                         <span className={`px-2 py-1 rounded text-xs ${
                           request.status === 'resolved' ? 'bg-green-100 text-green-800' : 
                           request.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' : 
@@ -3349,12 +3373,12 @@ const HRRecruitmentApp = () => {
               </div>
               
               {/* Documents */}
-              <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                 <h3 className="font-semibold text-gray-900 mb-3">Documents</h3>
                 {employeeDashboard.documents && employeeDashboard.documents.length > 0 ? (
                   <div className="space-y-2">
                     {employeeDashboard.documents.map((doc, index) => (
-                      <div key={index} className="flex justify-between items-center p-2 bg-white rounded">
+                      <div key={index} className="flex justify-between items-center p-2 bg-white rounded border">
                         <span>{doc.document_name}</span>
                         <span className="text-sm text-gray-600">{doc.document_type}</span>
                       </div>
@@ -3366,9 +3390,14 @@ const HRRecruitmentApp = () => {
               </div>
             </div>
           ) : (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Loading dashboard...</p>
+            <div className="text-center py-12">
+              <div className="text-gray-600">Unable to load dashboard. Please try again later.</div>
+              <button 
+                onClick={fetchEmployeeDashboard}
+                className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Retry
+              </button>
             </div>
           )}
         </div>
