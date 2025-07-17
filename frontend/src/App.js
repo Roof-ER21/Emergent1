@@ -4276,6 +4276,8 @@ const HRRecruitmentApp = () => {
             </div>
           </div>
         )}
+          </motion.div>
+        </div>
       </div>
 
       {/* Google Sheets Import Modal */}
