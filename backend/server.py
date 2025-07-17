@@ -2984,6 +2984,203 @@ async def initialize_leaderboard_sample_data(current_user: User = Depends(get_cu
     
     return {"message": "Sample leaderboard data initialized successfully"}
 
+# Automatic sync scheduler (runs 3 times a day)
+def setup_signup_sync_scheduler():
+    """Set up the scheduler for signup sync (3 times daily)"""
+    
+    def sync_job():
+        """Sync job that runs 3 times daily"""
+        try:
+            print(f"🔄 Starting scheduled signup sync at {datetime.utcnow()}")
+            
+            # Create sync request
+            sync_request = {
+                "spreadsheet_id": "1YSJD4RoqS_FLWF0LN1GRJKQhQNCdPT_aThqX6R6cZ4I",
+                "sheet_name": "Sign Ups 2025",
+                "range_name": "A1:Z100",
+                "force_sync": True
+            }
+            
+            # Run sync in a separate thread to avoid blocking
+            import threading
+            import asyncio
+            
+            def run_async_sync():
+                try:
+                    # Create new event loop for this thread
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+                    
+                    # Run the sync
+                    sync_id = str(uuid.uuid4())
+                    loop.run_until_complete(
+                        sync_signup_data_background(sync_id, sync_request, "system")
+                    )
+                    
+                    loop.close()
+                except Exception as e:
+                    print(f"❌ Scheduled sync failed: {e}")
+            
+            # Start the sync in a new thread
+            thread = threading.Thread(target=run_async_sync)
+            thread.start()
+            
+        except Exception as e:
+            print(f"❌ Error in scheduled sync job: {e}")
+    
+    # Schedule the job to run 3 times a day: 8 AM, 2 PM, 8 PM
+    signup_scheduler.add_job(
+        sync_job,
+        'cron',
+        hour='8,14,20',  # 8 AM, 2 PM, 8 PM
+        minute=0,
+        id='signup_sync_job',
+        replace_existing=True
+    )
+    
+    print("📅 Scheduled signup sync job: 8 AM, 2 PM, 8 PM daily")
+
+async def sync_signup_data_background(sync_id: str, request: dict, user_id: str):
+    """Background task for syncing signup data"""
+    try:
+        # Update sync status
+        await db.sync_status.update_one(
+            {"id": sync_id},
+            {"$set": {"status": "running", "last_sync": datetime.utcnow()}},
+            upsert=True
+        )
+        
+        # Get Google Sheets data
+        service = await google_sheets_service.get_service()
+        
+        # Try different possible sheet names for signup data
+        possible_ranges = [
+            f"'{request['sheet_name']}'!{request['range_name']}",
+            f"Sign Ups 2025!A1:Z100",
+            f"Sheet1!A1:Z100"
+        ]
+        
+        data = None
+        for range_name in possible_ranges:
+            try:
+                result = service.spreadsheets().values().get(
+                    spreadsheetId=request['spreadsheet_id'],
+                    range=range_name
+                ).execute()
+                
+                data = result.get('values', [])
+                if data:
+                    break
+            except Exception as e:
+                print(f"Failed to get data from range {range_name}: {e}")
+                continue
+        
+        if not data:
+            raise Exception("No data found in any of the attempted ranges")
+        
+        # Parse signup data
+        records_processed = 0
+        current_year = datetime.utcnow().year
+        
+        # Skip header row
+        header = data[0] if data else []
+        rows = data[1:] if len(data) > 1 else []
+        
+        for row in rows:
+            if len(row) < 2:  # Skip empty rows
+                continue
+                
+            try:
+                # Flexible parsing - adapt based on your sheet structure
+                rep_name = row[0] if len(row) > 0 else ""
+                if not rep_name:
+                    continue
+                
+                # Find or create rep
+                rep = await db.sales_reps.find_one({"name": {"$regex": rep_name, "$options": "i"}})
+                if not rep:
+                    # Create new rep if not found
+                    rep_id = str(uuid.uuid4())
+                    rep = {
+                        "id": rep_id,
+                        "name": rep_name,
+                        "email": f"{rep_name.lower().replace(' ', '.')}@company.com",
+                        "territory": "Unknown",
+                        "department": "Sales",
+                        "created_at": datetime.utcnow()
+                    }
+                    await db.sales_reps.insert_one(rep)
+                
+                # Process monthly signup data (columns 1-12 for months)
+                for month in range(1, 13):
+                    if len(row) > month:
+                        try:
+                            signups = int(row[month]) if row[month] and str(row[month]).isdigit() else 0
+                            
+                            # Update or create monthly signup record
+                            existing = await db.monthly_signups.find_one({
+                                "rep_id": rep["id"],
+                                "month": month,
+                                "year": current_year
+                            })
+                            
+                            if existing:
+                                await db.monthly_signups.update_one(
+                                    {"id": existing["id"]},
+                                    {"$set": {
+                                        "signups": signups,
+                                        "last_updated": datetime.utcnow(),
+                                        "sync_source": "google_sheets"
+                                    }}
+                                )
+                            else:
+                                await db.monthly_signups.insert_one({
+                                    "id": str(uuid.uuid4()),
+                                    "rep_id": rep["id"],
+                                    "rep_name": rep["name"],
+                                    "month": month,
+                                    "year": current_year,
+                                    "signups": signups,
+                                    "revenue": None,
+                                    "last_updated": datetime.utcnow(),
+                                    "sync_source": "google_sheets"
+                                })
+                            
+                            records_processed += 1
+                            
+                        except (ValueError, IndexError):
+                            continue
+                            
+            except Exception as e:
+                print(f"Error processing row {row}: {e}")
+                continue
+        
+        # Update sync status
+        await db.sync_status.update_one(
+            {"id": sync_id},
+            {"$set": {
+                "status": "completed",
+                "records_processed": records_processed,
+                "last_sync": datetime.utcnow(),
+                "next_sync": datetime.utcnow() + timedelta(hours=8)  # Next sync in 8 hours
+            }}
+        )
+        
+        print(f"✅ Signup sync completed: {records_processed} records processed")
+        
+    except Exception as e:
+        # Update sync status with error
+        await db.sync_status.update_one(
+            {"id": sync_id},
+            {"$set": {
+                "status": "failed",
+                "error_message": str(e),
+                "last_sync": datetime.utcnow()
+            }},
+            upsert=True
+        )
+        print(f"❌ Signup sync failed: {e}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
