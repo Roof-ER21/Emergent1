@@ -674,6 +674,160 @@ const SalesLeaderboardApp = () => {
     }
   };
 
+  // Goal Setting Functions
+  const handleCreateGoal = async (goalData) => {
+    try {
+      const response = await axios.post(`${API}/leaderboard/goals`, goalData);
+      await fetchGoals();
+      return response.data;
+    } catch (error) {
+      console.error('Error creating goal:', error);
+      throw error;
+    }
+  };
+
+  const handleUpdateGoal = async (goalId, goalData) => {
+    try {
+      const response = await axios.put(`${API}/leaderboard/goals/${goalId}`, goalData);
+      await fetchGoals();
+      return response.data;
+    } catch (error) {
+      console.error('Error updating goal:', error);
+      throw error;
+    }
+  };
+
+  const handleDeleteGoal = async (goalId) => {
+    try {
+      await axios.delete(`${API}/leaderboard/goals/${goalId}`);
+      await fetchGoals();
+    } catch (error) {
+      console.error('Error deleting goal:', error);
+      throw error;
+    }
+  };
+
+  // Auto-generate goals based on historical performance
+  const handleAutoGenerateGoals = async () => {
+    try {
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth() + 1;
+      const currentYear = currentDate.getFullYear();
+      
+      // Generate goals for all sales reps
+      const goalPromises = salesReps.map(async (rep) => {
+        // Calculate base goal (can be customized based on historical performance)
+        const baseSignupGoal = 25; // Base monthly target
+        const baseRevenueGoal = 50000; // Base monthly revenue target
+        
+        const goalData = {
+          rep_id: rep.id,
+          signup_goal: baseSignupGoal,
+          revenue_goal: baseRevenueGoal,
+          month: currentMonth,
+          year: currentYear,
+          goal_type: 'monthly',
+          created_by: user.id
+        };
+        
+        return handleCreateGoal(goalData);
+      });
+      
+      await Promise.all(goalPromises);
+      console.log('✅ Auto-generated goals for all reps');
+    } catch (error) {
+      console.error('Error auto-generating goals:', error);
+    }
+  };
+
+  // Bulk goal assignment
+  const handleBulkGoalAssignment = async () => {
+    try {
+      const currentDate = new Date();
+      const isAllowedPeriod = currentDate.getDate() <= 6; // 1st-6th of month
+      
+      if (!isAllowedPeriod && user.role === 'team_lead') {
+        alert('Goal assignment is only allowed between the 1st-6th of each month for Team Leads');
+        return;
+      }
+      
+      // Open bulk assignment modal or perform bulk assignment
+      const bulkGoalData = {
+        signup_goal: 30,
+        revenue_goal: 60000,
+        month: currentDate.getMonth() + 1,
+        year: currentDate.getFullYear(),
+        goal_type: 'monthly',
+        created_by: user.id
+      };
+      
+      const goalPromises = salesReps.map(rep => 
+        handleCreateGoal({ ...bulkGoalData, rep_id: rep.id })
+      );
+      
+      await Promise.all(goalPromises);
+      console.log('✅ Bulk goal assignment completed');
+    } catch (error) {
+      console.error('Error in bulk goal assignment:', error);
+    }
+  };
+
+  // Bonus tier automation functions
+  const calculateBonusTier = (signupCount) => {
+    // Tier system: Tier 1 (15 signups) to Tier 6 (40 signups)
+    if (signupCount >= 40) return 6; // Best tier
+    if (signupCount >= 35) return 5;
+    if (signupCount >= 30) return 4;
+    if (signupCount >= 25) return 3;
+    if (signupCount >= 20) return 2;
+    if (signupCount >= 15) return 1; // Lowest tier
+    return 0; // No tier
+  };
+
+  const handleTierAdvancement = async (repId, newTier) => {
+    try {
+      // Update rep's tier in the system
+      const response = await axios.put(`${API}/leaderboard/reps/${repId}/tier`, {
+        tier: newTier,
+        updated_by: user.id
+      });
+      
+      // Refresh data to reflect changes
+      await loadAllData();
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error advancing tier:', error);
+      throw error;
+    }
+  };
+
+  const handleAutomaticTierReview = async () => {
+    try {
+      // Review all reps and update their tiers based on signup count
+      const tierUpdatePromises = salesReps.map(async (rep) => {
+        const repSignups = signups.filter(signup => signup.rep_id === rep.id);
+        const currentMonthSignups = repSignups.filter(signup => {
+          const signupDate = new Date(signup.created_at);
+          const now = new Date();
+          return signupDate.getMonth() === now.getMonth() && signupDate.getFullYear() === now.getFullYear();
+        }).length;
+        
+        const newTier = calculateBonusTier(currentMonthSignups);
+        
+        // Only update if tier changed
+        if (newTier !== rep.current_tier) {
+          return handleTierAdvancement(rep.id, newTier);
+        }
+      });
+      
+      await Promise.all(tierUpdatePromises.filter(Boolean));
+      console.log('✅ Automatic tier review completed');
+    } catch (error) {
+      console.error('Error in automatic tier review:', error);
+    }
+  };
+
   useEffect(() => {
     const initializeData = async () => {
       // First try to load existing data
