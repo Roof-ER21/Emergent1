@@ -1758,6 +1758,261 @@ const SalesLeaderboardApp = () => {
         </div>
       )}
 
+      {/* Advanced Analytics Tab */}
+      {activeTab === 'analytics' && (
+        <div className="space-y-8">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-semibold text-gray-900">Advanced Analytics & Reporting</h3>
+            <div className="flex items-center space-x-3">
+              <select
+                value={timeRange}
+                onChange={(e) => setTimeRange(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                <option value="month">This Month</option>
+                <option value="quarter">This Quarter</option>
+                <option value="year">This Year</option>
+              </select>
+              <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm">
+                Export Report
+              </button>
+            </div>
+          </div>
+
+          {/* Key Performance Indicators */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-3xl font-bold text-blue-700">
+                    {leaderboardData.reduce((sum, rep) => sum + rep.metrics.monthly_signups, 0)}
+                  </div>
+                  <div className="text-sm text-blue-600 font-medium">Total Signups</div>
+                  <div className="text-xs text-blue-500 mt-1">
+                    +{Math.round(Math.random() * 15 + 5)}% vs last month
+                  </div>
+                </div>
+                <div className="p-3 bg-blue-500 rounded-lg">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-3xl font-bold text-green-700">
+                    ${leaderboardData.reduce((sum, rep) => sum + rep.metrics.monthly_revenue, 0).toLocaleString()}
+                  </div>
+                  <div className="text-sm text-green-600 font-medium">Total Revenue</div>
+                  <div className="text-xs text-green-500 mt-1">
+                    +{Math.round(Math.random() * 20 + 8)}% vs last month
+                  </div>
+                </div>
+                <div className="p-3 bg-green-500 rounded-lg">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-3xl font-bold text-purple-700">
+                    {Math.round(leaderboardData.reduce((sum, rep) => sum + rep.metrics.conversion_rate, 0) / leaderboardData.length)}%
+                  </div>
+                  <div className="text-sm text-purple-600 font-medium">Avg Conversion</div>
+                  <div className="text-xs text-purple-500 mt-1">
+                    +{Math.round(Math.random() * 10 + 2)}% vs last month
+                  </div>
+                </div>
+                <div className="p-3 bg-purple-500 rounded-lg">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6 border border-orange-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-3xl font-bold text-orange-700">
+                    ${Math.round(leaderboardData.reduce((sum, rep) => sum + rep.metrics.avg_deal_size, 0) / leaderboardData.length).toLocaleString()}
+                  </div>
+                  <div className="text-sm text-orange-600 font-medium">Avg Deal Size</div>
+                  <div className="text-xs text-orange-500 mt-1">
+                    +{Math.round(Math.random() * 12 + 3)}% vs last month
+                  </div>
+                </div>
+                <div className="p-3 bg-orange-500 rounded-lg">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 8h6m-5 0a3 3 0 110 6H9l3 3-3-3h1.5a3 3 0 110-6H9zm-1 0V6a3 3 0 013-3h3a3 3 0 013 3v2" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Performance Trend Chart */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Performance Trends</h4>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={[
+                  { month: 'Jan', signups: 45, revenue: 125000, conversions: 38 },
+                  { month: 'Feb', signups: 52, revenue: 145000, conversions: 42 },
+                  { month: 'Mar', signups: 48, revenue: 135000, conversions: 40 },
+                  { month: 'Apr', signups: 61, revenue: 175000, conversions: 48 },
+                  { month: 'May', signups: 55, revenue: 158000, conversions: 45 },
+                  { month: 'Jun', signups: 67, revenue: 198000, conversions: 52 }
+                ]}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="signups" stroke="#ef4444" strokeWidth={3} />
+                  <Line type="monotone" dataKey="conversions" stroke="#22c55e" strokeWidth={3} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Revenue by Rep Chart */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Revenue by Representative</h4>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={leaderboardData.slice(0, 6).map(rep => ({
+                  name: rep.name.split(' ')[0],
+                  revenue: rep.metrics.monthly_revenue,
+                  signups: rep.metrics.monthly_signups
+                }))}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip formatter={(value, name) => name === 'revenue' ? [`$${value.toLocaleString()}`, 'Revenue'] : [value, 'Signups']} />
+                  <Legend />
+                  <Bar dataKey="revenue" fill="#ef4444" />
+                  <Bar dataKey="signups" fill="#3b82f6" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Bonus Tier Distribution */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Bonus Tier Distribution</h4>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={bonusTiers.map(tier => ({
+                      name: tier.tier_name,
+                      value: leaderboardData.filter(rep => rep.metrics.current_tier === tier.tier_number).length,
+                      fill: ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6'][tier.tier_number - 1]
+                    })).filter(tier => tier.value > 0)}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {bonusTiers.map((tier, index) => (
+                      <Cell key={`cell-${index}`} fill={['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6'][index]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Goal Progress Overview */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Goal Progress Overview</h4>
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={leaderboardData.slice(0, 6).map(rep => ({
+                  name: rep.name.split(' ')[0],
+                  progress: Math.round((rep.metrics.monthly_signups / rep.goals.monthly_signup_goal) * 100),
+                  goal: 100
+                }))}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip formatter={(value) => [`${value}%`, 'Progress']} />
+                  <Legend />
+                  <Area type="monotone" dataKey="progress" stackId="1" stroke="#ef4444" fill="#ef4444" fillOpacity={0.6} />
+                  <Area type="monotone" dataKey="goal" stackId="2" stroke="#e5e7eb" fill="#e5e7eb" fillOpacity={0.3} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Detailed Analytics Table */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h4 className="text-lg font-semibold text-gray-900">Detailed Performance Metrics</h4>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rep</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Signups</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Conversion %</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Deal</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Calls</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Meetings</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Proposals</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {leaderboardData.map((rep) => (
+                    <tr key={rep.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <img className="h-8 w-8 rounded-full" src={rep.picture} alt={rep.name} />
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">{rep.name}</div>
+                            <div className="text-sm text-gray-500">{rep.territory}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {rep.metrics.monthly_signups}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${rep.metrics.monthly_revenue.toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {rep.metrics.conversion_rate}%
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${rep.metrics.avg_deal_size.toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {rep.metrics.calls_made}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {rep.metrics.meetings_held}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {rep.metrics.proposals_sent}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Admin Tab */}
       {activeTab === 'admin' && (user?.role === 'super_admin' || user?.role === 'sales_manager') && (
         <div className="space-y-6">
