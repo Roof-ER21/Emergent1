@@ -1251,7 +1251,7 @@ const SalesLeaderboardApp = () => {
             <div className="text-right">
               <div className="text-sm text-red-100">Total Team Revenue</div>
               <div className="text-2xl font-bold">
-                ${leaderboardData.reduce((sum, rep) => sum + rep.metrics.monthly_revenue, 0).toLocaleString()}
+                ${leaderboardData.reduce((sum, rep) => sum + (rep.metrics?.monthly_revenue || 0), 0).toLocaleString()}
               </div>
             </div>
           </div>
