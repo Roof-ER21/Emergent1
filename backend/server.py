@@ -110,6 +110,9 @@ db = client[os.environ['DB_NAME']]
 # Security
 security = HTTPBearer()
 
+# Initialize scheduler for signup sync
+signup_scheduler = BackgroundScheduler()
+
 # Create the main app without a prefix
 app = FastAPI(title="Roof-HR API", version="1.0.0")
 
