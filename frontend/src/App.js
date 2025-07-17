@@ -389,29 +389,6 @@ const AppHub = () => {
 };
 
 // Sales Leaderboard App Component
-              onClick={() => setSelectedApp(app)}
-            >
-              <div className="p-8 text-center">
-                <div className="text-6xl mb-6">{app.icon}</div>
-                <h3 className="text-xl font-bold text-white mb-3">{app.name}</h3>
-                <p className="text-gray-400 mb-6">{app.description}</p>
-                <button
-                  className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors ${
-                    app.color === 'red' 
-                      ? 'bg-red-600 text-white hover:bg-red-700' 
-                      : 'bg-gray-600 text-white hover:bg-gray-700'
-                  }`}
-                >
-                  Launch App
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // App Wrapper Component
 const AppWrapper = ({ app, onBack }) => {
