@@ -184,23 +184,26 @@ const AppHub = () => {
     {
       id: 'sales-leaderboard',
       name: 'Sales Leaderboard',
-      description: 'Track performance, competitions, and sales metrics',
+      description: 'Track performance, competitions, and sales metrics with comprehensive analytics',
       icon: '🏆',
-      color: 'red'
+      color: 'primary',
+      features: ['Real-time Rankings', 'Goal Tracking', 'Competition Management', 'Bonus Tiers']
     },
     {
       id: 'hr-recruitment',
       name: 'HR Recruitment',
-      description: 'Manage applicants, interviews, and onboarding',
+      description: 'Complete hiring workflow from applications to onboarding',
       icon: '👥',
-      color: 'gray'
+      color: 'secondary',
+      features: ['Candidate Management', 'Interview Scheduling', 'Onboarding Flows', 'Compliance Tracking']
     },
     {
       id: 'qr-generator',
       name: 'QR Code Generator',
-      description: 'Generate QR codes with individual landing pages',
+      description: 'Generate branded QR codes with personalized landing pages',
       icon: '📱',
-      color: 'red'
+      color: 'primary',
+      features: ['Custom QR Codes', 'Landing Pages', 'Lead Capture', 'Analytics Dashboard']
     }
   ];
 
@@ -209,55 +212,181 @@ const AppHub = () => {
       'super_admin': 'Super Admin',
       'hr_manager': 'HR Manager',
       'sales_manager': 'Sales Manager',
-      'sales_rep': 'Sales Rep'
+      'sales_rep': 'Sales Rep',
+      'team_lead': 'Team Lead'
     };
     return roleMap[role] || role;
   };
 
+  const getRoleBadgeColor = (role) => {
+    if (['super_admin', 'sales_manager'].includes(role)) return 'role-badge-super-admin';
+    if (['hr_manager'].includes(role)) return 'role-badge-hr-manager';
+    if (['sales_rep'].includes(role)) return 'role-badge-sales-rep';
+    if (['team_lead'].includes(role)) return 'role-badge-sales-manager';
+    return 'role-badge-employee';
+  };
+
   if (selectedApp) {
     return (
-      <div className="min-h-screen bg-gray-100">
+      <div className="min-h-screen bg-card">
         <AppWrapper app={selectedApp} onBack={() => setSelectedApp(null)} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900">
-      {/* Header */}
-      <header className="bg-gray-800 shadow-lg border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-red-400">Roof-HR Suite</h1>
-              <span className="ml-3 px-2 py-1 bg-red-900/30 text-red-400 text-xs rounded-full border border-red-500/30">
+    <div className="min-h-screen" style={{ background: 'var(--background-dark)' }}>
+      {/* Enhanced Header with Roof-ER Branding */}
+      <header className="roof-er-gradient border-b border-primary-800/20 shadow-lg">
+        <div className="mobile-container">
+          <div className="flex justify-between items-center py-6">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
+                  <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 7h-3V6a4 4 0 0 0-8 0v1H5a1 1 0 0 0-1 1v11a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V8a1 1 0 0 0-1-1zM10 6a2 2 0 0 1 4 0v1h-4V6zm8 13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9h2v1a1 1 0 0 0 2 0V9h4v1a1 1 0 0 0 2 0V9h2v10z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-white">Roof HR Hub</h1>
+                  <p className="text-white/70 text-sm">Enterprise HR Management System</p>
+                </div>
+              </div>
+              <div className={`role-badge ${getRoleBadgeColor(user?.role)}`}>
                 {getRoleDisplay(user?.role)}
-              </span>
+              </div>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-gray-300">{user?.name}</span>
-              <button
-                onClick={logout}
-                className="text-gray-400 hover:text-red-400 px-3 py-1 rounded-md text-sm transition-colors"
-              >
-                Logout
-              </button>
+              <div className="hidden md:block text-right">
+                <p className="text-white font-medium">{user?.name}</p>
+                <p className="text-white/70 text-sm">{user?.email}</p>
+              </div>
+              <div className="flex items-center space-x-2">
+                <button className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM9.06 3.71a10 10 0 0 1 5.88 0M15 21H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6l2 2h6a2 2 0 0 1 2 2v2M9 17h6" />
+                  </svg>
+                </button>
+                <button
+                  onClick={logout}
+                  className="px-4 py-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  <span>Logout</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </header>
 
-      {/* App Hub */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-white mb-4">Choose Your Application</h2>
-          <p className="text-gray-400 text-lg">All applications available with role-based permissions</p>
+      {/* Hero Section */}
+      <div className="roof-er-gradient-hero">
+        <div className="mobile-container py-16">
+          <div className="text-center">
+            <div className="slide-up">
+              <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+                Choose Your <span className="text-primary">Application</span>
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+                Access powerful HR tools designed for roofing companies. Streamline operations with our integrated suite of applications.
+              </p>
+              <div className="flex items-center justify-center space-x-8 text-muted-foreground">
+                <div className="flex items-center space-x-2">
+                  <svg className="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  <span>Integrity</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <svg className="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  <span>Quality</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <svg className="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  <span>Simplicity</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
 
+      {/* Applications Grid */}
+      <div className="mobile-container py-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {apps.map((app) => (
+          {apps.map((app, index) => (
             <div
               key={app.id}
+              className="card card-hover fade-in group cursor-pointer"
+              style={{ animationDelay: `${index * 0.1}s` }}
+              onClick={() => setSelectedApp(app.id)}
+            >
+              <div className="card-body">
+                <div className="flex items-center justify-between mb-6">
+                  <div className={`text-4xl p-4 rounded-xl ${app.color === 'primary' ? 'bg-primary-50' : 'bg-secondary-50'} group-hover:scale-110 transition-transform duration-300`}>
+                    {app.icon}
+                  </div>
+                  <div className={`px-3 py-1 rounded-full text-xs font-semibold ${app.color === 'primary' ? 'bg-primary-100 text-primary-800' : 'bg-secondary-100 text-secondary-800'}`}>
+                    Ready
+                  </div>
+                </div>
+                
+                <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors duration-200">
+                  {app.name}
+                </h3>
+                
+                <p className="text-muted-foreground mb-6 line-clamp-2">
+                  {app.description}
+                </p>
+                
+                <div className="space-y-2 mb-6">
+                  {app.features.slice(0, 3).map((feature, i) => (
+                    <div key={i} className="flex items-center space-x-2 text-sm text-muted-foreground">
+                      <svg className="w-4 h-4 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      <span>{feature}</span>
+                    </div>
+                  ))}
+                </div>
+                
+                <button className="btn-primary w-full group-hover:bg-primary-800 group-hover:transform group-hover:scale-105 transition-all duration-200">
+                  Launch Application
+                  <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="border-t border-border bg-card">
+        <div className="mobile-container py-8">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="flex items-center space-x-4 mb-4 md:mb-0">
+              <div className="text-sm text-muted-foreground">
+                © 2025 Roof HR Hub. All rights reserved.
+              </div>
+            </div>
+            <div className="flex items-center space-x-6 text-sm text-muted-foreground">
+              <span>Integrity • Quality • Simplicity</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
               className="bg-gray-800 rounded-lg shadow-lg border border-gray-700 hover:border-red-500 transition-all duration-200 cursor-pointer transform hover:scale-105"
               onClick={() => setSelectedApp(app)}
             >
