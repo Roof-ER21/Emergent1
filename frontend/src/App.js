@@ -566,6 +566,15 @@ const SalesLeaderboardApp = () => {
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [showCompetitionModal, setShowCompetitionModal] = useState(false);
 
+  // New state variables for sync management
+  const [showSyncStatus, setShowSyncStatus] = useState(false);
+  const [syncStatuses, setSyncStatuses] = useState([]);
+  const [revenueUpdate, setRevenueUpdate] = useState({
+    rep_id: '',
+    month: '',
+    revenue: 0
+  });
+
   // API Functions
   const fetchCompetitions = async () => {
     try {
