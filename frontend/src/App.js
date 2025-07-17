@@ -469,8 +469,18 @@ const SalesLeaderboardApp = () => {
       // First try to load existing data
       await loadAllData();
       
-      // If no data exists, initialize sample data
-      if (bonusTiers.length === 0 && competitions.length === 0) {
+      // Check if we need to initialize sample data by making a direct API call
+      try {
+        const bonusResponse = await axios.get(`${API}/leaderboard/bonus-tiers`);
+        const competitionResponse = await axios.get(`${API}/leaderboard/competitions`);
+        
+        if (bonusResponse.data.length === 0 && competitionResponse.data.length === 0) {
+          console.log('No data found, initializing sample data...');
+          await initializeSampleData();
+        }
+      } catch (error) {
+        console.error('Error checking for existing data:', error);
+        // Try to initialize sample data anyway
         await initializeSampleData();
       }
     };
