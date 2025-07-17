@@ -2315,13 +2315,22 @@ const SalesLeaderboardApp = () => {
                   <div className="bg-gray-50 rounded-lg p-4">
                     <h5 className="font-semibold text-gray-900 mb-3">Quick Actions</h5>
                     <div className="space-y-2">
-                      <button className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm">
+                      <button 
+                        onClick={() => handleAutoGenerateGoals()}
+                        className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                      >
                         Auto-Generate Goals
                       </button>
-                      <button className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
-                        Apply Team Template
+                      <button 
+                        onClick={() => setShowGoalModal(true)}
+                        className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                      >
+                        Assign Individual Goal
                       </button>
-                      <button className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm">
+                      <button 
+                        onClick={() => handleBulkGoalAssignment()}
+                        className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                      >
                         Bulk Goal Assignment
                       </button>
                     </div>
