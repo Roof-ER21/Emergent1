@@ -1543,7 +1543,7 @@ const SalesLeaderboardApp = () => {
                 <div className="flex items-center justify-between mt-4">
                   <span className="text-sm text-gray-600">Revenue Progress</span>
                   <span className="text-sm font-medium text-gray-900">
-                    ${currentUser.metrics.monthly_revenue.toLocaleString()} / ${currentUser.goals.monthly_revenue_goal.toLocaleString()}
+                    ${(currentUser.metrics?.monthly_revenue || 0).toLocaleString()} / ${(currentUser.goals?.monthly_revenue_goal || 0).toLocaleString()}
                   </span>
                 </div>
                 <div className="relative">
