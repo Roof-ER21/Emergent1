@@ -2217,7 +2217,7 @@ const SalesLeaderboardApp = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-3xl font-bold text-orange-700">
-                    ${Math.round(leaderboardData.reduce((sum, rep) => sum + rep.metrics.avg_deal_size, 0) / leaderboardData.length).toLocaleString()}
+                    ${Math.round(leaderboardData.reduce((sum, rep) => sum + (rep.metrics?.avg_deal_size || 0), 0) / Math.max(leaderboardData.length, 1)).toLocaleString()}
                   </div>
                   <div className="text-sm text-orange-600 font-medium">Avg Deal Size</div>
                   <div className="text-xs text-orange-500 mt-1">
