@@ -2068,7 +2068,7 @@ const SalesLeaderboardApp = () => {
                     </div>
                     <div className="bg-gray-50 rounded-lg p-4">
                       <div className="text-sm text-gray-600 mb-1">Leading Score</div>
-                      <div className="font-semibold text-gray-900">{competition.leader_score.toLocaleString()}</div>
+                      <div className="font-semibold text-gray-900">{(competition.leader_score || 0).toLocaleString()}</div>
                     </div>
                   </div>
 
