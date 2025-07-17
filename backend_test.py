@@ -39,6 +39,7 @@ class RoofHRTester:
             "hr_assignments": {},
             "hr_self_service": {},
             "hr_sample_data": {},
+            "hr_employee_extended": {},  # Extended HR employee management tests
             "hiring_flows": {},  # New hiring flow tests
             "sales_leaderboard": {}  # New sales leaderboard tests
         }
