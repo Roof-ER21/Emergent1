@@ -3670,15 +3670,16 @@ const HRRecruitmentApp = () => {
                                 </div>
                               </td>
                             </motion.tr>
-                    ))}
-                  </tbody>
-                </table>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
-          </div>
-        )}
 
-        {activeTab === 'onboarding' && (
+            {activeTab === 'onboarding' && (
           <div>
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-semibold text-gray-900">Onboarding Management</h3>
