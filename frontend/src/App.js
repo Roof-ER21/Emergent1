@@ -2362,13 +2362,13 @@ const SalesLeaderboardApp = () => {
                         {rep.metrics.monthly_signups}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        ${rep.metrics.monthly_revenue.toLocaleString()}
+                        ${(rep.metrics?.monthly_revenue || 0).toLocaleString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {rep.metrics.conversion_rate}%
+                        {(rep.metrics?.conversion_rate || 0)}%
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        ${rep.metrics.avg_deal_size.toLocaleString()}
+                        ${(rep.metrics?.avg_deal_size || 0).toLocaleString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {rep.metrics.calls_made}
