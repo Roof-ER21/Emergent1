@@ -83,17 +83,18 @@
   --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, 'Liberation Mono', Menlo, Monaco, 'Lucida Console', monospace;
 }
 
-/* Dark Theme Variables */
-[data-theme="dark"] {
+/* Dark Theme Variables (Force dark theme for better contrast) */
+:root {
+  /* Use dark theme as default for better visibility */
   --background: var(--background-dark);
   --background-card: var(--background-card-dark);
   --foreground: var(--foreground-dark);
-  --foreground-muted: var(--foreground-muted-dark);
+  --foreground-muted: hsl(215, 20%, 65%);
   --border: var(--border-dark);
 }
 
-/* Light Theme Variables (Default) */
-[data-theme="light"], :root {
+/* Light Theme Variables (Override when explicitly set) */
+[data-theme="light"] {
   --background: var(--background-light);
   --background-card: var(--background-card);
   --foreground: var(--foreground-light);
