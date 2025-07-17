@@ -336,6 +336,41 @@ class SalesRepUpdate(BaseModel):
     about_me: Optional[str] = None
     is_active: Optional[bool] = None
 
+class SyncStatus(BaseModel):
+    id: str
+    sync_type: str  # 'signups', 'revenue', 'employees'
+    last_sync: Optional[datetime] = None
+    next_sync: Optional[datetime] = None
+    status: str = 'pending'  # 'pending', 'running', 'completed', 'failed'
+    records_processed: int = 0
+    error_message: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class MonthlySignupData(BaseModel):
+    id: str
+    rep_id: str
+    rep_name: str
+    month: int
+    year: int
+    signups: int
+    revenue: Optional[float] = None
+    last_updated: datetime = Field(default_factory=datetime.utcnow)
+    updated_by: Optional[str] = None
+    sync_source: str = 'manual'  # 'manual', 'google_sheets'
+
+class RevenueUpdate(BaseModel):
+    rep_id: str
+    month: int
+    year: int
+    revenue: float
+    updated_by: str
+
+class SignupSyncRequest(BaseModel):
+    spreadsheet_id: str
+    sheet_name: str
+    range_name: str
+    force_sync: bool = False
+
 class LeadCreate(BaseModel):
     name: str
     email: str
