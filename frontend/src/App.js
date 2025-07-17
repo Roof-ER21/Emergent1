@@ -842,14 +842,20 @@ const SalesLeaderboardApp = () => {
   const handleManualSync = async () => {
     try {
       console.log('🔄 Starting manual sync...');
-      const response = await axios.post(`${API}/leaderboard/manual-sync`);
-      console.log('✅ Manual sync completed:', response.data);
+      const syncRequest = {
+        spreadsheet_id: "1YSJD4RoqS_FLWF0LN1GRJKQhQNCdPT_aThqX6R6cZ4I",
+        sheet_name: "Sign Ups 2025",
+        range_name: "A1:Z100",
+        force_sync: true
+      };
       
-      // Refresh data after sync
-      await loadAllData();
+      const response = await axios.post(`${API}/sync/signups`, syncRequest);
+      console.log('✅ Manual sync started:', response.data);
       
-      // Update sync status
+      // Refresh sync status
       await fetchSyncStatuses();
+      
+      alert('Manual sync started successfully! Check sync status for progress.');
     } catch (error) {
       console.error('❌ Error in manual sync:', error);
       alert('Manual sync failed. Please try again.');
@@ -858,21 +864,21 @@ const SalesLeaderboardApp = () => {
 
   const fetchSyncStatuses = async () => {
     try {
-      const response = await axios.get(`${API}/leaderboard/sync-status`);
-      setSyncStatuses(response.data);
+      const response = await axios.get(`${API}/sync/status`);
+      setSyncStatuses(response.data.sync_statuses || []);
     } catch (error) {
       console.error('Error fetching sync statuses:', error);
       // Set mock data if API fails
       setSyncStatuses([
         {
-          sync_type: 'automatic',
+          sync_type: 'signups',
           status: 'completed',
           last_sync: new Date().toISOString(),
           records_processed: 25,
           error_message: null
         },
         {
-          sync_type: 'manual',
+          sync_type: 'signups',
           status: 'completed',
           last_sync: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
           records_processed: 23,
@@ -885,7 +891,14 @@ const SalesLeaderboardApp = () => {
   const handleRevenueUpdate = async () => {
     try {
       console.log('🔄 Updating revenue...', revenueUpdate);
-      const response = await axios.post(`${API}/leaderboard/update-revenue`, revenueUpdate);
+      const updateData = {
+        rep_id: revenueUpdate.rep_id,
+        month: revenueUpdate.month,
+        year: new Date().getFullYear(),
+        revenue: revenueUpdate.revenue
+      };
+      
+      const response = await axios.post(`${API}/sync/revenue`, updateData);
       console.log('✅ Revenue updated:', response.data);
       
       // Reset form
