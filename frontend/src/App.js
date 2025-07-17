@@ -387,7 +387,8 @@ const AppHub = () => {
     </div>
   );
 };
-              className="bg-gray-800 rounded-lg shadow-lg border border-gray-700 hover:border-red-500 transition-all duration-200 cursor-pointer transform hover:scale-105"
+
+// Sales Leaderboard App Component
               onClick={() => setSelectedApp(app)}
             >
               <div className="p-8 text-center">
