@@ -656,6 +656,7 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Automated Goal Setting and Bonus Tier Automation System"
     - "Sales Leaderboard Backend API Development"
     - "User Authentication System with Emergent OAuth"
     - "QR Code Generator Backend APIs"
