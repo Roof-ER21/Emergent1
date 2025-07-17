@@ -1653,7 +1653,7 @@ const SalesLeaderboardApp = () => {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm opacity-90">Revenue</span>
-                    <span className="font-bold">${rep.metrics.monthly_revenue.toLocaleString()}</span>
+                    <span className="font-bold">${(rep.metrics?.monthly_revenue || 0).toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm opacity-90">QR Leads</span>
