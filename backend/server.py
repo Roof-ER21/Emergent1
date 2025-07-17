@@ -2985,6 +2985,116 @@ async def initialize_leaderboard_sample_data(current_user: User = Depends(get_cu
     
     return {"message": "Sample leaderboard data initialized successfully"}
 
+@api_router.post("/sync/signups")
+async def sync_signup_data(
+    request: SignupSyncRequest,
+    background_tasks: BackgroundTasks,
+    current_user: User = Depends(get_current_user)
+):
+    """Sync signup data from Google Sheets"""
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Create sync status record
+    sync_id = str(uuid.uuid4())
+    sync_record = {
+        "id": sync_id,
+        "sync_type": "signups",
+        "status": "running",
+        "records_processed": 0,
+        "created_at": datetime.utcnow(),
+        "started_by": current_user.id
+    }
+    
+    await db.sync_status.insert_one(sync_record)
+    
+    # Start background sync
+    background_tasks.add_task(sync_signup_data_background, sync_id, request.__dict__, current_user.id)
+    
+    return {"message": "Signup sync started", "sync_id": sync_id}
+
+@api_router.post("/sync/revenue")
+async def update_revenue(
+    request: RevenueUpdate,
+    current_user: User = Depends(get_current_user)
+):
+    """Update revenue for a specific rep/month (Admin/Sales Manager only)"""
+    if current_user.role not in ["super_admin", "sales_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Update revenue in monthly signups
+    result = await db.monthly_signups.update_one(
+        {
+            "rep_id": request.rep_id,
+            "month": request.month,
+            "year": request.year
+        },
+        {"$set": {
+            "revenue": request.revenue,
+            "last_updated": datetime.utcnow(),
+            "updated_by": current_user.id
+        }}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Monthly signup record not found")
+    
+    return {"message": "Revenue updated successfully"}
+
+@api_router.get("/sync/status")
+async def get_sync_status(current_user: User = Depends(get_current_user)):
+    """Get sync status for all sync operations"""
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Get latest sync status for each type
+    sync_statuses = await db.sync_status.find().sort("created_at", -1).limit(10).to_list(10)
+    
+    return {
+        "sync_statuses": sync_statuses,
+        "next_auto_sync": datetime.utcnow() + timedelta(hours=8)
+    }
+
+@api_router.get("/signups/monthly")
+async def get_monthly_signups(
+    year: int = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get monthly signup data for all reps"""
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    if not year:
+        year = datetime.utcnow().year
+    
+    signups = await db.monthly_signups.find({"year": year}).to_list(None)
+    
+    return {"signups": signups, "year": year}
+
+@api_router.get("/signups/rep/{rep_id}")
+async def get_rep_signups(
+    rep_id: str,
+    year: int = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get signup data for specific rep"""
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead", "sales_rep"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Sales reps can only see their own data
+    if current_user.role == "sales_rep" and current_user.id != rep_id:
+        raise HTTPException(status_code=403, detail="Can only view your own data")
+    
+    if not year:
+        year = datetime.utcnow().year
+    
+    signups = await db.monthly_signups.find({
+        "rep_id": rep_id,
+        "year": year
+    }).to_list(None)
+    
+    return {"signups": signups, "rep_id": rep_id, "year": year}
+
 # Automatic sync scheduler (runs 3 times a day)
 def setup_signup_sync_scheduler():
     """Set up the scheduler for signup sync (3 times daily)"""
