@@ -1726,12 +1726,12 @@ const SalesLeaderboardApp = () => {
                           </div>
                         </td>
                         <td className="py-4 px-4">
-                          <div className="text-lg font-bold text-gray-900">{rep.metrics.monthly_signups}</div>
-                          <div className="text-sm text-gray-500">Goal: {rep.goals.monthly_signup_goal}</div>
+                          <div className="text-lg font-bold text-gray-900">{rep.metrics?.monthly_signups || 0}</div>
+                          <div className="text-sm text-gray-500">Goal: {rep.goals?.monthly_signup_goal || 0}</div>
                         </td>
                         <td className="py-4 px-4">
-                          <div className="text-lg font-bold text-gray-900">{rep.metrics.monthly_qr_leads}</div>
-                          <div className="text-sm text-gray-500">Rate: {rep.metrics.conversion_rate}%</div>
+                          <div className="text-lg font-bold text-gray-900">{rep.metrics?.monthly_qr_leads || 0}</div>
+                          <div className="text-sm text-gray-500">Rate: {rep.metrics?.conversion_rate || 0}%</div>
                         </td>
                         <td className="py-4 px-4">
                           <div className="text-lg font-bold text-gray-900">
