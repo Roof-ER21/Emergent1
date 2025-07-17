@@ -428,20 +428,23 @@ const SalesLeaderboardApp = () => {
 
   const fetchTeamAssignments = async () => {
     try {
+      console.log('🔄 Fetching team assignments from:', `${API}/leaderboard/team-assignments`);
       const response = await axios.get(`${API}/leaderboard/team-assignments`);
+      console.log('👥 Team assignments data:', response.data);
       setTeamAssignments(response.data);
     } catch (error) {
-      console.error('Error fetching team assignments:', error);
+      console.error('❌ Error fetching team assignments:', error.response?.status, error.response?.data || error.message);
     }
   };
 
   const fetchSalesReps = async () => {
     try {
+      console.log('🔄 Fetching sales reps from:', `${API}/qr-generator/reps`);
       const response = await axios.get(`${API}/qr-generator/reps`);
       console.log('📊 Sales reps data:', response.data);
       setSalesReps(response.data);
     } catch (error) {
-      console.error('Error fetching sales reps:', error);
+      console.error('❌ Error fetching sales reps:', error.response?.status, error.response?.data || error.message);
     }
   };
 
