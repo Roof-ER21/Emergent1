@@ -323,49 +323,112 @@ const AppHub = () => {
       <div className="mobile-container py-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {apps.map((app, index) => (
-            <div
+            <motion.div
               key={app.id}
-              className="card card-hover fade-in group cursor-pointer"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              className="card card-hover group cursor-pointer"
               onClick={() => setSelectedApp(app.id)}
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                duration: 0.5, 
+                delay: index * 0.1,
+                ease: "easeOut"
+              }}
+              whileHover={{ 
+                scale: 1.05,
+                y: -10,
+                transition: { duration: 0.2 }
+              }}
+              whileTap={{ scale: 0.95 }}
             >
               <div className="card-body">
                 <div className="flex items-center justify-between mb-6">
-                  <div className={`text-4xl p-4 rounded-xl ${app.color === 'primary' ? 'bg-primary-50' : 'bg-secondary-50'} group-hover:scale-110 transition-transform duration-300`}>
+                  <motion.div 
+                    className={`text-4xl p-4 rounded-xl ${app.color === 'primary' ? 'bg-primary-50' : 'bg-secondary-50'}`}
+                    whileHover={{ 
+                      scale: 1.2,
+                      rotate: 10,
+                      transition: { duration: 0.3 }
+                    }}
+                  >
                     {app.icon}
-                  </div>
-                  <div className={`px-3 py-1 rounded-full text-xs font-semibold ${app.color === 'primary' ? 'bg-primary-100 text-primary-800' : 'bg-secondary-100 text-secondary-800'}`}>
+                  </motion.div>
+                  <motion.div 
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${app.color === 'primary' ? 'bg-primary-100 text-primary-800' : 'bg-secondary-100 text-secondary-800'}`}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: index * 0.1 + 0.3 }}
+                  >
                     Ready
-                  </div>
+                  </motion.div>
                 </div>
                 
-                <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors duration-200">
+                <motion.h3 
+                  className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors duration-200"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: index * 0.1 + 0.2 }}
+                >
                   {app.name}
-                </h3>
+                </motion.h3>
                 
-                <p className="text-muted-foreground mb-6 line-clamp-2">
+                <motion.p 
+                  className="text-muted-foreground mb-6 line-clamp-2"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: index * 0.1 + 0.3 }}
+                >
                   {app.description}
-                </p>
+                </motion.p>
                 
-                <div className="space-y-2 mb-6">
+                <motion.div 
+                  className="space-y-2 mb-6"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: index * 0.1 + 0.4 }}
+                >
                   {app.features.slice(0, 3).map((feature, i) => (
-                    <div key={i} className="flex items-center space-x-2 text-sm text-muted-foreground">
+                    <motion.div 
+                      key={i} 
+                      className="flex items-center space-x-2 text-sm text-muted-foreground"
+                      initial={{ x: -20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: index * 0.1 + 0.5 + i * 0.05 }}
+                    >
                       <svg className="w-4 h-4 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                       <span>{feature}</span>
-                    </div>
+                    </motion.div>
                   ))}
-                </div>
+                </motion.div>
                 
-                <button className="btn-primary w-full group-hover:bg-primary-800 group-hover:transform group-hover:scale-105 transition-all duration-200">
+                <motion.button 
+                  className="btn-primary w-full flex items-center justify-center"
+                  whileHover={{ 
+                    scale: 1.02,
+                    backgroundColor: "var(--primary-800)",
+                    transition: { duration: 0.2 }
+                  }}
+                  whileTap={{ scale: 0.98 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 + 0.6 }}
+                >
                   Launch Application
-                  <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <motion.svg 
+                    className="w-4 h-4 ml-2" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                    whileHover={{ x: 5 }}
+                    transition={{ duration: 0.2 }}
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </button>
+                  </motion.svg>
+                </motion.button>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
