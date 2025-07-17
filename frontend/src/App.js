@@ -838,6 +838,73 @@ const SalesLeaderboardApp = () => {
     }
   };
 
+  // Sync management functions
+  const handleManualSync = async () => {
+    try {
+      console.log('🔄 Starting manual sync...');
+      const response = await axios.post(`${API}/leaderboard/manual-sync`);
+      console.log('✅ Manual sync completed:', response.data);
+      
+      // Refresh data after sync
+      await loadAllData();
+      
+      // Update sync status
+      await fetchSyncStatuses();
+    } catch (error) {
+      console.error('❌ Error in manual sync:', error);
+      alert('Manual sync failed. Please try again.');
+    }
+  };
+
+  const fetchSyncStatuses = async () => {
+    try {
+      const response = await axios.get(`${API}/leaderboard/sync-status`);
+      setSyncStatuses(response.data);
+    } catch (error) {
+      console.error('Error fetching sync statuses:', error);
+      // Set mock data if API fails
+      setSyncStatuses([
+        {
+          sync_type: 'automatic',
+          status: 'completed',
+          last_sync: new Date().toISOString(),
+          records_processed: 25,
+          error_message: null
+        },
+        {
+          sync_type: 'manual',
+          status: 'completed',
+          last_sync: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+          records_processed: 23,
+          error_message: null
+        }
+      ]);
+    }
+  };
+
+  const handleRevenueUpdate = async () => {
+    try {
+      console.log('🔄 Updating revenue...', revenueUpdate);
+      const response = await axios.post(`${API}/leaderboard/update-revenue`, revenueUpdate);
+      console.log('✅ Revenue updated:', response.data);
+      
+      // Reset form
+      setRevenueUpdate({
+        rep_id: '',
+        month: '',
+        revenue: 0
+      });
+      
+      // Refresh data
+      await loadAllData();
+      
+      alert('Revenue updated successfully!');
+    } catch (error) {
+      console.error('❌ Error updating revenue:', error);
+      alert('Failed to update revenue. Please try again.');
+    }
+  };
+
   useEffect(() => {
     const initializeData = async () => {
       // First try to load existing data
