@@ -375,6 +375,7 @@ const SalesLeaderboardApp = () => {
   const fetchCompetitions = async () => {
     try {
       const response = await axios.get(`${API}/leaderboard/competitions`);
+      console.log('🏁 Competitions data:', response.data);
       setCompetitions(response.data);
     } catch (error) {
       console.error('Error fetching competitions:', error);
@@ -411,6 +412,7 @@ const SalesLeaderboardApp = () => {
   const fetchBonusTiers = async () => {
     try {
       const response = await axios.get(`${API}/leaderboard/bonus-tiers`);
+      console.log('🏆 Bonus tiers data:', response.data);
       setBonusTiers(response.data);
     } catch (error) {
       console.error('Error fetching bonus tiers:', error);
@@ -429,6 +431,7 @@ const SalesLeaderboardApp = () => {
   const fetchSalesReps = async () => {
     try {
       const response = await axios.get(`${API}/qr-generator/reps`);
+      console.log('📊 Sales reps data:', response.data);
       setSalesReps(response.data);
     } catch (error) {
       console.error('Error fetching sales reps:', error);
