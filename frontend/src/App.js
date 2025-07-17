@@ -927,6 +927,7 @@ const SalesLeaderboardApp = () => {
     };
     
     initializeData();
+    fetchSyncStatuses(); // Initialize sync status data
   }, []);
 
   // Transform and compute leaderboard data
