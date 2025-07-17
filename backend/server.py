@@ -1166,7 +1166,8 @@ async def initialize_sample_data():
 async def startup_event():
     await initialize_sample_data()
     
-    # Start the signup sync scheduler
+    # Set up and start the signup sync scheduler
+    setup_signup_sync_scheduler()
     signup_scheduler.start()
     print("🔄 Signup sync scheduler started (3 times daily)")
 
