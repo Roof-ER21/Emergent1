@@ -2437,67 +2437,123 @@ const HRRecruitmentApp = () => {
 
   // Admin/Manager View
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-      {/* Header */}
-      <div className="border-b border-gray-200 p-6">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-gray-900">HR Management System</h2>
-          <div className="flex space-x-3">
-            <button
-              onClick={initializeSampleData}
-              className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+    <div className="min-h-screen bg-gray-900">
+      {/* Enhanced Header */}
+      <motion.div 
+        className="roof-er-gradient border-b border-red-800/20 shadow-lg"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="mobile-container">
+          <div className="flex justify-between items-center py-6">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
             >
-              Initialize Sample Data
-            </button>
-            <button
-              onClick={handleTraditionalImport}
-              disabled={importing}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
+                  <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 4.354a4 4 0 110 5.292V21a1 1 0 01-2 0V9.646a4 4 0 110-5.292z"/>
+                    <path d="M15 1a1 1 0 011 1v2a1 1 0 11-2 0V2a1 1 0 011-1zM9 1a1 1 0 011 1v2a1 1 0 11-2 0V2a1 1 0 011-1z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-white">HR Management System</h2>
+                  <p className="text-white/70 text-sm">Comprehensive HR workflow management</p>
+                </div>
+              </div>
+            </motion.div>
+            <motion.div 
+              className="flex space-x-3"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
             >
-              {importing ? 'Importing...' : 'Import Sample Data'}
-            </button>
-            <button
-              onClick={() => setImportModalOpen(true)}
-              disabled={importing}
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
-            >
-              Import from Google Sheets
-            </button>
+              <motion.button
+                onClick={initializeSampleData}
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-all duration-200 flex items-center space-x-2"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span>Initialize Sample Data</span>
+              </motion.button>
+              <motion.button
+                onClick={handleTraditionalImport}
+                disabled={importing}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all duration-200 disabled:opacity-50 flex items-center space-x-2"
+                whileHover={{ scale: importing ? 1 : 1.05 }}
+                whileTap={{ scale: importing ? 1 : 0.95 }}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                </svg>
+                <span>{importing ? 'Importing...' : 'Import Sample Data'}</span>
+              </motion.button>
+              <motion.button
+                onClick={() => setImportModalOpen(true)}
+                disabled={importing}
+                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-all duration-200 disabled:opacity-50 flex items-center space-x-2"
+                whileHover={{ scale: importing ? 1 : 1.05 }}
+                whileTap={{ scale: importing ? 1 : 0.95 }}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Import from Google Sheets</span>
+              </motion.button>
+            </motion.div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Tab Navigation */}
-      <div className="border-b border-gray-200">
-        <nav className="flex space-x-8 px-6">
-          {[
-            { id: 'employees', name: 'Employees' },
-            { id: 'onboarding', name: 'Onboarding' },
-            { id: 'pto', name: 'PTO Management' },
-            { id: 'hiring', name: 'Hiring Flows' },
-            { id: 'compliance', name: 'Compliance' },
-            { id: 'assignments', name: 'Project Assignments' },
-            { id: 'requests', name: 'Employee Requests' }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === tab.id
-                  ? 'border-red-500 text-red-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              {tab.name}
-            </button>
-          ))}
+      {/* Enhanced Tab Navigation */}
+      <motion.div 
+        className="bg-gray-800 border-b border-gray-700"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+      >
+        <nav className="mobile-container">
+          <div className="flex space-x-1 overflow-x-auto py-4">
+            {[
+              { id: 'employees', name: 'Employees', icon: '👥' },
+              { id: 'onboarding', name: 'Onboarding', icon: '🎯' },
+              { id: 'pto', name: 'PTO Management', icon: '🏖️' },
+              { id: 'hiring', name: 'Hiring Flows', icon: '🔄' },
+              { id: 'compliance', name: 'Compliance', icon: '✅' },
+              { id: 'assignments', name: 'Project Assignments', icon: '📋' },
+              { id: 'requests', name: 'Employee Requests', icon: '📝' }
+            ].map((tab, index) => (
+              <motion.button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-lg font-medium text-sm transition-all duration-200 whitespace-nowrap ${
+                  activeTab === tab.id
+                    ? 'bg-red-600 text-white shadow-lg'
+                    : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                }`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.4 + index * 0.05 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="text-lg">{tab.icon}</span>
+                <span>{tab.name}</span>
+              </motion.button>
+            ))}
+          </div>
         </nav>
-      </div>
+      </motion.div>
 
-      {/* Import Status */}
-      {importStatus && (
-        <div className="p-6 border-b border-gray-200">
-          <div className="bg-gray-50 rounded-lg p-4">
+      {/* Content Area */}
+      <div className="bg-gray-900 min-h-screen">
+        <div className="mobile-container py-8">
             <h3 className="font-semibold text-gray-900 mb-2">Import Configuration</h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
