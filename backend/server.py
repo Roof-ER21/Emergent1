@@ -1165,6 +1165,16 @@ async def initialize_sample_data():
 @app.on_event("startup")
 async def startup_event():
     await initialize_sample_data()
+    
+    # Start the signup sync scheduler
+    signup_scheduler.start()
+    print("🔄 Signup sync scheduler started (3 times daily)")
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    # Stop the signup sync scheduler
+    signup_scheduler.stop()
+    print("⏹️ Signup sync scheduler stopped")
 
 # Authentication Routes
 @api_router.post("/auth/login")
