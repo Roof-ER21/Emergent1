@@ -3010,10 +3010,28 @@ const HRRecruitmentApp = () => {
 
   const fetchEmployeeDashboard = async () => {
     try {
+      setLoading(true);
       const response = await axios.get(`${API}/self-service/dashboard`);
       setEmployeeDashboard(response.data);
+      console.log('✅ Employee dashboard loaded:', response.data);
     } catch (error) {
-      console.error('Error fetching employee dashboard:', error);
+      console.error('❌ Error fetching employee dashboard:', error);
+      // Set fallback dashboard data if API fails
+      setEmployeeDashboard({
+        employee: {
+          name: user?.name || 'Employee',
+          email: user?.email || 'employee@company.com',
+          role: user?.role || 'employee',
+          employee_type: 'w2'
+        },
+        employee_type: 'w2',
+        onboarding_progress: { completed_stages: 0, total_stages: 0 },
+        pto_balance: { available_days: 0, used_days: 0 },
+        recent_requests: [],
+        documents: []
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
