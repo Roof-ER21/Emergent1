@@ -41,7 +41,8 @@ class RoofHRTester:
             "hr_sample_data": {},
             "hr_employee_extended": {},  # Extended HR employee management tests
             "hiring_flows": {},  # New hiring flow tests
-            "sales_leaderboard": {}  # New sales leaderboard tests
+            "sales_leaderboard": {},  # New sales leaderboard tests
+            "automated_signup_sync": {}  # New automated signup sync tests
         }
         
     def log_result(self, category, test_name, success, message, response_data=None):
