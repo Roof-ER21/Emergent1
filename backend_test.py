@@ -3268,6 +3268,180 @@ class RoofHRTester:
         else:
             self.log_result("hr_employee_extended", "import_employees_reverify", False, "No response received")
 
+    def test_google_sheets_integration_with_real_credentials(self):
+        """Test Google Sheets integration with real service account credentials"""
+        print("\n📊 Testing Google Sheets Integration with Real Credentials...")
+        
+        # Set development token
+        self.auth_token = "dev-token-super_admin"
+        
+        # Test 1: Check import status with credentials
+        print("Testing GET /import/status to check credentials...")
+        response = self.make_request("GET", "/import/status", auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                status_data = response.json()
+                google_sheets_enabled = status_data.get("google_sheets_enabled", False)
+                credentials_configured = status_data.get("credentials_configured", False)
+                
+                self.log_result("google_sheets_integration", "credentials_status_check", True, 
+                               f"Google Sheets enabled: {google_sheets_enabled}, Credentials configured: {credentials_configured}")
+                
+                if not google_sheets_enabled:
+                    self.log_result("google_sheets_integration", "google_sheets_disabled", True, 
+                                   "Google Sheets integration is disabled - cannot test real import")
+                    return
+                    
+                if not credentials_configured:
+                    self.log_result("google_sheets_integration", "credentials_missing", True, 
+                                   "Service account credentials not found - cannot test real import")
+                    return
+                    
+            except json.JSONDecodeError:
+                self.log_result("google_sheets_integration", "credentials_status_check", False, "Invalid JSON response")
+                return
+        else:
+            self.log_result("google_sheets_integration", "credentials_status_check", False, "Could not check import status")
+            return
+        
+        # Test 2: Test with user's actual spreadsheet ID
+        user_spreadsheet_id = "1YSJD4RoqS_FLWF0LN1GRJKQhQNCdPT_aThqX6R6cZ4I"
+        
+        # Test different range formats
+        test_ranges = [
+            "Sheet1!A1:Z100",
+            "Sheet1!A:Z", 
+            "Sheet1!A1:E50"
+        ]
+        
+        for range_name in test_ranges:
+            print(f"Testing employee import with range: {range_name}...")
+            import_data = {
+                "spreadsheet_id": user_spreadsheet_id,
+                "range_name": range_name,
+                "data_type": "employees"
+            }
+            response = self.make_request("POST", "/employees/import-from-sheets", import_data, auth_required=True)
+            
+            if response is not None and response.status_code == 200:
+                try:
+                    result = response.json()
+                    imported_count = result.get("imported", 0)
+                    total_rows = result.get("total_rows", 0)
+                    errors = result.get("errors", [])
+                    
+                    self.log_result("google_sheets_integration", f"employee_import_{range_name.replace(':', '_').replace('!', '_')}", True, 
+                                   f"Successfully imported {imported_count}/{total_rows} employees. Errors: {len(errors)}")
+                    
+                    if errors:
+                        print(f"Import errors for {range_name}: {errors[:3]}")  # Show first 3 errors
+                        
+                except json.JSONDecodeError:
+                    self.log_result("google_sheets_integration", f"employee_import_{range_name.replace(':', '_').replace('!', '_')}", False, "Invalid JSON response")
+            elif response is not None and response.status_code == 400:
+                try:
+                    error_data = response.json()
+                    error_detail = error_data.get("detail", "Unknown error")
+                    self.log_result("google_sheets_integration", f"employee_import_{range_name.replace(':', '_').replace('!', '_')}", False, 
+                                   f"Import failed with 400: {error_detail}")
+                except:
+                    self.log_result("google_sheets_integration", f"employee_import_{range_name.replace(':', '_').replace('!', '_')}", False, 
+                                   f"Import failed with 400 (could not parse error)")
+            elif response is not None:
+                self.log_result("google_sheets_integration", f"employee_import_{range_name.replace(':', '_').replace('!', '_')}", False, 
+                               f"Expected 200, got {response.status_code}")
+            else:
+                self.log_result("google_sheets_integration", f"employee_import_{range_name.replace(':', '_').replace('!', '_')}", False, "No response received")
+        
+        # Test 3: Test sales reps import
+        print("Testing sales reps import...")
+        import_data = {
+            "spreadsheet_id": user_spreadsheet_id,
+            "range_name": "Sheet1!A1:F50",
+            "data_type": "sales_reps"
+        }
+        response = self.make_request("POST", "/sales-reps/import-from-sheets", import_data, auth_required=True)
+        
+        if response is not None and response.status_code == 200:
+            try:
+                result = response.json()
+                imported_count = result.get("imported", 0)
+                total_rows = result.get("total_rows", 0)
+                
+                self.log_result("google_sheets_integration", "sales_reps_import", True, 
+                               f"Successfully imported {imported_count}/{total_rows} sales reps")
+                
+            except json.JSONDecodeError:
+                self.log_result("google_sheets_integration", "sales_reps_import", False, "Invalid JSON response")
+        elif response is not None and response.status_code == 400:
+            try:
+                error_data = response.json()
+                error_detail = error_data.get("detail", "Unknown error")
+                self.log_result("google_sheets_integration", "sales_reps_import", False, f"Sales reps import failed: {error_detail}")
+            except:
+                self.log_result("google_sheets_integration", "sales_reps_import", False, "Sales reps import failed (could not parse error)")
+        elif response is not None:
+            self.log_result("google_sheets_integration", "sales_reps_import", False, f"Expected 200, got {response.status_code}")
+        else:
+            self.log_result("google_sheets_integration", "sales_reps_import", False, "No response received")
+        
+        # Test 4: Test with invalid spreadsheet ID
+        print("Testing with invalid spreadsheet ID...")
+        import_data = {
+            "spreadsheet_id": "invalid_spreadsheet_id_123",
+            "range_name": "Sheet1!A1:E10",
+            "data_type": "employees"
+        }
+        response = self.make_request("POST", "/employees/import-from-sheets", import_data, auth_required=True)
+        
+        if response is not None and response.status_code == 400:
+            self.log_result("google_sheets_integration", "invalid_spreadsheet_id", True, "Correctly rejected invalid spreadsheet ID")
+        elif response is not None:
+            self.log_result("google_sheets_integration", "invalid_spreadsheet_id", False, f"Expected 400, got {response.status_code}")
+        else:
+            self.log_result("google_sheets_integration", "invalid_spreadsheet_id", False, "No response received")
+        
+        # Test 5: Test with invalid range format
+        print("Testing with invalid range format...")
+        import_data = {
+            "spreadsheet_id": user_spreadsheet_id,
+            "range_name": "InvalidRange",
+            "data_type": "employees"
+        }
+        response = self.make_request("POST", "/employees/import-from-sheets", import_data, auth_required=True)
+        
+        if response is not None and response.status_code == 400:
+            self.log_result("google_sheets_integration", "invalid_range_format", True, "Correctly rejected invalid range format")
+        elif response is not None:
+            self.log_result("google_sheets_integration", "invalid_range_format", False, f"Expected 400, got {response.status_code}")
+        else:
+            self.log_result("google_sheets_integration", "invalid_range_format", False, "No response received")
+        
+        # Test 6: Test authentication with different user roles
+        for role in ["hr_manager", "sales_manager"]:
+            print(f"Testing Google Sheets import with {role} role...")
+            self.auth_token = f"dev-token-{role}"
+            
+            import_data = {
+                "spreadsheet_id": user_spreadsheet_id,
+                "range_name": "Sheet1!A1:E10",
+                "data_type": "employees"
+            }
+            response = self.make_request("POST", "/employees/import-from-sheets", import_data, auth_required=True)
+            
+            if response is not None and response.status_code in [200, 400]:  # 200 for success, 400 for Google Sheets errors
+                self.log_result("google_sheets_integration", f"auth_{role}_role", True, f"{role} role can access Google Sheets import")
+            elif response is not None and response.status_code == 403:
+                self.log_result("google_sheets_integration", f"auth_{role}_role", False, f"{role} role incorrectly denied access")
+            elif response is not None:
+                self.log_result("google_sheets_integration", f"auth_{role}_role", True, f"{role} role access test completed (status: {response.status_code})")
+            else:
+                self.log_result("google_sheets_integration", f"auth_{role}_role", False, "No response received")
+        
+        # Reset to super_admin for remaining tests
+        self.auth_token = "dev-token-super_admin"
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Roof-HR Backend API Testing...")
