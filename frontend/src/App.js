@@ -1997,8 +1997,8 @@ const SalesLeaderboardApp = () => {
                             <div className="text-right">
                               <div className="font-semibold text-gray-900">
                                 {competition.competition_type === 'signups' ? 
-                                  rep.metrics.monthly_signups : 
-                                  `$${rep.metrics.monthly_revenue.toLocaleString()}`
+                                  (rep.metrics?.monthly_signups || 0) : 
+                                  `$${(rep.metrics?.monthly_revenue || 0).toLocaleString()}`
                                 }
                               </div>
                               <div className="text-xs text-gray-500">
