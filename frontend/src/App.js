@@ -3665,7 +3665,7 @@ const HRRecruitmentApp = () => {
                                   {employee.employee_type === '1099' && (
                                     <motion.button
                                       onClick={() => handleWorkersCompSubmission(employee.id)}
-                                      className="text-blue-400 hover:text-blue-300 px-3 py-1 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 transition-all duration-200"
+                                      className="text-red-400 hover:text-red-300 px-3 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-all duration-200"
                                       whileHover={{ scale: 1.05 }}
                                       whileTap={{ scale: 0.95 }}
                                     >
