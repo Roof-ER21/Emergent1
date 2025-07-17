@@ -1383,8 +1383,11 @@ async def get_import_status(current_user: User = Depends(get_current_user)):
     if current_user.role not in ["super_admin", "hr_manager"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
+    # Check enabled status dynamically
+    google_sheets_enabled = os.getenv("GOOGLE_SHEETS_ENABLED", "false").lower() == "true"
+    
     return {
-        "google_sheets_enabled": google_sheets_service.enabled,
+        "google_sheets_enabled": google_sheets_enabled,
         "credentials_configured": os.path.exists(google_sheets_service.credentials_path),
         "supported_data_types": ["employees", "sales_reps"],
         "sample_ranges": {
