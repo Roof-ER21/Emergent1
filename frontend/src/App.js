@@ -2554,58 +2554,85 @@ const HRRecruitmentApp = () => {
       {/* Content Area */}
       <div className="bg-gray-900 min-h-screen">
         <div className="mobile-container py-8">
-            <h3 className="font-semibold text-gray-900 mb-2">Import Configuration</h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium">Google Sheets Enabled:</span>
-                <span className={`ml-2 ${importStatus.google_sheets_enabled ? 'text-green-600' : 'text-red-600'}`}>
-                  {importStatus.google_sheets_enabled ? 'Yes' : 'No'}
-                </span>
+          
+          {/* Import Status */}
+          {importStatus && (
+            <motion.div 
+              className="mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+                <h3 className="font-semibold text-white mb-4 flex items-center space-x-2">
+                  <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span>Import Configuration</span>
+                </h3>
+                <div className="grid grid-cols-2 gap-6 text-sm">
+                  <div className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
+                    <span className="font-medium text-gray-300">Google Sheets Enabled:</span>
+                    <span className={`ml-2 px-2 py-1 rounded-full text-xs font-semibold ${importStatus.google_sheets_enabled ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                      {importStatus.google_sheets_enabled ? 'Yes' : 'No'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
+                    <span className="font-medium text-gray-300">Credentials Configured:</span>
+                    <span className={`ml-2 px-2 py-1 rounded-full text-xs font-semibold ${importStatus.credentials_configured ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                      {importStatus.credentials_configured ? 'Yes' : 'No'}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div>
-                <span className="font-medium">Credentials Configured:</span>
-                <span className={`ml-2 ${importStatus.credentials_configured ? 'text-green-600' : 'text-red-600'}`}>
-                  {importStatus.credentials_configured ? 'Yes' : 'No'}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          )}
 
-      {/* Import Result */}
-      {importResult && (
-        <div className="p-6 border-b border-gray-200">
-          <div className={`rounded-lg p-4 ${importResult.success ? 'bg-green-50' : 'bg-red-50'}`}>
-            <h3 className={`font-semibold ${importResult.success ? 'text-green-800' : 'text-red-800'}`}>
-              Import Result
-            </h3>
-            {importResult.success ? (
-              <div className="mt-2 text-sm text-green-700">
-                {importResult.type === 'google_sheets' ? (
-                  <div>
-                    <p>Successfully imported {importResult.data.imported} out of {importResult.data.total_rows} records</p>
-                    {importResult.data.errors && importResult.data.errors.length > 0 && (
-                      <div className="mt-2">
-                        <p className="font-medium">Errors:</p>
-                        <ul className="list-disc pl-5">
-                          {importResult.data.errors.map((error, index) => (
-                            <li key={index}>{error}</li>
-                          ))}
-                        </ul>
+          {/* Import Result */}
+          {importResult && (
+            <motion.div 
+              className="mb-8"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className={`rounded-lg p-6 border ${importResult.success ? 'bg-green-500/10 border-green-500/20' : 'bg-red-500/10 border-red-500/20'}`}>
+                <h3 className={`font-semibold text-lg mb-3 flex items-center space-x-2 ${importResult.success ? 'text-green-400' : 'text-red-400'}`}>
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    {importResult.success ? (
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    ) : (
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    )}
+                  </svg>
+                  <span>Import Result</span>
+                </h3>
+                {importResult.success ? (
+                  <div className="text-sm text-green-300">
+                    {importResult.type === 'google_sheets' ? (
+                      <div>
+                        <p className="mb-2">Successfully imported {importResult.data.imported} out of {importResult.data.total_rows} records</p>
+                        {importResult.data.errors && importResult.data.errors.length > 0 && (
+                          <div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                            <p className="font-medium text-yellow-400 mb-2">Errors:</p>
+                            <ul className="list-disc pl-5 space-y-1">
+                              {importResult.data.errors.map((error, index) => (
+                                <li key={index} className="text-yellow-300">{error}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
                       </div>
+                    ) : (
+                      <p>{importResult.message}</p>
                     )}
                   </div>
                 ) : (
-                  <p>{importResult.message}</p>
+                  <p className="text-sm text-red-300">{importResult.message}</p>
                 )}
               </div>
-            ) : (
-              <p className="mt-2 text-sm text-red-700">{importResult.message}</p>
-            )}
-          </div>
-        </div>
-      )}
+            </motion.div>
+          )}
 
       {/* Tab Content */}
       <div className="p-6">
