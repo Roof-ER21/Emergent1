@@ -29,6 +29,9 @@ class GoogleSheetsService:
         self.service = None
         
     async def get_service(self):
+        # Check enabled status dynamically
+        self.enabled = os.getenv("GOOGLE_SHEETS_ENABLED", "false").lower() == "true"
+        
         if not self.enabled:
             raise HTTPException(status_code=400, detail="Google Sheets integration is disabled")
             
