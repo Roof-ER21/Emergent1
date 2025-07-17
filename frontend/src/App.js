@@ -2179,7 +2179,7 @@ const SalesLeaderboardApp = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-3xl font-bold text-green-700">
-                    ${leaderboardData.reduce((sum, rep) => sum + rep.metrics.monthly_revenue, 0).toLocaleString()}
+                    ${leaderboardData.reduce((sum, rep) => sum + (rep.metrics?.monthly_revenue || 0), 0).toLocaleString()}
                   </div>
                   <div className="text-sm text-green-600 font-medium">Total Revenue</div>
                   <div className="text-xs text-green-500 mt-1">
