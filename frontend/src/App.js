@@ -445,6 +445,7 @@ const SalesLeaderboardApp = () => {
   };
 
   const loadAllData = async () => {
+    console.log('🔄 Starting to load all data...');
     setLoading(true);
     try {
       await Promise.all([
@@ -456,10 +457,12 @@ const SalesLeaderboardApp = () => {
         fetchTeamAssignments(),
         fetchSalesReps()
       ]);
+      console.log('✅ All data loaded successfully');
     } catch (error) {
-      console.error('Error loading data:', error);
+      console.error('❌ Error loading data:', error);
       setError('Failed to load leaderboard data');
     } finally {
+      console.log('🏁 Setting loading to false');
       setLoading(false);
     }
   };
