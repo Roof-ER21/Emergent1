@@ -236,9 +236,9 @@ const AppHub = () => {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--background-dark)' }}>
+    <div className="min-h-screen bg-gray-900">
       {/* Enhanced Header with Roof-ER Branding */}
-      <header className="roof-er-gradient border-b border-primary-800/20 shadow-lg">
+      <header className="roof-er-gradient border-b border-red-800/20 shadow-lg">
         <div className="mobile-container">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-4">
@@ -284,7 +284,7 @@ const AppHub = () => {
       </header>
 
       {/* Hero Section */}
-      <div className="roof-er-gradient-hero">
+      <div className="bg-gray-800">
         <div className="mobile-container py-16">
           <div className="text-center">
             <motion.div
@@ -293,13 +293,13 @@ const AppHub = () => {
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
               <motion.h2 
-                className="text-4xl md:text-5xl font-bold text-foreground mb-6"
+                className="text-4xl md:text-5xl font-bold text-white mb-6"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
                 Choose Your <motion.span 
-                  className="text-primary"
+                  className="text-red-400"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.6, delay: 0.8 }}
@@ -308,7 +308,7 @@ const AppHub = () => {
                 </motion.span>
               </motion.h2>
               <motion.p 
-                className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8"
+                className="text-xl text-gray-300 max-w-3xl mx-auto mb-8"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
@@ -316,7 +316,7 @@ const AppHub = () => {
                 Access powerful HR tools designed for roofing companies. Streamline operations with our integrated suite of applications.
               </motion.p>
               <motion.div 
-                className="flex items-center justify-center space-x-8 text-muted-foreground"
+                className="flex items-center justify-center space-x-8 text-gray-400"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.6 }}
@@ -329,10 +329,10 @@ const AppHub = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.4, delay: 0.8 + index * 0.1 }}
                   >
-                    <svg className="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
-                    <span>{value}</span>
+                    <span className="text-gray-300">{value}</span>
                   </motion.div>
                 ))}
               </motion.div>
