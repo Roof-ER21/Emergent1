@@ -5313,8 +5313,6 @@ const QRGeneratorApp = () => {
       </div>
     </div>
   );
-    </div>
-  );
 };
 
 // Candidate Modal Component
