@@ -315,6 +315,21 @@ backend:
         agent: "testing"
         comment: "✅ FINAL COMPREHENSIVE TESTING: Executed comprehensive backend testing with 93/119 tests passing (78% success rate). Sales Leaderboard specific results: 1) All 14 leaderboard API endpoints working correctly with proper authentication. 2) All 6 data models implemented (SalesGoal, SalesSignup, SalesCompetition, SalesMetrics, BonusTier, TeamAssignment). 3) Role-based access control properly implemented. 4) Sample data initialization creates proper competitions and bonus tiers. 5) Automated goal setting system working (POST/bulk assignment functional). 6) Bonus tier automation system working (GET/POST endpoints, tier calculation logic, automatic advancement). 7) Data integration working (goals linked to reps, signups structured for tier calculation). MINOR ISSUES: Dashboard endpoint missing aggregation fields, goal assignment date restrictions not implemented, some network timeouts. Core Sales Leaderboard backend functionality is production-ready and fully functional."
 
+  - task: "Automated Signup Sync System with Google Sheets Integration"
+    implemented: true
+    working: false
+    file: "server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Need to implement automated signup sync system with manual trigger endpoints and scheduled sync functionality"
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL ISSUES FOUND: Automated signup sync system has backend infrastructure but missing critical API endpoints. IMPLEMENTED: 1) Scheduler infrastructure (BackgroundScheduler, setup_signup_sync_scheduler) working correctly. 2) Sync data models defined (SyncStatus, SignupSyncRequest, MonthlySignupData, RevenueUpdate). 3) Background sync logic implemented (sync_signup_data_background function). 4) Scheduler configured for 3 daily syncs (8 AM, 2 PM, 8 PM). 5) Google Sheets integration ready and working. 6) Database collections (sync_status, monthly_signups, sales_reps) properly used. 7) Sync logic includes automatic rep creation, monthly data parsing, error handling. MISSING CRITICAL ENDPOINTS: 1) POST /api/sync/signups (manual sync trigger) - 404 NOT FOUND. 2) GET /api/sync/status (sync status tracking) - 404 NOT FOUND. 3) POST /api/sync/revenue (revenue updates) - 404 NOT FOUND. 4) GET /api/signups/monthly (monthly signup data) - 404 NOT FOUND. 5) GET /api/signups/rep/{rep_id} (rep-specific data) - 404 NOT FOUND. IMPACT: Automated sync runs in background but no manual control or status monitoring available. System needs these 5 API endpoints implemented to be fully functional."
+
   - task: "Google Sheets Integration with Import Functionality"
     implemented: true
     working: true
