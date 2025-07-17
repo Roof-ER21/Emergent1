@@ -3638,8 +3638,6 @@ const HRRecruitmentApp = () => {
             )}
           </div>
         )}
-      </div>
-    </div>
 
         {activeTab === 'onboarding' && (
           <div>
