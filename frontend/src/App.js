@@ -4017,6 +4017,152 @@ const HRRecruitmentApp = () => {
           </div>
         )}
 
+        {activeTab === 'compliance' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-gray-900">Compliance Requirements</h3>
+              <div className="text-sm text-gray-600">
+                Focused on 1099 workers' compensation submission
+              </div>
+            </div>
+
+            {/* Compliance Overview Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="h-8 w-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.732 15.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                  </div>
+                  <div className="ml-4">
+                    <div className="text-sm font-medium text-gray-900">Pending Submissions</div>
+                    <div className="text-2xl font-bold text-yellow-600">
+                      {employees.filter(emp => emp.employee_type === '1099' && !emp.workers_comp_submitted).length}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="ml-4">
+                    <div className="text-sm font-medium text-gray-900">Compliant</div>
+                    <div className="text-2xl font-bold text-green-600">
+                      {employees.filter(emp => emp.employee_type === '1099' && emp.workers_comp_submitted).length}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </div>
+                  <div className="ml-4">
+                    <div className="text-sm font-medium text-gray-900">Total 1099 Workers</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      {employees.filter(emp => emp.employee_type === '1099').length}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 1099 Workers Compliance Table */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h4 className="text-lg font-semibold text-gray-900">1099 Workers' Compensation Compliance</h4>
+              </div>
+              
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Territory</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted Date</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {employees.filter(emp => emp.employee_type === '1099').map((employee, index) => (
+                      <tr key={employee.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">{employee.name}</div>
+                          <div className="text-sm text-gray-500">{employee.email}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {employee.territory || 'Not Assigned'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            employee.workers_comp_submitted 
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}>
+                            {employee.workers_comp_submitted ? 'Compliant' : 'Pending'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {employee.workers_comp_submitted_date 
+                            ? new Date(employee.workers_comp_submitted_date).toLocaleDateString()
+                            : 'Not Submitted'
+                          }
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          {!employee.workers_comp_submitted && (
+                            <button
+                              onClick={() => handleWorkersCompSubmission(employee.id)}
+                              className="text-blue-600 hover:text-blue-900 mr-4"
+                            >
+                              Mark as Submitted
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleSendComplianceReminder(employee.id)}
+                            className="text-gray-600 hover:text-gray-900"
+                          >
+                            Send Reminder
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Compliance Actions */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Compliance Actions</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button
+                  onClick={() => handleBulkComplianceReminder()}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Send Bulk Reminder
+                </button>
+                <button
+                  onClick={() => handleExportComplianceReport()}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  Export Compliance Report
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'requests' && (
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Employee Requests</h3>
