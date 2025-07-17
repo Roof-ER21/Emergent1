@@ -695,6 +695,7 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Automated Signup Sync System with Google Sheets Integration"
     - "Automated Goal Setting and Bonus Tier Automation System"
     - "Sales Leaderboard Backend API Development"
     - "User Authentication System with Emergent OAuth"
@@ -702,7 +703,8 @@ test_plan:
     - "Sales Rep Management System"
     - "Lead Capture and Distribution"
     - "Google Sheets Integration with Import Functionality"
-  stuck_tasks: []
+  stuck_tasks:
+    - "Automated Signup Sync System with Google Sheets Integration"
   test_all: false
   test_priority: "high_first"
 
