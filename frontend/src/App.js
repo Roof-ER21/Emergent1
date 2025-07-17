@@ -1697,63 +1697,279 @@ const SalesLeaderboardApp = () => {
         </div>
       )}
 
-      {/* Competitions Tab */}
+      {/* Enhanced Competitions Tab */}
       {activeTab === 'competitions' && (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold text-gray-900">Competitions & Contests</h3>
-            {(user?.role === 'super_admin' || user?.role === 'sales_manager') && (
-              <button
-                onClick={() => setShowCompetitionModal(true)}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-              >
-                Create Competition
-              </button>
-            )}
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900">Advanced Competitions & Tournaments</h3>
+              <p className="text-gray-600 mt-1">Manage contests, track progress, and boost team performance</p>
+            </div>
+            <div className="flex items-center space-x-3">
+              {(user?.role === 'super_admin' || user?.role === 'sales_manager') && (
+                <>
+                  <button
+                    onClick={() => setShowCompetitionModal(true)}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    <span>Create Competition</span>
+                  </button>
+                  <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center space-x-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                    </svg>
+                    <span>Tournament Mode</span>
+                  </button>
+                </>
+              )}
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Competition Status Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-3xl font-bold text-blue-700">{competitions.filter(c => c.status === 'active').length}</div>
+                  <div className="text-sm text-blue-600 font-medium">Active Competitions</div>
+                </div>
+                <div className="p-3 bg-blue-500 rounded-lg">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-3xl font-bold text-green-700">{competitions.reduce((sum, c) => sum + c.participants.length, 0)}</div>
+                  <div className="text-sm text-green-600 font-medium">Total Participants</div>
+                </div>
+                <div className="p-3 bg-green-500 rounded-lg">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-6 border border-yellow-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-3xl font-bold text-yellow-700">
+                    {competitions.filter(c => {
+                      const endDate = new Date(c.end_date);
+                      const today = new Date();
+                      const daysLeft = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+                      return daysLeft > 0 && daysLeft <= 7;
+                    }).length}
+                  </div>
+                  <div className="text-sm text-yellow-600 font-medium">Ending This Week</div>
+                </div>
+                <div className="p-3 bg-yellow-500 rounded-lg">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-3xl font-bold text-purple-700">{competitions.filter(c => c.status === 'completed').length}</div>
+                  <div className="text-sm text-purple-600 font-medium">Completed</div>
+                </div>
+                <div className="p-3 bg-purple-500 rounded-lg">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Live Competition Leaderboard */}
+          {competitions.filter(c => c.status === 'active').length > 0 && (
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-red-50 to-red-100">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                    <span>Live Competition Rankings</span>
+                  </h4>
+                  <div className="text-sm text-gray-600">Real-time updates</div>
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {competitions.filter(c => c.status === 'active').slice(0, 2).map((competition, index) => (
+                    <div key={competition.id} className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h5 className="font-semibold text-gray-900">{competition.name}</h5>
+                        <span className="text-sm text-gray-600">
+                          {Math.ceil((new Date(competition.end_date) - new Date()) / (1000 * 60 * 60 * 24))} days left
+                        </span>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        {leaderboardData.slice(0, 5).map((rep, repIndex) => (
+                          <div key={rep.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div className="flex items-center space-x-3">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                                repIndex === 0 ? 'bg-yellow-500 text-white' :
+                                repIndex === 1 ? 'bg-gray-400 text-white' :
+                                repIndex === 2 ? 'bg-orange-600 text-white' :
+                                'bg-gray-200 text-gray-700'
+                              }`}>
+                                {repIndex + 1}
+                              </div>
+                              <img src={rep.picture} alt={rep.name} className="w-8 h-8 rounded-full" />
+                              <div>
+                                <div className="font-medium text-gray-900">{rep.name}</div>
+                                <div className="text-xs text-gray-500">{rep.territory}</div>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="font-semibold text-gray-900">
+                                {competition.competition_type === 'signups' ? 
+                                  rep.metrics.monthly_signups : 
+                                  `$${rep.metrics.monthly_revenue.toLocaleString()}`
+                                }
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {competition.competition_type === 'signups' ? 'signups' : 'revenue'}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Enhanced Competition Cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {competitions.map((competition) => (
-              <div key={competition.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-lg font-semibold text-gray-900">{competition.name}</h4>
-                  <span className="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-medium">
-                    {competition.status}
-                  </span>
+              <div key={competition.id} className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                <div className={`px-6 py-4 ${
+                  competition.status === 'active' ? 'bg-gradient-to-r from-green-50 to-green-100 border-b border-green-200' :
+                  competition.status === 'completed' ? 'bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200' :
+                  'bg-gradient-to-r from-blue-50 to-blue-100 border-b border-blue-200'
+                }`}>
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+                      <span>{competition.name}</span>
+                      {competition.status === 'active' && (
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      )}
+                    </h4>
+                    <div className="flex items-center space-x-2">
+                      <span className={`px-3 py-1 text-xs rounded-full font-medium ${
+                        competition.status === 'active' ? 'bg-green-100 text-green-800' :
+                        competition.status === 'completed' ? 'bg-gray-100 text-gray-800' :
+                        'bg-blue-100 text-blue-800'
+                      }`}>
+                        {competition.status}
+                      </span>
+                      {(user?.role === 'super_admin' || user?.role === 'sales_manager') && (
+                        <button className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
                 
-                <p className="text-gray-600 mb-4">{competition.description}</p>
-                
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Type:</span>
-                    <span className="font-medium">{competition.competition_type}</span>
+                <div className="p-6">
+                  <p className="text-gray-600 mb-6">{competition.description}</p>
+                  
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="text-sm text-gray-600 mb-1">Competition Type</div>
+                      <div className="font-semibold text-gray-900 capitalize">{competition.competition_type}</div>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="text-sm text-gray-600 mb-1">Participants</div>
+                      <div className="font-semibold text-gray-900">{competition.participants.length} reps</div>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="text-sm text-gray-600 mb-1">Current Leader</div>
+                      <div className="font-semibold text-gray-900">{competition.leader}</div>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="text-sm text-gray-600 mb-1">Leading Score</div>
+                      <div className="font-semibold text-gray-900">{competition.leader_score.toLocaleString()}</div>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Current Leader:</span>
-                    <span className="font-medium">{competition.leader}</span>
+
+                  <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg p-4 border border-yellow-200 mb-4">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                      </svg>
+                      <span className="font-semibold text-yellow-800">Prize</span>
+                    </div>
+                    <div className="text-yellow-700">{competition.prize_description}</div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Leading Score:</span>
-                    <span className="font-medium">{competition.leader_score.toLocaleString()}</span>
+
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="text-gray-600">
+                      Started: {new Date(competition.start_date).toLocaleDateString()}
+                    </div>
+                    <div className={`font-medium ${
+                      new Date(competition.end_date) > new Date() ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      Ends: {new Date(competition.end_date).toLocaleDateString()}
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Participants:</span>
-                    <span className="font-medium">{competition.participants.length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Prize:</span>
-                    <span className="font-medium text-red-600">{competition.prize_description}</span>
-                  </div>
-                </div>
-                
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <div className="text-xs text-gray-500">
-                    Ends: {new Date(competition.end_date).toLocaleDateString()}
-                  </div>
+
+                  {competition.status === 'active' && (
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <div className="flex items-center justify-between">
+                        <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm">
+                          View Full Leaderboard
+                        </button>
+                        <div className="text-sm text-gray-600">
+                          {Math.ceil((new Date(competition.end_date) - new Date()) / (1000 * 60 * 60 * 24))} days remaining
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Tournament Bracket View (if in tournament mode) */}
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-purple-100">
+              <h4 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+                <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                </svg>
+                <span>Tournament Bracket Preview</span>
+              </h4>
+            </div>
+            <div className="p-6">
+              <div className="text-center text-gray-600">
+                <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                </svg>
+                <p className="text-lg font-medium">Tournament Mode Coming Soon</p>
+                <p className="text-sm">Create bracket-style competitions with elimination rounds</p>
+              </div>
+            </div>
           </div>
         </div>
       )}
