@@ -3766,6 +3766,9 @@ class RoofHRTester:
         self.test_hr_project_assignment_system()
         self.test_hr_employee_management_extended()
         
+        # Automated Signup Sync System tests
+        self.test_automated_signup_sync_system()
+        
         return self.test_results
 
     def print_summary(self):
