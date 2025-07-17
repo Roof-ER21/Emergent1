@@ -1452,9 +1452,9 @@ const SalesLeaderboardApp = () => {
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-green-600">Goal: ${currentUser.goals.monthly_revenue_goal.toLocaleString()}</span>
+                  <span className="text-green-600">Goal: ${(currentUser.goals?.monthly_revenue_goal || 0).toLocaleString()}</span>
                   <span className="text-green-800 font-medium">
-                    {Math.round((currentUser.metrics.monthly_revenue / currentUser.goals.monthly_revenue_goal) * 100)}%
+                    {Math.round(((currentUser.metrics?.monthly_revenue || 0) / (currentUser.goals?.monthly_revenue_goal || 1)) * 100)}%
                   </span>
                 </div>
                 <div className="relative">
