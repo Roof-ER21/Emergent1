@@ -3326,6 +3326,7 @@ class RoofHRTester:
         self.test_google_sheets_sales_rep_import()
         self.test_google_sheets_error_handling()
         self.test_google_sheets_role_based_access()
+        self.test_google_sheets_integration_with_real_credentials()
         
         # HR Modules comprehensive tests
         self.test_hr_modules_comprehensive()
