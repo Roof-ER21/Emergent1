@@ -3161,6 +3161,45 @@ const HRRecruitmentApp = () => {
     }
   };
 
+  // Send compliance reminder
+  const handleSendComplianceReminder = async (employeeId) => {
+    try {
+      await axios.post(`${API}/compliance/send-reminder`, { employee_id: employeeId });
+      console.log('Compliance reminder sent successfully');
+    } catch (error) {
+      console.error('Error sending compliance reminder:', error);
+    }
+  };
+
+  // Send bulk compliance reminder
+  const handleBulkComplianceReminder = async () => {
+    try {
+      const pendingEmployees = employees.filter(emp => emp.employee_type === '1099' && !emp.workers_comp_submitted);
+      const promises = pendingEmployees.map(emp => handleSendComplianceReminder(emp.id));
+      await Promise.all(promises);
+      console.log('Bulk compliance reminders sent successfully');
+    } catch (error) {
+      console.error('Error sending bulk compliance reminders:', error);
+    }
+  };
+
+  // Export compliance report
+  const handleExportComplianceReport = async () => {
+    try {
+      const response = await axios.get(`${API}/compliance/export-report`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `compliance-report-${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error exporting compliance report:', error);
+    }
+  };
+
   // Get employee onboarding progress
   const getOnboardingProgress = async (employeeId) => {
     try {
