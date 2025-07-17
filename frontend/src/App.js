@@ -456,15 +456,15 @@ const AppHub = () => {
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-card">
+      <footer className="border-t border-gray-700 bg-gray-800">
         <div className="mobile-container py-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-4 mb-4 md:mb-0">
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-gray-400">
                 © 2025 Roof HR Hub. All rights reserved.
               </div>
             </div>
-            <div className="flex items-center space-x-6 text-sm text-muted-foreground">
+            <div className="flex items-center space-x-6 text-sm text-gray-400">
               <span>Integrity • Quality • Simplicity</span>
             </div>
           </div>
