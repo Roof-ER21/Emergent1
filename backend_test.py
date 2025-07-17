@@ -3340,6 +3340,14 @@ class RoofHRTester:
         self.test_leaderboard_role_based_access()
         self.test_leaderboard_goal_assignment_restrictions()
         
+        # HR Module comprehensive tests
+        self.test_hr_onboarding_system()
+        self.test_hr_pto_management()
+        self.test_hr_compliance_system()
+        self.test_hr_hiring_flow_system()
+        self.test_hr_project_assignment_system()
+        self.test_hr_employee_management_extended()
+        
         return self.test_results
 
     def print_summary(self):
