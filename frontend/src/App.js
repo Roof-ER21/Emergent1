@@ -1465,7 +1465,7 @@ const SalesLeaderboardApp = () => {
                     ></div>
                   </div>
                   <div className="text-xs text-green-600 mt-1">
-                    Yearly: ${currentUser.metrics.yearly_revenue.toLocaleString()} / ${currentUser.goals.yearly_revenue_goal.toLocaleString()}
+                    Yearly: ${(currentUser.metrics?.yearly_revenue || 0).toLocaleString()} / ${(currentUser.goals?.yearly_revenue_goal || 0).toLocaleString()}
                   </div>
                 </div>
               </div>
