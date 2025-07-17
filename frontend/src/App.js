@@ -4444,70 +4444,158 @@ const QRGeneratorApp = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Tab Navigation */}
-      <div className="bg-gray-800 rounded-lg shadow-lg border border-gray-700">
-        <div className="border-b border-gray-700">
-          <nav className="flex space-x-8 px-6">
-            <button
-              onClick={() => setActiveTab('overview')}
-              className={`py-4 px-2 border-b-2 font-medium text-sm flex items-center gap-2 ${
-                activeTab === 'overview'
-                  ? 'border-red-500 text-red-400'
-                  : 'border-transparent text-gray-400 hover:text-gray-300'
-              }`}
+    <div className="min-h-screen bg-gray-900">
+      {/* Enhanced Header */}
+      <motion.div 
+        className="roof-er-gradient border-b border-red-800/20 shadow-lg"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="mobile-container">
+          <div className="flex justify-between items-center py-6">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-              {isAdmin ? 'Rep Overview' : 'Overview'}
-            </button>
-            {isAdmin && (
-              <button
-                onClick={() => setActiveTab('leads')}
-                className={`py-4 px-2 border-b-2 font-medium text-sm flex items-center gap-2 ${
-                  activeTab === 'leads'
-                    ? 'border-red-500 text-red-400'
-                    : 'border-transparent text-gray-400 hover:text-gray-300'
-                }`}
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
+                  <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-white">QR Code Generator</h2>
+                  <p className="text-white/70 text-sm">Personalized landing pages & lead capture</p>
+                </div>
+              </div>
+            </motion.div>
+            <motion.div 
+              className="flex items-center space-x-4"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              {isAdmin && (
+                <div className="flex items-center space-x-2 px-3 py-2 bg-white/10 rounded-lg">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                  </svg>
+                  <span className="text-white text-sm font-medium">Admin View</span>
+                </div>
+              )}
+              {user?.role === 'sales_rep' && (
+                <div className="flex items-center space-x-2 px-3 py-2 bg-blue-500/20 rounded-lg">
+                  <svg className="w-5 h-5 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  <span className="text-blue-300 text-sm font-medium">Sales Rep</span>
+                </div>
+              )}
+            </motion.div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Content Area */}
+      <div className="mobile-container py-8">
+        <div className="space-y-8">
+          {/* Enhanced Tab Navigation */}
+          <motion.div 
+            className="bg-gray-800 border border-gray-700 rounded-lg shadow-lg"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <div className="border-b border-gray-700">
+              <nav className="flex space-x-1 px-6 py-4">
+                {[
+                  { 
+                    id: 'overview', 
+                    name: isAdmin ? 'Rep Overview' : 'Overview', 
+                    icon: (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
+                    )
+                  },
+                  ...(isAdmin ? [{
+                    id: 'leads',
+                    name: 'Lead Management',
+                    icon: (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                      </svg>
+                    )
+                  }] : []),
+                  ...(user?.role === 'sales_rep' ? [{
+                    id: 'mypage',
+                    name: 'My Landing Page',
+                    icon: (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    )
+                  }] : [])
+                ].map((tab, index) => (
+                  <motion.button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center space-x-2 px-4 py-3 rounded-lg font-medium text-sm transition-all duration-200 whitespace-nowrap ${
+                      activeTab === tab.id
+                        ? 'bg-red-600 text-white shadow-lg'
+                        : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                    }`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: 0.4 + index * 0.05 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {tab.icon}
+                    <span>{tab.name}</span>
+                  </motion.button>
+                ))}
+              </nav>
+            </div>
+          </motion.div>
+
+          {/* Tab Content with Animation */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {activeTab === 'overview' && <OverviewTab />}
+              {activeTab === 'leads' && <LeadsTab />}
+              {activeTab === 'mypage' && <MyPageTab />}
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Rep Landing Page Preview Modal */}
+          <AnimatePresence>
+            {selectedRep && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
-                </svg>
-                Lead Management
-              </button>
+                <RepLandingPage 
+                  rep={selectedRep} 
+                  onClose={() => setSelectedRep(null)} 
+                />
+              </motion.div>
             )}
-            {user?.role === 'sales_rep' && (
-              <button
-                onClick={() => setActiveTab('mypage')}
-                className={`py-4 px-2 border-b-2 font-medium text-sm flex items-center gap-2 ${
-                  activeTab === 'mypage'
-                    ? 'border-red-500 text-red-400'
-                    : 'border-transparent text-gray-400 hover:text-gray-300'
-                }`}
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                My Landing Page
-              </button>
-            )}
-          </nav>
+          </AnimatePresence>
         </div>
       </div>
-
-      {/* Tab Content */}
-      {activeTab === 'overview' && <OverviewTab />}
-      {activeTab === 'leads' && <LeadsTab />}
-      {activeTab === 'mypage' && <MyPageTab />}
-
-      {/* Rep Landing Page Preview Modal */}
-      {selectedRep && (
-        <RepLandingPage 
-          rep={selectedRep} 
-          onClose={() => setSelectedRep(null)} 
-        />
-      )}
+    </div>
+  );
     </div>
   );
 };
