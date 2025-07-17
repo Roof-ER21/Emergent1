@@ -1734,8 +1734,12 @@ const SalesLeaderboardApp = () => {
                           <div className="text-sm text-gray-500">Rate: {rep.metrics.conversion_rate}%</div>
                         </td>
                         <td className="py-4 px-4">
-                          <div className="text-lg font-bold text-gray-900">${rep.metrics.monthly_revenue.toLocaleString()}</div>
-                          <div className="text-sm text-gray-500">Avg: ${rep.metrics.avg_deal_size.toLocaleString()}</div>
+                          <div className="text-lg font-bold text-gray-900">
+                            ${(rep.metrics?.monthly_revenue || 0).toLocaleString()}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            Avg: ${(rep.metrics?.avg_deal_size || 0).toLocaleString()}
+                          </div>
                         </td>
                         <td className="py-4 px-4">
                           <div className="w-24">
