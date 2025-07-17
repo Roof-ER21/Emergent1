@@ -1832,7 +1832,7 @@ const SalesLeaderboardApp = () => {
                   
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Monthly Revenue</span>
-                    <span className="font-medium">${member.metrics.monthly_revenue.toLocaleString()}</span>
+                    <span className="font-medium">${(member.metrics?.monthly_revenue || 0).toLocaleString()}</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div 
