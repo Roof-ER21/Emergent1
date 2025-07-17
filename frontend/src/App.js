@@ -2229,36 +2229,224 @@ const SalesLeaderboardApp = () => {
         </div>
       )}
 
-      {/* Admin Tab */}
+      {/* Enhanced Admin Settings Tab */}
       {activeTab === 'admin' && (user?.role === 'super_admin' || user?.role === 'sales_manager') && (
-        <div className="space-y-6">
-          <h3 className="text-xl font-semibold text-gray-900">Admin Settings</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <h4 className="text-lg font-semibold text-gray-900 mb-4">Bonus Tiers Management</h4>
-              <div className="space-y-3">
-                {bonusTiers.map((tier) => (
-                  <div key={tier.tier_number} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div>
-                      <div className="font-medium">{tier.tier_name}</div>
-                      <div className="text-sm text-gray-600">{tier.description}</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-medium">{tier.signup_threshold} signups</div>
-                      <div className="text-sm text-gray-600">Tier {tier.tier_number}</div>
+        <div className="space-y-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900">Advanced Admin Settings</h3>
+              <p className="text-gray-600 mt-1">Automated goal setting, bonus tier management, and system administration</p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span>Auto-Set Goals</span>
+              </button>
+              <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center space-x-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                <span>Performance Analytics</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Automated Goal Setting System */}
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-blue-100">
+              <h4 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span>Smart Goal Assignment System</span>
+              </h4>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 space-y-6">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h5 className="font-semibold text-gray-900 mb-3">Goal Setting Algorithm</h5>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Base Monthly Target</label>
+                          <input type="number" className="w-full px-3 py-2 border border-gray-300 rounded-lg" defaultValue="25" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Performance Multiplier</label>
+                          <select className="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            <option>Historical Performance</option>
+                            <option>Trending Average</option>
+                            <option>Industry Benchmark</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Seasonal Adjustment</label>
+                          <input type="number" className="w-full px-3 py-2 border border-gray-300 rounded-lg" defaultValue="1.2" step="0.1" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Growth Factor</label>
+                          <input type="number" className="w-full px-3 py-2 border border-gray-300 rounded-lg" defaultValue="5" />
+                        </div>
+                      </div>
                     </div>
                   </div>
-                ))}
+
+                  <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                    <div className="flex items-center space-x-2 mb-3">
+                      <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.732 15.5c-.77.833.192 2.5 1.732 2.5z" />
+                      </svg>
+                      <span className="font-semibold text-yellow-800">Goal Assignment Restrictions</span>
+                    </div>
+                    <div className="text-sm text-yellow-700">
+                      <p className="mb-2">• Goals can only be assigned between the 1st-6th of each month</p>
+                      <p className="mb-2">• Current date: {new Date().toLocaleDateString()} - {new Date().getDate() <= 6 ? '✅ Assignment allowed' : '❌ Assignment restricted'}</p>
+                      <p>• Team Leads can only assign goals to their direct reports</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h5 className="font-semibold text-gray-900 mb-3">Quick Actions</h5>
+                    <div className="space-y-2">
+                      <button className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm">
+                        Auto-Generate Goals
+                      </button>
+                      <button className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                        Apply Team Template
+                      </button>
+                      <button className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm">
+                        Bulk Goal Assignment
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h5 className="font-semibold text-gray-900 mb-3">Goal Templates</h5>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>Aggressive Growth:</span>
+                        <span className="font-medium">+20%</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Steady Progress:</span>
+                        <span className="font-medium">+10%</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Maintenance:</span>
+                        <span className="font-medium">+5%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            
+          </div>
+
+          {/* Bonus Tier Automation System */}
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-purple-100">
+              <h4 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+                <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Automated Bonus Tier Management</span>
+              </h4>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="space-y-6">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h5 className="font-semibold text-gray-900 mb-4">Tier Progression Rules</h5>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                        <span className="text-sm font-medium">Auto-advance on threshold</span>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input type="checkbox" className="sr-only peer" defaultChecked />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                        </label>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                        <span className="text-sm font-medium">Monthly tier review</span>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input type="checkbox" className="sr-only peer" defaultChecked />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                        </label>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                        <span className="text-sm font-medium">Notification alerts</span>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input type="checkbox" className="sr-only peer" defaultChecked />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                    <h5 className="font-semibold text-green-800 mb-3">Recent Tier Advancements</h5>
+                    <div className="space-y-2">
+                      {leaderboardData.filter(rep => rep.metrics.monthly_signups >= 25).slice(0, 3).map((rep) => (
+                        <div key={rep.id} className="flex items-center space-x-3 text-sm">
+                          <img src={rep.picture} alt={rep.name} className="w-6 h-6 rounded-full" />
+                          <span className="text-green-700">{rep.name} advanced to {rep.metrics.tier_name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h5 className="font-semibold text-gray-900 mb-4">Bonus Tier Configuration</h5>
+                    <div className="space-y-3">
+                      {bonusTiers.map((tier) => (
+                        <div key={tier.tier_number} className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                          <div className="flex items-center space-x-3">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                              tier.tier_number === 1 ? 'bg-orange-600 text-white' :
+                              tier.tier_number === 2 ? 'bg-gray-400 text-white' :
+                              tier.tier_number === 3 ? 'bg-yellow-500 text-white' :
+                              tier.tier_number === 4 ? 'bg-gray-600 text-white' :
+                              tier.tier_number === 5 ? 'bg-blue-600 text-white' :
+                              'bg-purple-600 text-white'
+                            }`}>
+                              {tier.tier_number}
+                            </div>
+                            <div>
+                              <div className="font-medium text-gray-900">{tier.tier_name}</div>
+                              <div className="text-sm text-gray-600">{tier.signup_threshold}+ signups</div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm font-medium text-gray-900">
+                              {leaderboardData.filter(rep => rep.metrics.current_tier === tier.tier_number).length} reps
+                            </div>
+                            <button className="text-xs text-blue-600 hover:text-blue-800">Edit</button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* System Administration */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
               <h4 className="text-lg font-semibold text-gray-900 mb-4">System Statistics</h4>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Total Team Members</span>
-                  <span className="font-medium">{mockSalesData.length}</span>
+                  <span className="font-medium">{leaderboardData.length}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Active Competitions</span>
@@ -2266,12 +2454,55 @@ const SalesLeaderboardApp = () => {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Total Monthly Signups</span>
-                  <span className="font-medium">{mockSalesData.reduce((sum, rep) => sum + rep.metrics.monthly_signups, 0)}</span>
+                  <span className="font-medium">{leaderboardData.reduce((sum, rep) => sum + rep.metrics.monthly_signups, 0)}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Total Monthly Revenue</span>
-                  <span className="font-medium">${mockSalesData.reduce((sum, rep) => sum + rep.metrics.monthly_revenue, 0).toLocaleString()}</span>
+                  <span className="font-medium">${leaderboardData.reduce((sum, rep) => sum + rep.metrics.monthly_revenue, 0).toLocaleString()}</span>
                 </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Avg Conversion Rate</span>
+                  <span className="font-medium">{Math.round(leaderboardData.reduce((sum, rep) => sum + rep.metrics.conversion_rate, 0) / leaderboardData.length)}%</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Performance Insights</h4>
+              <div className="space-y-4">
+                <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                  <div className="text-sm font-medium text-blue-800 mb-1">Top Performer</div>
+                  <div className="text-blue-700">{leaderboardData[0]?.name}</div>
+                  <div className="text-xs text-blue-600">{leaderboardData[0]?.metrics.monthly_signups} signups</div>
+                </div>
+                <div className="bg-green-50 rounded-lg p-3 border border-green-200">
+                  <div className="text-sm font-medium text-green-800 mb-1">Fastest Growing</div>
+                  <div className="text-green-700">{leaderboardData.find(rep => rep.trend === 'up')?.name}</div>
+                  <div className="text-xs text-green-600">+{Math.round(Math.random() * 15 + 5)}% growth</div>
+                </div>
+                <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
+                  <div className="text-sm font-medium text-purple-800 mb-1">Elite Tier Reps</div>
+                  <div className="text-purple-700">{leaderboardData.filter(rep => rep.metrics.current_tier >= 5).length} members</div>
+                  <div className="text-xs text-purple-600">Top performance tier</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h4>
+              <div className="space-y-3">
+                <button className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm">
+                  Generate Monthly Report
+                </button>
+                <button className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                  Backup System Data
+                </button>
+                <button className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm">
+                  Send Team Notifications
+                </button>
+                <button className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm">
+                  Configure Alerts
+                </button>
               </div>
             </div>
           </div>
