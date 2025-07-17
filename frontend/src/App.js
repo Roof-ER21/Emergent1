@@ -2626,7 +2626,7 @@ const SalesLeaderboardApp = () => {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Total Monthly Revenue</span>
-                  <span className="font-medium">${leaderboardData.reduce((sum, rep) => sum + rep.metrics.monthly_revenue, 0).toLocaleString()}</span>
+                  <span className="font-medium">${leaderboardData.reduce((sum, rep) => sum + (rep.metrics?.monthly_revenue || 0), 0).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Avg Conversion Rate</span>
