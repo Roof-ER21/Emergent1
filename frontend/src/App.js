@@ -2843,6 +2843,172 @@ const SalesLeaderboardApp = () => {
           </div>
         </div>
       )}
+
+      {/* Signup Data Sync Management */}
+      {activeTab === 'admin' && (user?.role === 'super_admin' || user?.role === 'sales_manager') && (
+        <div className="space-y-8">
+          {/* Signup Data Sync Management */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h4 className="text-lg font-semibold text-gray-900 mb-4">Signup Data Sync Management</h4>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <h5 className="font-medium text-gray-900">Automatic Sync</h5>
+                  <p className="text-sm text-gray-600">Syncs signup data from Google Sheets 3 times daily (8 AM, 2 PM, 8 PM)</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm text-gray-500">Next sync: 8:00 PM</div>
+                  <div className="text-xs text-green-600">Last sync: 2 hours ago</div>
+                </div>
+              </div>
+              
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => handleManualSync()}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  Manual Sync Now
+                </button>
+                <button
+                  onClick={() => setShowSyncStatus(true)}
+                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  View Sync Status
+                </button>
+              </div>
+              
+              <div className="text-sm text-gray-600">
+                <strong>Source:</strong> Google Sheets "Sign Ups 2025" tab<br/>
+                <strong>Spreadsheet ID:</strong> 1YSJD4RoqS_FLWF0LN1GRJKQhQNCdPT_aThqX6R6cZ4I
+              </div>
+            </div>
+          </div>
+
+          {/* Revenue Management */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h4 className="text-lg font-semibold text-gray-900 mb-4">Revenue Management</h4>
+            <p className="text-sm text-gray-600 mb-4">
+              Revenue numbers are updated manually by Admin/Sales Manager. Signup data is automatically synced.
+            </p>
+            
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Sales Rep</label>
+                  <select
+                    value={revenueUpdate.rep_id}
+                    onChange={(e) => setRevenueUpdate({...revenueUpdate, rep_id: e.target.value})}
+                    className="w-full border-gray-300 rounded-md shadow-sm focus:border-red-500 focus:ring-red-500"
+                  >
+                    <option value="">Select Rep</option>
+                    {salesReps.map(rep => (
+                      <option key={rep.id} value={rep.id}>{rep.name}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Month</label>
+                  <select
+                    value={revenueUpdate.month}
+                    onChange={(e) => setRevenueUpdate({...revenueUpdate, month: parseInt(e.target.value)})}
+                    className="w-full border-gray-300 rounded-md shadow-sm focus:border-red-500 focus:ring-red-500"
+                  >
+                    <option value="">Select Month</option>
+                    {Array.from({length: 12}, (_, i) => (
+                      <option key={i + 1} value={i + 1}>
+                        {new Date(2025, i, 1).toLocaleDateString('en-US', { month: 'long' })}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Revenue ($)</label>
+                  <input
+                    type="number"
+                    value={revenueUpdate.revenue}
+                    onChange={(e) => setRevenueUpdate({...revenueUpdate, revenue: parseFloat(e.target.value) || 0})}
+                    className="w-full border-gray-300 rounded-md shadow-sm focus:border-red-500 focus:ring-red-500"
+                    placeholder="Enter revenue amount"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex justify-end">
+                <button
+                  onClick={handleRevenueUpdate}
+                  disabled={!revenueUpdate.rep_id || !revenueUpdate.month || !revenueUpdate.revenue}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                >
+                  Update Revenue
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Sync Status Modal */}
+      {showSyncStatus && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-2/3 shadow-lg rounded-md bg-white">
+            <div className="mt-3">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Sync Status History</h3>
+              
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Sync</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Records</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Error</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {syncStatuses.map((status, index) => (
+                      <tr key={index}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {status.sync_type}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            status.status === 'completed' ? 'bg-green-100 text-green-800' :
+                            status.status === 'failed' ? 'bg-red-100 text-red-800' :
+                            'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {status.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {status.last_sync ? new Date(status.last_sync).toLocaleString() : 'N/A'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {status.records_processed || 0}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600">
+                          {status.error_message || 'None'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              <div className="flex justify-end mt-4">
+                <button
+                  onClick={() => setShowSyncStatus(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
