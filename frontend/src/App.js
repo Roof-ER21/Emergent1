@@ -342,12 +342,12 @@ const AppHub = () => {
       </div>
 
       {/* Applications Grid */}
-      <div className="mobile-container py-16">
+      <div className="mobile-container py-16 bg-gray-900">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {apps.map((app, index) => (
             <motion.div
               key={app.id}
-              className="card card-hover group cursor-pointer"
+              className="bg-gray-800 border border-gray-700 rounded-lg shadow-lg group cursor-pointer hover:border-red-500 transition-all duration-300"
               onClick={() => setSelectedApp(app.id)}
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
@@ -363,10 +363,10 @@ const AppHub = () => {
               }}
               whileTap={{ scale: 0.95 }}
             >
-              <div className="card-body">
+              <div className="p-8">
                 <div className="flex items-center justify-between mb-6">
                   <motion.div 
-                    className={`text-4xl p-4 rounded-xl ${app.color === 'primary' ? 'bg-primary-50' : 'bg-secondary-50'}`}
+                    className={`text-4xl p-4 rounded-xl ${app.color === 'primary' ? 'bg-red-500/10 border border-red-500/20' : 'bg-gray-700 border border-gray-600'}`}
                     whileHover={{ 
                       scale: 1.2,
                       rotate: 10,
@@ -376,7 +376,7 @@ const AppHub = () => {
                     {app.icon}
                   </motion.div>
                   <motion.div 
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${app.color === 'primary' ? 'bg-primary-100 text-primary-800' : 'bg-secondary-100 text-secondary-800'}`}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${app.color === 'primary' ? 'bg-red-500/20 text-red-300 border border-red-500/30' : 'bg-gray-700 text-gray-300 border border-gray-600'}`}
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: index * 0.1 + 0.3 }}
@@ -386,7 +386,7 @@ const AppHub = () => {
                 </div>
                 
                 <motion.h3 
-                  className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors duration-200"
+                  className="text-xl font-bold text-white mb-3 group-hover:text-red-400 transition-colors duration-200"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: index * 0.1 + 0.2 }}
@@ -395,7 +395,7 @@ const AppHub = () => {
                 </motion.h3>
                 
                 <motion.p 
-                  className="text-muted-foreground mb-6 line-clamp-2"
+                  className="text-gray-300 mb-6"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: index * 0.1 + 0.3 }}
@@ -412,24 +412,24 @@ const AppHub = () => {
                   {app.features.slice(0, 3).map((feature, i) => (
                     <motion.div 
                       key={i} 
-                      className="flex items-center space-x-2 text-sm text-muted-foreground"
+                      className="flex items-center space-x-2 text-sm text-gray-400"
                       initial={{ x: -20, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
                       transition={{ delay: index * 0.1 + 0.5 + i * 0.05 }}
                     >
-                      <svg className="w-4 h-4 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-4 h-4 text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
-                      <span>{feature}</span>
+                      <span className="text-gray-300">{feature}</span>
                     </motion.div>
                   ))}
                 </motion.div>
                 
                 <motion.button 
-                  className="btn-primary w-full flex items-center justify-center"
+                  className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center group-hover:scale-105"
                   whileHover={{ 
                     scale: 1.02,
-                    backgroundColor: "var(--primary-800)",
+                    backgroundColor: "#991b1b",
                     transition: { duration: 0.2 }
                   }}
                   whileTap={{ scale: 0.98 }}
