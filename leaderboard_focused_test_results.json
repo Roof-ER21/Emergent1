@@ -1,0 +1,106 @@
+{
+  "automated_goal_setting": {
+    "sample_data_init": {
+      "success": true,
+      "message": "Sample data initialized successfully",
+      "response_data": null,
+      "timestamp": "2025-07-17T04:41:45.529259"
+    },
+    "create_goal_endpoint": {
+      "success": true,
+      "message": "Goal created successfully with ID: 75b62dd4-a1f5-477a-aa93-61d9ba66cf12",
+      "response_data": null,
+      "timestamp": "2025-07-17T04:41:45.555009"
+    },
+    "update_goal_endpoint": {
+      "success": false,
+      "message": "Failed to update goal: No response",
+      "response_data": null,
+      "timestamp": "2025-07-17T04:41:45.574823"
+    },
+    "delete_goal_endpoint": {
+      "success": false,
+      "message": "Failed to delete goal: No response",
+      "response_data": null,
+      "timestamp": "2025-07-17T04:41:45.595185"
+    },
+    "bulk_goal_assignment": {
+      "success": true,
+      "message": "Successfully created 2 goals in bulk",
+      "response_data": null,
+      "timestamp": "2025-07-17T04:41:45.638156"
+    }
+  },
+  "bonus_tier_automation": {
+    "get_bonus_tiers": {
+      "success": false,
+      "message": "Tier thresholds incorrect: [15, 25, 35, 50, 75, 100, 5, 5]",
+      "response_data": null,
+      "timestamp": "2025-07-17T04:41:45.658419"
+    },
+    "create_bonus_tier": {
+      "success": true,
+      "message": "Bonus tier created successfully: Platinum Elite",
+      "response_data": null,
+      "timestamp": "2025-07-17T04:41:45.680519"
+    },
+    "tier_calculation_logic": {
+      "success": true,
+      "message": "Tier calculation logic working correctly",
+      "response_data": null,
+      "timestamp": "2025-07-17T04:41:48.212543"
+    },
+    "automatic_tier_advancement": {
+      "success": true,
+      "message": "Automatic tier advancement working",
+      "response_data": null,
+      "timestamp": "2025-07-17T04:41:48.232977"
+    }
+  },
+  "role_based_access": {
+    "super_admin_goal_access": {
+      "success": true,
+      "message": "super_admin can set goals correctly",
+      "response_data": null,
+      "timestamp": "2025-07-17T04:41:48.252992"
+    },
+    "sales_manager_goal_access": {
+      "success": true,
+      "message": "sales_manager can set goals correctly",
+      "response_data": null,
+      "timestamp": "2025-07-17T04:41:48.270777"
+    },
+    "team_lead_goal_access": {
+      "success": true,
+      "message": "team_lead can set goals correctly",
+      "response_data": null,
+      "timestamp": "2025-07-17T04:41:48.289693"
+    },
+    "sales_rep_goal_access_denied": {
+      "success": false,
+      "message": "sales_rep should be denied but got: 200",
+      "response_data": null,
+      "timestamp": "2025-07-17T04:41:48.306381"
+    }
+  },
+  "data_integration": {
+    "goal_rep_linkage": {
+      "success": true,
+      "message": "All 9 goals properly linked to sales reps",
+      "response_data": null,
+      "timestamp": "2025-07-17T04:41:48.327929"
+    },
+    "signup_tier_integration": {
+      "success": true,
+      "message": "All 92 signups have proper structure for tier calculation",
+      "response_data": null,
+      "timestamp": "2025-07-17T04:41:48.349762"
+    },
+    "sample_tier_structure": {
+      "success": false,
+      "message": "Tier structure incorrect: [(1, 5), (1, 5), (1, 15), (2, 25), (3, 35), (4, 50), (5, 75), (6, 100), (7, 50)]",
+      "response_data": null,
+      "timestamp": "2025-07-17T04:41:48.369433"
+    }
+  }
+}
