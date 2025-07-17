@@ -3420,7 +3420,7 @@ const HRRecruitmentApp = () => {
               <motion.button
                 onClick={() => setImportModalOpen(true)}
                 disabled={importing}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-all duration-200 disabled:opacity-50 flex items-center space-x-2"
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-all duration-200 disabled:opacity-50 flex items-center space-x-2"
                 whileHover={{ scale: importing ? 1 : 1.05 }}
                 whileTap={{ scale: importing ? 1 : 0.95 }}
               >
