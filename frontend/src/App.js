@@ -374,38 +374,45 @@ const SalesLeaderboardApp = () => {
   // API Functions
   const fetchCompetitions = async () => {
     try {
+      console.log('🔄 Fetching competitions from:', `${API}/leaderboard/competitions`);
       const response = await axios.get(`${API}/leaderboard/competitions`);
       console.log('🏁 Competitions data:', response.data);
       setCompetitions(response.data);
     } catch (error) {
-      console.error('Error fetching competitions:', error);
+      console.error('❌ Error fetching competitions:', error.response?.status, error.response?.data || error.message);
     }
   };
 
   const fetchGoals = async () => {
     try {
+      console.log('🔄 Fetching goals from:', `${API}/leaderboard/goals`);
       const response = await axios.get(`${API}/leaderboard/goals`);
+      console.log('🎯 Goals data:', response.data);
       setGoals(response.data);
     } catch (error) {
-      console.error('Error fetching goals:', error);
+      console.error('❌ Error fetching goals:', error.response?.status, error.response?.data || error.message);
     }
   };
 
   const fetchSignups = async () => {
     try {
+      console.log('🔄 Fetching signups from:', `${API}/leaderboard/signups`);
       const response = await axios.get(`${API}/leaderboard/signups`);
+      console.log('📝 Signups data:', response.data);
       setSignups(response.data);
     } catch (error) {
-      console.error('Error fetching signups:', error);
+      console.error('❌ Error fetching signups:', error.response?.status, error.response?.data || error.message);
     }
   };
 
   const fetchMetrics = async () => {
     try {
+      console.log('🔄 Fetching metrics from:', `${API}/leaderboard/metrics`);
       const response = await axios.get(`${API}/leaderboard/metrics`);
+      console.log('📊 Metrics data:', response.data);
       setMetrics(response.data);
     } catch (error) {
-      console.error('Error fetching metrics:', error);
+      console.error('❌ Error fetching metrics:', error.response?.status, error.response?.data || error.message);
     }
   };
 
