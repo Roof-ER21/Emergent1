@@ -2708,44 +2708,49 @@ const HRRecruitmentApp = () => {
                                 <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
                                   {employee.role}
                                 </span>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                  employee.employee_type === 'w2' ? 'bg-green-500/20 text-green-300 border border-green-500/30' : 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
+                                }`}>
+                                  {employee.employee_type?.toUpperCase() || 'W2'}
+                                </span>
                               </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            employee.employee_type === 'w2' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                          }`}>
-                            {employee.employee_type?.toUpperCase() || 'W2'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {employee.territory || 'N/A'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            employee.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                          }`}>
-                            {employee.is_active ? 'Active' : 'Inactive'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <button
-                            onClick={() => {
-                              setSelectedEmployee(employee);
-                              getOnboardingProgress(employee.id);
-                            }}
-                            className="text-red-600 hover:text-red-900 mr-3"
-                          >
-                            View Onboarding
-                          </button>
-                          {employee.employee_type === '1099' && (
-                            <button
-                              onClick={() => handleWorkersCompSubmission(employee.id)}
-                              className="text-blue-600 hover:text-blue-900"
-                            >
-                              Submit Workers Comp
-                            </button>
-                          )}
-                        </td>
-                      </tr>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                {employee.territory || 'N/A'}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                  employee.is_active ? 'bg-green-500/20 text-green-300 border border-green-500/30' : 'bg-red-500/20 text-red-300 border border-red-500/30'
+                                }`}>
+                                  {employee.is_active ? 'Active' : 'Inactive'}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div className="flex space-x-2">
+                                  <motion.button
+                                    onClick={() => {
+                                      setSelectedEmployee(employee);
+                                      getOnboardingProgress(employee.id);
+                                    }}
+                                    className="text-red-400 hover:text-red-300 px-3 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-all duration-200"
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                  >
+                                    View Onboarding
+                                  </motion.button>
+                                  {employee.employee_type === '1099' && (
+                                    <motion.button
+                                      onClick={() => handleWorkersCompSubmission(employee.id)}
+                                      className="text-blue-400 hover:text-blue-300 px-3 py-1 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 transition-all duration-200"
+                                      whileHover={{ scale: 1.05 }}
+                                      whileTap={{ scale: 0.95 }}
+                                    >
+                                      Submit Workers Comp
+                                    </motion.button>
+                                  )}
+                                </div>
+                              </td>
+                            </motion.tr>
                     ))}
                   </tbody>
                 </table>
