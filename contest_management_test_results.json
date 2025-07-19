@@ -1,0 +1,78 @@
+{
+  "contest_api_endpoints": {
+    "list_competitions": {
+      "success": true,
+      "message": "Retrieved 8 competitions successfully",
+      "response_data": null,
+      "timestamp": "2025-07-19T20:06:44.994780"
+    },
+    "create_competition": {
+      "success": false,
+      "message": "Failed to create competition: No response",
+      "response_data": null,
+      "timestamp": "2025-07-19T20:06:45.018867"
+    }
+  },
+  "enhanced_competition_management": {
+    "enhanced_data_model": {
+      "success": false,
+      "message": "Failed to test enhanced data model: No response",
+      "response_data": null,
+      "timestamp": "2025-07-19T20:06:45.079246"
+    },
+    "contest_status_logic": {
+      "success": false,
+      "message": "Contest status logic not properly implemented",
+      "response_data": null,
+      "timestamp": "2025-07-19T20:06:45.108638"
+    }
+  },
+  "real_time_contest_updates": {
+    "websocket_endpoint": {
+      "success": false,
+      "message": "WebSocket library not available for testing",
+      "response_data": null,
+      "timestamp": "2025-07-19T20:06:45.109060"
+    },
+    "contest_creation_broadcast": {
+      "success": false,
+      "message": "Contest creation failed, cannot test WebSocket broadcast",
+      "response_data": null,
+      "timestamp": "2025-07-19T20:06:45.145401"
+    }
+  },
+  "rbac_integration": {
+    "super_admin_create_permission": {
+      "success": false,
+      "message": "super_admin cannot create contests: No response",
+      "response_data": null,
+      "timestamp": "2025-07-19T20:06:45.165987"
+    },
+    "sales_manager_create_permission": {
+      "success": false,
+      "message": "sales_manager cannot create contests: No response",
+      "response_data": null,
+      "timestamp": "2025-07-19T20:06:45.190360"
+    },
+    "sales_rep_create_denied": {
+      "success": false,
+      "message": "Unexpected response for sales_rep: No response",
+      "response_data": null,
+      "timestamp": "2025-07-19T20:06:45.209858"
+    }
+  },
+  "contest_timeline_status": {
+    "timeline_fields": {
+      "success": true,
+      "message": "Competitions have required timeline fields",
+      "response_data": null,
+      "timestamp": "2025-07-19T20:06:45.229582"
+    },
+    "date_based_status": {
+      "success": true,
+      "message": "Date-based status calculation appears to be working",
+      "response_data": null,
+      "timestamp": "2025-07-19T20:06:45.229642"
+    }
+  }
+}
