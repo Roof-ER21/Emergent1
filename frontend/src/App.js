@@ -451,7 +451,7 @@ const AppHub = () => {
       icon: '👥',
       color: 'secondary',
       features: ['Candidate Management', 'Interview Scheduling', 'Onboarding Flows', 'Compliance Tracking'],
-      roles: ['super_admin', 'hr_manager', 'employee'] // HR-focused roles + employees for PTO
+      roles: ['super_admin', 'hr_manager', 'sales_manager', 'team_lead', 'sales_rep', 'employee'] // All roles can access
     },
     {
       id: 'qr-generator',
@@ -460,7 +460,7 @@ const AppHub = () => {
       icon: '📱',
       color: 'primary',
       features: ['Custom QR Codes', 'Landing Pages', 'Lead Capture', 'Analytics Dashboard'],
-      roles: ['super_admin', 'sales_manager', 'sales_rep'] // Sales-focused roles only
+      roles: ['super_admin', 'sales_manager', 'sales_rep'] // Simplified - only these roles need QR access
     }
   ];
 
