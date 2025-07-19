@@ -4201,37 +4201,37 @@ const HRRecruitmentApp = () => {
             )}
 
             {activeTab === 'onboarding' && (
-          <div>
+          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 rounded-lg">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Onboarding Management</h3>
+              <h3 className="text-lg font-semibold text-indigo-900">Onboarding Management</h3>
               <button
                 onClick={() => setSelectedEmployee(null)}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
               >
                 Create New Stage
               </button>
             </div>
             
             {/* Create New Stage Form */}
-            <div className="bg-gray-50 p-6 rounded-lg mb-6">
-              <h4 className="text-md font-medium text-gray-900 mb-4">Create Onboarding Stage</h4>
+            <div className="bg-white/80 backdrop-blur-sm p-6 rounded-lg mb-6 border border-indigo-200">
+              <h4 className="text-md font-medium text-indigo-900 mb-4">Create Onboarding Stage</h4>
               <form onSubmit={handleCreateOnboardingStage} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Stage Name</label>
+                  <label className="block text-sm font-medium text-indigo-700 mb-1">Stage Name</label>
                   <input
                     type="text"
                     value={newStage.name}
                     onChange={(e) => setNewStage({...newStage, name: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    className="w-full px-3 py-2 border border-indigo-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white/90"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Employee Type</label>
+                  <label className="block text-sm font-medium text-indigo-700 mb-1">Employee Type</label>
                   <select
                     value={newStage.employee_type}
                     onChange={(e) => setNewStage({...newStage, employee_type: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    className="w-full px-3 py-2 border border-indigo-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white/90"
                   >
                     <option value="all">All Employees</option>
                     <option value="w2">W2 Only</option>
@@ -4239,22 +4239,22 @@ const HRRecruitmentApp = () => {
                   </select>
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <label className="block text-sm font-medium text-indigo-700 mb-1">Description</label>
                   <textarea
                     value={newStage.description}
                     onChange={(e) => setNewStage({...newStage, description: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    className="w-full px-3 py-2 border border-indigo-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white/90"
                     rows="3"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Order</label>
+                  <label className="block text-sm font-medium text-indigo-700 mb-1">Order</label>
                   <input
                     type="number"
                     value={newStage.order}
                     onChange={(e) => setNewStage({...newStage, order: parseInt(e.target.value)})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    className="w-full px-3 py-2 border border-indigo-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white/90"
                     min="1"
                     required
                   />
@@ -4262,7 +4262,7 @@ const HRRecruitmentApp = () => {
                 <div className="flex items-end">
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
                   >
                     Create Stage
                   </button>
@@ -4272,16 +4272,16 @@ const HRRecruitmentApp = () => {
             
             {/* Onboarding Stages */}
             <div className="space-y-4">
-              <h4 className="text-md font-medium text-gray-900">Onboarding Stages</h4>
+              <h4 className="text-md font-medium text-indigo-900">Onboarding Stages</h4>
               {onboardingStages.map((stage) => (
-                <div key={stage.id} className="border border-gray-200 rounded-lg p-4">
+                <div key={stage.id} className="bg-white/80 backdrop-blur-sm border border-indigo-200 rounded-lg p-4">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h5 className="font-medium text-gray-900">{stage.name}</h5>
-                      <p className="text-sm text-gray-600 mt-1">{stage.description}</p>
+                      <h5 className="font-medium text-indigo-900">{stage.name}</h5>
+                      <p className="text-sm text-indigo-700 mt-1">{stage.description}</p>
                       <div className="flex space-x-4 mt-2">
-                        <span className="text-xs text-gray-500">Order: {stage.order}</span>
-                        <span className="text-xs text-gray-500">Type: {stage.employee_type}</span>
+                        <span className="text-xs text-indigo-600">Order: {stage.order}</span>
+                        <span className="text-xs text-indigo-600">Type: {stage.employee_type}</span>
                       </div>
                     </div>
                     <span className={`px-2 py-1 text-xs rounded-full ${
