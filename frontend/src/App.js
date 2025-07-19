@@ -6017,7 +6017,78 @@ const HRRecruitmentApp = () => {
 
         {activeTab === 'pto' && (
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">PTO Management (W2 Employees)</h3>
+            {/* Workers Comp Section for Sales Reps */}
+            {user?.role === 'sales_rep' && (
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Workers Compensation Information</h3>
+                <p className="text-gray-600 mb-6">Upload your Workers Comp information for the states you work in: VA, MD, PA, NJ, NC</p>
+                
+                {/* Workers Comp Upload by State */}
+                <div className="space-y-6">
+                  {['VA', 'MD', 'PA', 'NJ', 'NC'].map((state) => (
+                    <div key={state} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium text-gray-900">{state} Workers Compensation</h4>
+                        <span className="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
+                          Pending Upload
+                        </span>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Policy Number</label>
+                          <input
+                            type="text"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder={`Enter ${state} policy number`}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Expiration Date</label>
+                          <input
+                            type="date"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="mt-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Upload Certificate</label>
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                          <input
+                            type="file"
+                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                            className="hidden"
+                            id={`workers-comp-${state}`}
+                          />
+                          <label
+                            htmlFor={`workers-comp-${state}`}
+                            className="cursor-pointer flex flex-col items-center"
+                          >
+                            <svg className="w-8 h-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                            <span className="text-sm text-gray-600">Upload {state} Workers Comp Certificate</span>
+                            <span className="text-xs text-gray-500 mt-1">PDF, DOC, or Image files</span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="mt-6 flex justify-end">
+                  <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    Save Workers Comp Information
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Regular PTO Section for Non-Sales Reps */}
+            {user?.role !== 'sales_rep' && (
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">PTO Management (W2 Employees)</h3>
             
             {user?.role === 'employee' && (
               <div className="bg-blue-50 p-6 rounded-lg mb-6">
