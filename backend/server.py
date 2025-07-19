@@ -2418,7 +2418,7 @@ async def delete_hiring_flow(flow_id: str, current_user: User = Depends(get_curr
 @api_router.get("/hiring/candidates", response_model=List[HiringCandidate])
 async def get_hiring_candidates(current_user: User = Depends(get_current_user)):
     """Get all hiring candidates"""
-    if current_user.role not in ["super_admin", "hr_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     candidates = await db.hiring_candidates.find().to_list(1000)
