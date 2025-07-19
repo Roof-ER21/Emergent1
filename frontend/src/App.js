@@ -3539,7 +3539,93 @@ const HRRecruitmentApp = () => {
     employee_type: 'all',
     order: 1
   });
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  // Real-Time Sync State
+  const [syncStatus, setSyncStatus] = useState({
+    isConnected: false,
+    lastSync: null,
+    isSyncing: false,
+    syncMessage: '',
+    connectionStatus: 'disconnected'
+  });
+
+  // Initialize WebSocket connection on app start
+  useEffect(() => {
+    // Connect WebSocket for real-time updates
+    wsManager.connect();
+
+    // Listen for connection status changes
+    wsManager.addListener('connection', (data) => {
+      setSyncStatus(prev => ({
+        ...prev,
+        isConnected: data.status === 'connected',
+        connectionStatus: data.status
+      }));
+    });
+
+    // Listen for sync completion
+    wsManager.addListener('sync_complete', (data) => {
+      setSyncStatus(prev => ({
+        ...prev,
+        lastSync: new Date(data.timestamp),
+        isSyncing: false,
+        syncMessage: data.message || 'Data sync completed successfully'
+      }));
+      
+      // Refresh leaderboard data
+      if (currentApp === 'sales-leaderboard') {
+        fetchLeaderboardData();
+      }
+    });
+
+    // Listen for sync errors
+    wsManager.addListener('sync_error', (data) => {
+      setSyncStatus(prev => ({
+        ...prev,
+        isSyncing: false,
+        syncMessage: `Sync failed: ${data.error}`
+      }));
+    });
+
+    // Cleanup on unmount
+    return () => {
+      wsManager.disconnect();
+    };
+  }, []);
+
+  // Manual sync function
+  const triggerManualSync = async () => {
+    setSyncStatus(prev => ({
+      ...prev,
+      isSyncing: true,
+      syncMessage: 'Initiating manual sync...'
+    }));
+
+    try {
+      const response = await axios.post(`${API}/sync/manual`);
+      console.log('✅ Manual sync completed:', response.data);
+    } catch (error) {
+      console.error('❌ Manual sync failed:', error);
+      setSyncStatus(prev => ({
+        ...prev,
+        isSyncing: false,
+        syncMessage: `Manual sync failed: ${error.response?.data?.detail || error.message}`
+      }));
+    }
+  };
+
+  // Get sync status from server
+  const fetchSyncStatus = async () => {
+    try {
+      const response = await axios.get(`${API}/sync/status`);
+      setSyncStatus(prev => ({
+        ...prev,
+        ...response.data,
+        lastSync: response.data.last_sync ? new Date(response.data.last_sync) : null
+      }));
+    } catch (error) {
+      console.error('Failed to fetch sync status:', error);
+    }
+  };
   const [onboardingProgress, setOnboardingProgress] = useState(null);
   
   // PTO Management
