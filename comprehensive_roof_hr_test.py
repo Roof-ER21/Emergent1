@@ -426,7 +426,7 @@ def test_cross_module_integration():
         user_email = user_data.get("email")
         
         # Check if same user exists in sales reps
-        sales_response, error = make_request("GET", "/qr/sales-reps", role="sales_manager")
+        sales_response, error = make_request("GET", "/qr-generator/reps", role="sales_manager")
         if not error and sales_response.status_code == 200:
             sales_reps = sales_response.json()
             user_in_sales = any(rep.get("email") == user_email for rep in sales_reps)
@@ -440,7 +440,7 @@ def test_cross_module_integration():
     # Test 2: Role permissions across modules
     # Test sales_manager access to both leaderboard and QR modules
     leaderboard_access, _ = make_request("GET", "/leaderboard/competitions", role="sales_manager")
-    qr_access, _ = make_request("GET", "/qr/sales-reps", role="sales_manager")
+    qr_access, _ = make_request("GET", "/qr-generator/reps", role="sales_manager")
     
     both_accessible = (leaderboard_access and leaderboard_access.status_code == 200 and 
                       qr_access and qr_access.status_code == 200)
@@ -449,7 +449,7 @@ def test_cross_module_integration():
     
     # Test 3: Data sharing between modules (leads to signups)
     # Check if leads from QR module can be converted to signups in leaderboard
-    leads_response, _ = make_request("GET", "/qr/leads", role="sales_manager")
+    leads_response, _ = make_request("GET", "/qr-generator/leads", role="sales_manager")
     signups_response, _ = make_request("GET", "/leaderboard/signups", role="sales_manager")
     
     data_integration = (leads_response and leads_response.status_code == 200 and
