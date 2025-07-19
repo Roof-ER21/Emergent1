@@ -3871,7 +3871,7 @@ const HRRecruitmentApp = () => {
               { id: 'compliance', name: 'Compliance', icon: '✅' },
               { id: 'assignments', name: 'Project Assignments', icon: '📋' },
               { id: 'requests', name: 'Employee Requests', icon: '📝' }
-            ].map((tab, index) => (
+            ].filter(tab => !['assignments'].includes(tab.id)).map((tab, index) => (
               <motion.button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
