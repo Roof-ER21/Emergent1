@@ -2427,7 +2427,7 @@ async def get_hiring_candidates(current_user: User = Depends(get_current_user)):
 @api_router.post("/hiring/candidates", response_model=HiringCandidate)
 async def create_hiring_candidate(candidate: HiringCandidate, current_user: User = Depends(get_current_user)):
     """Create a new hiring candidate"""
-    if current_user.role not in ["super_admin", "hr_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     await db.hiring_candidates.insert_one(candidate.model_dump())
