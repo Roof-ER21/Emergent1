@@ -2652,7 +2652,7 @@ async def get_workers_comp_submissions(current_user: User = Depends(get_current_
 @api_router.post("/compliance/workers-comp", response_model=WorkersCompSubmission)
 async def create_workers_comp_submission(employee_id: str, background_tasks: BackgroundTasks, current_user: User = Depends(get_current_user)):
     """Create workers compensation submission record"""
-    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     employee = await db.employees.find_one({"id": employee_id})
