@@ -4627,6 +4627,288 @@ const HRRecruitmentApp = () => {
           </div>
         )}
 
+        {/* Enhanced Candidate Detail Modal */}
+        {showCandidateDetailModal && selectedPipelineCandidate && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div className="relative top-20 mx-auto p-5 border w-4/5 max-w-4xl shadow-lg rounded-md bg-white">
+              <div className="mt-3">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    {selectedPipelineCandidate.name}
+                  </h3>
+                  <button
+                    onClick={() => setShowCandidateDetailModal(false)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Candidate Info */}
+                  <div className="lg:col-span-2 space-y-6">
+                    <div className="bg-gray-50 rounded-lg p-6">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-4">Candidate Information</h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">Email</label>
+                          <p className="text-sm text-gray-900">{selectedPipelineCandidate.email}</p>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">Phone</label>
+                          <p className="text-sm text-gray-900">{selectedPipelineCandidate.phone || 'Not provided'}</p>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">Position</label>
+                          <p className="text-sm text-gray-900">{selectedPipelineCandidate.position || selectedPipelineCandidate.hiring_type}</p>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">Source</label>
+                          <p className="text-sm text-gray-900">{selectedPipelineCandidate.source || 'Manual'}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Notes Section */}
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-4">Notes & Comments</h4>
+                      
+                      {/* Add Note */}
+                      <div className="mb-4">
+                        <textarea
+                          value={newNote}
+                          onChange={(e) => setNewNote(e.target.value)}
+                          placeholder="Add a note about this candidate..."
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                          rows="3"
+                        />
+                        <button
+                          onClick={() => addCandidateNote(selectedPipelineCandidate.id, newNote)}
+                          className="mt-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                        >
+                          Add Note
+                        </button>
+                      </div>
+
+                      {/* Notes List */}
+                      <div className="space-y-3 max-h-64 overflow-y-auto">
+                        {candidateNotes.map((note, index) => (
+                          <div key={index} className="bg-gray-50 rounded-lg p-3">
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <p className="text-sm text-gray-900">{note.note || note.content}</p>
+                                <div className="flex items-center mt-2 text-xs text-gray-500">
+                                  <span>{note.author || user.name}</span>
+                                  <span className="mx-2">•</span>
+                                  <span>{note.created_at ? new Date(note.created_at).toLocaleString() : 'Just now'}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                        {candidateNotes.length === 0 && (
+                          <p className="text-sm text-gray-500 text-center py-4">No notes yet</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions Sidebar */}
+                  <div className="space-y-6">
+                    {/* Stage Progression */}
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-4">Stage Progression</h4>
+                      <div className="space-y-3">
+                        {pipelineStages.map((stage) => (
+                          <button
+                            key={stage.id}
+                            onClick={() => handleCandidateStageChange(selectedPipelineCandidate.id, stage.id)}
+                            className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                              selectedPipelineCandidate.status === stage.id
+                                ? 'bg-red-100 text-red-800 border border-red-300'
+                                : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                            }`}
+                          >
+                            {stage.name}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Quick Actions */}
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h4>
+                      <div className="space-y-3">
+                        <button
+                          onClick={() => {
+                            setShowScheduleModal(true);
+                          }}
+                          className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                        >
+                          Schedule Interview
+                        </button>
+                        <button
+                          onClick={() => sendStageChangeEmail(selectedPipelineCandidate.id, selectedPipelineCandidate.status)}
+                          className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                        >
+                          Send Email Update
+                        </button>
+                        <button
+                          onClick={() => handleCandidateStageChange(selectedPipelineCandidate.id, 'declined')}
+                          className="w-full px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                        >
+                          Decline Candidate
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Interview History */}
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-4">Interview History</h4>
+                      <div className="space-y-3">
+                        {interviews.map((interview, index) => (
+                          <div key={index} className="bg-gray-50 rounded-lg p-3">
+                            <p className="text-sm font-medium text-gray-900">{interview.type || 'Interview'}</p>
+                            <p className="text-xs text-gray-500">
+                              {interview.scheduled_date ? new Date(interview.scheduled_date).toLocaleString() : 'Date TBD'}
+                            </p>
+                          </div>
+                        ))}
+                        {interviews.length === 0 && (
+                          <p className="text-sm text-gray-500 text-center py-4">No interviews scheduled</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Bulk Import Modal */}
+        {bulkImportModal && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+              <div className="mt-3">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Import Candidates</h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Import Source</label>
+                    <select className="w-full border-gray-300 rounded-md shadow-sm focus:border-red-500 focus:ring-red-500">
+                      <option value="google_sheets">Google Sheets</option>
+                      <option value="indeed">Indeed</option>
+                      <option value="email">Email</option>
+                      <option value="csv">CSV File</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Source Details</label>
+                    <input
+                      type="text"
+                      placeholder="Enter spreadsheet ID, email, or upload file..."
+                      className="w-full border-gray-300 rounded-md shadow-sm focus:border-red-500 focus:ring-red-500"
+                    />
+                  </div>
+                </div>
+                
+                <div className="flex justify-end space-x-3 mt-6">
+                  <button
+                    onClick={() => setBulkImportModal(false)}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      // Handle import logic here
+                      setBulkImportModal(false);
+                    }}
+                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+                  >
+                    Import
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Interview Scheduling Modal */}
+        {showScheduleModal && selectedPipelineCandidate && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+              <div className="mt-3">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                  Schedule Interview - {selectedPipelineCandidate.name}
+                </h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Interview Type</label>
+                    <select className="w-full border-gray-300 rounded-md shadow-sm focus:border-red-500 focus:ring-red-500">
+                      <option value="phone">Phone Screen</option>
+                      <option value="video">Video Interview</option>
+                      <option value="in_person">In-Person</option>
+                      <option value="panel">Panel Interview</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Date & Time</label>
+                    <input
+                      type="datetime-local"
+                      className="w-full border-gray-300 rounded-md shadow-sm focus:border-red-500 focus:ring-red-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Interviewer(s)</label>
+                    <input
+                      type="text"
+                      placeholder="Enter interviewer names..."
+                      className="w-full border-gray-300 rounded-md shadow-sm focus:border-red-500 focus:ring-red-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                    <textarea
+                      placeholder="Interview notes or special instructions..."
+                      className="w-full border-gray-300 rounded-md shadow-sm focus:border-red-500 focus:ring-red-500"
+                      rows="3"
+                    />
+                  </div>
+                </div>
+                
+                <div className="flex justify-end space-x-3 mt-6">
+                  <button
+                    onClick={() => setShowScheduleModal(false)}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      // Handle scheduling logic here
+                      setShowScheduleModal(false);
+                    }}
+                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+                  >
+                    Schedule Interview
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Existing modals continue here... */}
+
         {activeTab === 'assignments' && (
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Project Assignments & QR Analytics</h3>
