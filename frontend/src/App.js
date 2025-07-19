@@ -1587,6 +1587,49 @@ const SalesLeaderboardApp = () => {
             </p>
           </div>
           <div className="flex items-center space-x-4">
+            
+            {/* Real-Time Sync Status */}
+            <div className="flex items-center space-x-2 bg-white/20 rounded-lg p-3">
+              <div className="flex items-center space-x-2">
+                <div className={`w-2 h-2 rounded-full ${
+                  syncStatus.isConnected ? 'bg-green-400' : 'bg-red-400'
+                }`}></div>
+                <span className="text-white text-xs font-medium">
+                  {syncStatus.isConnected ? 'Live' : 'Offline'}
+                </span>
+              </div>
+              
+              {/* Manual Sync Button - Available to Sales Managers and above */}
+              {hasAnyPermission(user?.role, [PERMISSIONS.SYNC_DATA]) && (
+                <button
+                  onClick={triggerManualSync}
+                  disabled={syncStatus.isSyncing}
+                  className="px-3 py-1 bg-white/30 hover:bg-white/40 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs rounded transition-colors flex items-center space-x-1"
+                >
+                  {syncStatus.isSyncing ? (
+                    <>
+                      <div className="animate-spin w-3 h-3 border border-white border-t-transparent rounded-full"></div>
+                      <span>Syncing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      <span>Sync</span>
+                    </>
+                  )}
+                </button>
+              )}
+              
+              {/* Last Sync Info */}
+              {syncStatus.lastSync && (
+                <div className="text-xs text-white/80">
+                  Last: {syncStatus.lastSync.toLocaleTimeString()}
+                </div>
+              )}
+            </div>
+
             <select
               value={timeRange}
               onChange={(e) => setTimeRange(e.target.value)}
