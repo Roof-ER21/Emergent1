@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 import time
 
 # Configuration - Use external URL for testing
-BASE_URL = "https://175ab446-7532-4f1e-800f-5cff63911a45.preview.emergentagent.com/api"
+BASE_URL = "https://cda26137-70e2-49c7-8a66-73c61a911d12.preview.emergentagent.com/api"
 HEADERS = {"Content-Type": "application/json"}
 
 class RoofHRTester:
