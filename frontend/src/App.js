@@ -3571,9 +3571,10 @@ const HRRecruitmentApp = () => {
         syncMessage: data.message || 'Data sync completed successfully'
       }));
       
-      // Refresh leaderboard data
-      if (currentApp === 'sales-leaderboard') {
-        fetchLeaderboardData();
+      // Refresh leaderboard data if currently viewing it
+      if (window.location.pathname.includes('sales-leaderboard')) {
+        // You can add specific refresh logic here
+        window.location.reload(); // Simple approach for now
       }
     });
 
