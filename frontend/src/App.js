@@ -5452,7 +5452,7 @@ const HRRecruitmentApp = () => {
   }, [user]);
 
   const isAdmin = user?.role === 'super_admin' || user?.role === 'hr_manager';
-  const isManager = user?.role === 'sales_manager' || isAdmin;
+  const isManager = user?.role === 'sales_manager' || user?.role === 'team_lead' || isAdmin;
   const isEmployee = user?.role === 'employee' || user?.role === 'sales_rep';
 
   if (!isAdmin && !isManager && !isEmployee) {
