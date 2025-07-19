@@ -114,6 +114,169 @@ security = HTTPBearer()
 # Initialize scheduler for signup sync
 signup_scheduler = AsyncIOScheduler()
 
+# WebSocket Connection Manager for Real-Time Updates
+class WebSocketManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
+        
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+        
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+        
+    async def send_personal_message(self, message: str, websocket: WebSocket):
+        await websocket.send_text(message)
+        
+    async def broadcast(self, message: dict):
+        """Broadcast real-time updates to all connected clients"""
+        if self.active_connections:
+            for connection in self.active_connections.copy():
+                try:
+                    await connection.send_json(message)
+                except:
+                    # Remove stale connections
+                    self.active_connections.remove(connection)
+
+# Global WebSocket manager
+ws_manager = WebSocketManager()
+
+# Enhanced Sync Service for Real-Time Updates
+class RealTimeSyncService:
+    def __init__(self, db_client, sheets_service, ws_manager):
+        self.db = db_client
+        self.sheets_service = sheets_service
+        self.ws_manager = ws_manager
+        
+    async def sync_signups_data(self, background: bool = False):
+        """Enhanced signup sync with real-time broadcasting"""
+        try:
+            # Get Google Sheets service
+            service = await self.sheets_service.get_service()
+            
+            # Your existing signup sync logic here
+            spreadsheet_id = os.getenv("GOOGLE_SHEETS_SIGNUP_ID")
+            if not spreadsheet_id:
+                raise HTTPException(status_code=400, detail="Signup spreadsheet ID not configured")
+            
+            # Fetch data from sheets (using exponential backoff)
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    result = service.spreadsheets().values().get(
+                        spreadsheetId=spreadsheet_id,
+                        range='A:Z'  # Get all data
+                    ).execute()
+                    break
+                except Exception as e:
+                    if attempt == max_retries - 1:
+                        raise e
+                    await asyncio.sleep(2 ** attempt)  # Exponential backoff
+            
+            values = result.get('values', [])
+            if not values:
+                return {"message": "No data found", "synced_count": 0}
+            
+            # Process and validate data
+            headers = values[0] if values else []
+            synced_count = 0
+            updated_users = []
+            
+            for i, row in enumerate(values[1:], 1):
+                if len(row) < len(headers):
+                    row.extend([''] * (len(headers) - len(row)))
+                    
+                try:
+                    # Extract signup data (customize based on your sheet structure)
+                    signup_data = {}
+                    for j, header in enumerate(headers):
+                        signup_data[header.lower().replace(' ', '_')] = row[j] if j < len(row) else ''
+                    
+                    # Update database
+                    if 'email' in signup_data and signup_data['email']:
+                        # Update or insert signup record
+                        await self.db.signups.update_one(
+                            {"email": signup_data['email']},
+                            {"$set": {
+                                **signup_data,
+                                "last_updated": datetime.utcnow(),
+                                "sync_source": "google_sheets"
+                            }},
+                            upsert=True
+                        )
+                        synced_count += 1
+                        updated_users.append(signup_data.get('email', ''))
+                        
+                except Exception as e:
+                    print(f"Error processing row {i}: {e}")
+                    continue
+            
+            # Broadcast real-time update to connected clients
+            if not background:  # Only broadcast for manual syncs
+                await self.ws_manager.broadcast({
+                    "type": "data_sync_complete",
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "synced_count": synced_count,
+                    "updated_users": updated_users[:10],  # Limit for performance
+                    "message": f"Successfully synced {synced_count} signup records"
+                })
+            
+            return {
+                "message": f"Successfully synced {synced_count} signup records",
+                "synced_count": synced_count,
+                "timestamp": datetime.utcnow()
+            }
+            
+        except Exception as e:
+            error_msg = f"Sync failed: {str(e)}"
+            # Broadcast error to clients
+            await self.ws_manager.broadcast({
+                "type": "sync_error",
+                "timestamp": datetime.utcnow().isoformat(),
+                "error": error_msg
+            })
+            raise HTTPException(status_code=500, detail=error_msg)
+    
+    async def sync_estimates_data(self):
+        """Sync estimates data from Google Sheets"""
+        # Similar implementation for estimates
+        pass
+    
+    async def sync_revenue_data(self):
+        """Sync revenue data from Google Sheets"""  
+        # Similar implementation for revenue
+        pass
+    
+    async def full_data_sync(self):
+        """Perform complete data sync - signups, estimates, revenue"""
+        results = {}
+        
+        try:
+            results['signups'] = await self.sync_signups_data(background=True)
+            results['estimates'] = await self.sync_estimates_data()
+            results['revenue'] = await self.sync_revenue_data()
+            
+            # Broadcast completion
+            await self.ws_manager.broadcast({
+                "type": "full_sync_complete",
+                "timestamp": datetime.utcnow().isoformat(),
+                "results": results
+            })
+            
+            return results
+            
+        except Exception as e:
+            await self.ws_manager.broadcast({
+                "type": "full_sync_error", 
+                "error": str(e),
+                "timestamp": datetime.utcnow().isoformat()
+            })
+            raise
+
+# Initialize real-time sync service
+sync_service = RealTimeSyncService(db, google_sheets_service, ws_manager)
+
 # Create the main app without a prefix
 app = FastAPI(title="Roof-HR API", version="1.0.0")
 
