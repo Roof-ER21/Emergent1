@@ -233,7 +233,7 @@ const AppHub = () => {
       icon: '👥',
       color: 'secondary',
       features: ['Candidate Management', 'Interview Scheduling', 'Onboarding Flows', 'Compliance Tracking'],
-      roles: ['super_admin', 'hr_manager'] // HR-focused roles only
+      roles: ['super_admin', 'hr_manager', 'employee'] // HR-focused roles + employees for PTO
     },
     {
       id: 'qr-generator',
