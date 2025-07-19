@@ -2448,7 +2448,7 @@ async def get_hiring_candidate(candidate_id: str, current_user: User = Depends(g
 @api_router.put("/hiring/candidates/{candidate_id}", response_model=HiringCandidate)
 async def update_hiring_candidate(candidate_id: str, candidate_update: HiringCandidate, current_user: User = Depends(get_current_user)):
     """Update hiring candidate"""
-    if current_user.role not in ["super_admin", "hr_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     candidate_data = candidate_update.model_dump()
