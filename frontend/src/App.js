@@ -3120,6 +3120,29 @@ const HRRecruitmentApp = () => {
   const [importResult, setImportResult] = useState(null);
   const [importStatus, setImportStatus] = useState(null);
   
+  // Enhanced Recruitment Management
+  const [pipelineView, setPipelineView] = useState('kanban'); // 'kanban' or 'list'
+  const [selectedCandidate, setSelectedCandidate] = useState(null);
+  const [showCandidateModal, setShowCandidateModal] = useState(false);
+  const [candidateNotes, setCandidateNotes] = useState([]);
+  const [newNote, setNewNote] = useState('');
+  const [interviews, setInterviews] = useState([]);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [bulkImportModal, setBulkImportModal] = useState(false);
+  const [emailTemplates, setEmailTemplates] = useState([]);
+  const [selectedTemplate, setSelectedTemplate] = useState('');
+  
+  // Pipeline stages for Kanban view
+  const pipelineStages = [
+    { id: 'applied', name: 'Applied', color: 'bg-blue-100 border-blue-300', count: 0 },
+    { id: 'screening', name: 'Screening', color: 'bg-yellow-100 border-yellow-300', count: 0 },
+    { id: 'interview', name: 'Interview', color: 'bg-purple-100 border-purple-300', count: 0 },
+    { id: 'reference', name: 'Reference Check', color: 'bg-orange-100 border-orange-300', count: 0 },
+    { id: 'offer', name: 'Offer', color: 'bg-green-100 border-green-300', count: 0 },
+    { id: 'hired', name: 'Hired', color: 'bg-emerald-100 border-emerald-300', count: 0 },
+    { id: 'declined', name: 'Declined', color: 'bg-red-100 border-red-300', count: 0 }
+  ];
+  
   // Onboarding Management
   const [onboardingStages, setOnboardingStages] = useState([]);
   const [newStage, setNewStage] = useState({
