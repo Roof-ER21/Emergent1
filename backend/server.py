@@ -3605,13 +3605,13 @@ async def join_contest(contest_id: str, participant_data: dict = None):
         
         # Check if already joined
         existing_participants = contest.get("participants", [])
-        if any(p.get("participant_id") == participant["participant_id"] for p in existing_participants):
+        if any(p.get("participant_id") == participant.participant_id for p in existing_participants):
             raise HTTPException(status_code=400, detail="Already joined this contest")
         
         # Update contest with new participant
         await db.sales_competitions.update_one(
             {"id": contest_id},
-            {"$push": {"participants": participant}}
+            {"$push": {"participants": participant.model_dump()}}
         )
         
         # Broadcast real-time update
