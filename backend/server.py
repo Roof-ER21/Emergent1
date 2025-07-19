@@ -2479,7 +2479,7 @@ async def delete_hiring_candidate(candidate_id: str, current_user: User = Depend
 @api_router.get("/hiring/candidates/by-type/{hiring_type}", response_model=List[HiringCandidate])
 async def get_candidates_by_type(hiring_type: str, current_user: User = Depends(get_current_user)):
     """Get candidates by hiring type"""
-    if current_user.role not in ["super_admin", "hr_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     candidates = await db.hiring_candidates.find({"hiring_type": hiring_type}).to_list(1000)
