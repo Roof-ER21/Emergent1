@@ -5655,17 +5655,18 @@ const QRGeneratorApp = () => {
     };
 
     return (
-      <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-        <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-gray-700">
-          <div className="sticky top-0 bg-gray-800 border-b border-gray-700 px-6 py-4 flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-white">Landing Page Preview</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-white text-2xl transition-colors"
-            >
-              ×
-            </button>
-          </div>
+      <>
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-gray-700">
+            <div className="sticky top-0 bg-gray-800 border-b border-gray-700 px-6 py-4 flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-white">Landing Page Preview</h2>
+              <button
+                onClick={onClose}
+                className="text-gray-400 hover:text-white text-2xl transition-colors"
+              >
+                ×
+              </button>
+            </div>
           
           {/* Mobile-optimized landing page */}
           <div className="p-6 bg-gray-900">
