@@ -3548,6 +3548,9 @@ const HRRecruitmentApp = () => {
     connectionStatus: 'disconnected'
   });
 
+  // Other state variables
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+
   // Initialize WebSocket connection on app start
   useEffect(() => {
     // Connect WebSocket for real-time updates
