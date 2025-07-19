@@ -3522,6 +3522,100 @@ const HRRecruitmentApp = () => {
     }
   };
 
+  // Enhanced Recruitment Functions
+  const handleCandidateStageChange = async (candidateId, newStage) => {
+    try {
+      await axios.put(`${API}/hiring/candidates/${candidateId}`, { status: newStage });
+      await fetchHiringCandidates();
+      
+      // Send automated email for stage change
+      await sendStageChangeEmail(candidateId, newStage);
+    } catch (error) {
+      console.error('Error updating candidate stage:', error);
+    }
+  };
+
+  const sendStageChangeEmail = async (candidateId, stage) => {
+    try {
+      const emailData = {
+        candidate_id: candidateId,
+        stage: stage,
+        template_type: `stage_${stage}`
+      };
+      await axios.post(`${API}/candidates/send-email`, emailData);
+    } catch (error) {
+      console.error('Error sending stage change email:', error);
+    }
+  };
+
+  const addCandidateNote = async (candidateId, note) => {
+    try {
+      const noteData = {
+        candidate_id: candidateId,
+        note: note,
+        author: user.name,
+        created_at: new Date().toISOString()
+      };
+      await axios.post(`${API}/candidates/notes`, noteData);
+      setNewNote('');
+      await fetchCandidateNotes(candidateId);
+    } catch (error) {
+      console.error('Error adding candidate note:', error);
+    }
+  };
+
+  const fetchCandidateNotes = async (candidateId) => {
+    try {
+      const response = await axios.get(`${API}/candidates/${candidateId}/notes`);
+      setCandidateNotes(response.data);
+    } catch (error) {
+      console.error('Error fetching candidate notes:', error);
+    }
+  };
+
+  const scheduleInterview = async (candidateId, interviewData) => {
+    try {
+      const data = {
+        candidate_id: candidateId,
+        scheduled_by: user.id,
+        ...interviewData
+      };
+      await axios.post(`${API}/interviews`, data);
+      setShowScheduleModal(false);
+      await fetchCandidateInterviews(candidateId);
+    } catch (error) {
+      console.error('Error scheduling interview:', error);
+    }
+  };
+
+  const fetchCandidateInterviews = async (candidateId) => {
+    try {
+      const response = await axios.get(`${API}/candidates/${candidateId}/interviews`);
+      setInterviews(response.data);
+    } catch (error) {
+      console.error('Error fetching interviews:', error);
+    }
+  };
+
+  const importCandidatesFromEmail = async (emailData) => {
+    try {
+      const response = await axios.post(`${API}/candidates/import-email`, emailData);
+      await fetchHiringCandidates();
+      return response.data;
+    } catch (error) {
+      console.error('Error importing candidates from email:', error);
+    }
+  };
+
+  const getCandidatesByStage = (stage) => {
+    return hiringCandidates.filter(candidate => candidate.status === stage);
+  };
+
+  const handleDragDrop = async (candidateId, targetStage) => {
+    // Handle drag and drop between stages
+    await handleCandidateStageChange(candidateId, targetStage);
+  };
+
   useEffect(() => {
     fetchEmployees();
     fetchImportStatus();
