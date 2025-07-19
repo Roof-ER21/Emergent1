@@ -3271,7 +3271,418 @@ const SalesLeaderboardApp = () => {
 
       {/* Enhanced Super Admin Dashboard */}
       {activeTab === 'dashboard' && user?.role === 'super_admin' && (
-        <div className="space-y-8">
+        <div className="space-y-6">
+          
+          {/* Super Admin System Overview */}
+          <div className="bg-gradient-to-r from-gray-800 to-gray-900 rounded-xl p-6 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold mb-2">System Administrator Dashboard</h2>
+                <p className="text-gray-300">Complete system oversight and management controls</p>
+              </div>
+              <div className="flex items-center space-x-6">
+                <div className="text-center">
+                  <div className="text-sm text-gray-300">System Health</div>
+                  <div className="text-2xl font-bold text-green-400">98%</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-sm text-gray-300">Active Users</div>
+                  <div className="text-2xl font-bold">{leaderboardData.length + 5}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* System Metrics Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-gray-900">{leaderboardData.length}</div>
+                  <div className="text-sm text-gray-600">Sales Reps</div>
+                </div>
+                <div className="p-3 bg-blue-100 rounded-lg">
+                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-gray-900">{competitions.length}</div>
+                  <div className="text-sm text-gray-600">Active Contests</div>
+                </div>
+                <div className="p-3 bg-purple-100 rounded-lg">
+                  <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-gray-900">
+                    {syncStatus.isConnected ? 1 : 0}
+                  </div>
+                  <div className="text-sm text-gray-600">Data Syncs Today</div>
+                </div>
+                <div className="p-3 bg-green-100 rounded-lg">
+                  <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-gray-900">24/7</div>
+                  <div className="text-sm text-gray-600">System Uptime</div>
+                </div>
+                <div className="p-3 bg-orange-100 rounded-lg">
+                  <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-gray-900">5</div>
+                  <div className="text-sm text-gray-600">Modules Active</div>
+                </div>
+                <div className="p-3 bg-red-100 rounded-lg">
+                  <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Admin Management Panels */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            {/* User Management Panel */}
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">User Management</h3>
+                <button className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors">
+                  Add User
+                </button>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <span className="text-sm font-medium text-gray-900">Sales Managers</span>
+                  <span className="text-sm text-gray-600">2 active</span>
+                </div>
+                <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <span className="text-sm font-medium text-gray-900">Team Leads</span>
+                  <span className="text-sm text-gray-600">3 active</span>
+                </div>
+                <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <span className="text-sm font-medium text-gray-900">Sales Reps</span>
+                  <span className="text-sm text-gray-600">{leaderboardData.length} active</span>
+                </div>
+                <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <span className="text-sm font-medium text-gray-900">HR Managers</span>
+                  <span className="text-sm text-gray-600">1 active</span>
+                </div>
+                <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <span className="text-sm font-medium text-gray-900">Employees</span>
+                  <span className="text-sm text-gray-600">15 active</span>
+                </div>
+              </div>
+            </div>
+
+            {/* System Analytics */}
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">System Analytics</h3>
+              <div className="space-y-4">
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Database Performance</span>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-16 bg-gray-200 rounded-full h-2">
+                      <div className="bg-green-500 h-2 rounded-full" style={{width: '92%'}}></div>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">92%</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">API Response Time</span>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-16 bg-gray-200 rounded-full h-2">
+                      <div className="bg-blue-500 h-2 rounded-full" style={{width: '78%'}}></div>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">234ms</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">WebSocket Connections</span>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-16 bg-gray-200 rounded-full h-2">
+                      <div className="bg-purple-500 h-2 rounded-full" style={{width: '65%'}}></div>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">Active</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Storage Usage</span>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-16 bg-gray-200 rounded-full h-2">
+                      <div className="bg-orange-500 h-2 rounded-full" style={{width: '45%'}}></div>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">2.1GB</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Video Rotator for Top Performers */}
+          <div className="bg-white rounded-xl p-6 border border-gray-200">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">Top Performer Spotlight</h3>
+              <div className="flex space-x-2">
+                <button className="px-3 py-1 text-sm bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors">
+                  Upload Video
+                </button>
+                <button className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors">
+                  Manage Rotator
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-gray-100 rounded-lg p-8 text-center">
+              <div className="mb-4">
+                <svg className="w-16 h-16 text-gray-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h4 className="text-lg font-medium text-gray-900 mb-2">Featured Performer Video</h4>
+              <p className="text-gray-600 mb-4">Showcase your top performers with rotating video highlights</p>
+              <div className="bg-white rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-900">
+                    {leaderboardData[0]?.name || 'Top Performer'}
+                  </span>
+                  <span className="text-xs text-gray-500">This Month's Winner</span>
+                </div>
+                <div className="text-sm text-gray-600">
+                  🏆 {leaderboardData[0]?.metrics.monthly_signups} signups • 
+                  ${leaderboardData[0]?.metrics.monthly_revenue.toLocaleString()} revenue
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Enhanced Employee Dashboard for HR/Employee roles */}
+      {(activeTab === 'dashboard' && (user?.role === 'hr_manager' || user?.role === 'employee')) && (
+        <div className="space-y-6">
+          
+          {/* Employee Welcome Section */}
+          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold mb-2">
+                  {user?.role === 'hr_manager' ? 'HR Manager Dashboard' : 'Employee Portal'}
+                </h2>
+                <p className="text-indigo-100">
+                  {user?.role === 'hr_manager' ? 'Employee management and company oversight' : 'Your company information and benefits access'}
+                </p>
+              </div>
+              <div className="text-right">
+                <div className="text-sm text-indigo-100">Your Role</div>
+                <div className="text-xl font-bold">
+                  {getRoleInfo(user?.role).name}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Company Information Dashboard */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-gray-900">125</div>
+                  <div className="text-sm text-gray-600">Total Employees</div>
+                </div>
+                <div className="p-3 bg-indigo-100 rounded-lg">
+                  <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-gray-900">8</div>
+                  <div className="text-sm text-gray-600">Departments</div>
+                </div>
+                <div className="p-3 bg-green-100 rounded-lg">
+                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h4a1 1 0 011 1v5m-6 0h6" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-gray-900">12</div>
+                  <div className="text-sm text-gray-600">Years in Business</div>
+                </div>
+                <div className="p-3 bg-purple-100 rounded-lg">
+                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Benefits and Company Info */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            {/* Benefits Overview */}
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Employee Benefits</h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">Health Insurance</div>
+                      <div className="text-xs text-gray-600">Premium coverage for employees and families</div>
+                    </div>
+                  </div>
+                  <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Active</span>
+                </div>
+
+                <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                      <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">401(k) Retirement Plan</div>
+                      <div className="text-xs text-gray-600">6% company matching contribution</div>
+                    </div>
+                  </div>
+                  <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">6% Match</span>
+                </div>
+
+                <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">Paid Time Off</div>
+                      <div className="text-xs text-gray-600">25 days annual leave plus holidays</div>
+                    </div>
+                  </div>
+                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">25 Days</span>
+                </div>
+
+                <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                      <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">Learning & Development</div>
+                      <div className="text-xs text-gray-600">$2,000 annual education allowance</div>
+                    </div>
+                  </div>
+                  <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">$2K</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Company Directory */}
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Company Directory</h3>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                  <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-medium text-red-600">SM</span>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">Sales Manager</div>
+                    <div className="text-xs text-gray-600">manager@theroofdocs.com</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                  <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-medium text-indigo-600">HR</span>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">HR Manager</div>
+                    <div className="text-xs text-gray-600">hr@theroofdocs.com</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-medium text-green-600">IT</span>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">IT Support</div>
+                    <div className="text-xs text-gray-600">it@theroofdocs.com</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-medium text-purple-600">AC</span>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">Accounting</div>
+                    <div className="text-xs text-gray-600">accounting@theroofdocs.com</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <button className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm">
+                  View Full Directory
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-xl font-semibold text-gray-900">Advanced Competitions & Tournaments</h3>
