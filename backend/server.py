@@ -3361,7 +3361,7 @@ async def get_rep_signups(
     
     return {"signups": signups, "rep_id": rep_id, "year": year}
 
-# Automatic sync scheduler (runs 3 times a day)
+# Include the router in the main app
 def setup_signup_sync_scheduler():
     """Set up the scheduler for signup sync (3 times daily)"""
     
