@@ -6,6 +6,108 @@ import './App.css';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
+const WS_URL = BACKEND_URL.replace('http', 'ws') + '/ws';
+
+// WebSocket Manager for Real-Time Updates
+class WebSocketManager {
+  constructor() {
+    this.ws = null;
+    this.reconnectAttempts = 0;
+    this.maxReconnectAttempts = 5;
+    this.reconnectInterval = 3000;
+    this.listeners = new Map();
+  }
+
+  connect() {
+    try {
+      this.ws = new WebSocket(WS_URL);
+      
+      this.ws.onopen = () => {
+        console.log('🔗 WebSocket connected for real-time updates');
+        this.reconnectAttempts = 0;
+        this.notifyListeners('connection', { status: 'connected' });
+      };
+
+      this.ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          console.log('📡 Real-time update received:', data);
+          this.notifyListeners('message', data);
+          
+          // Handle specific message types
+          if (data.type === 'data_sync_complete') {
+            this.notifyListeners('sync_complete', data);
+          } else if (data.type === 'sync_error') {
+            this.notifyListeners('sync_error', data);
+          }
+        } catch (e) {
+          console.log('📡 Real-time message:', event.data);
+        }
+      };
+
+      this.ws.onclose = () => {
+        console.log('🔌 WebSocket disconnected');
+        this.notifyListeners('connection', { status: 'disconnected' });
+        this.attemptReconnect();
+      };
+
+      this.ws.onerror = (error) => {
+        console.error('🚨 WebSocket error:', error);
+        this.notifyListeners('error', error);
+      };
+
+    } catch (error) {
+      console.error('🚨 WebSocket connection failed:', error);
+    }
+  }
+
+  attemptReconnect() {
+    if (this.reconnectAttempts < this.maxReconnectAttempts) {
+      this.reconnectAttempts++;
+      console.log(`🔄 Attempting WebSocket reconnection (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+      setTimeout(() => this.connect(), this.reconnectInterval);
+    }
+  }
+
+  addListener(type, callback) {
+    if (!this.listeners.has(type)) {
+      this.listeners.set(type, []);
+    }
+    this.listeners.get(type).push(callback);
+  }
+
+  removeListener(type, callback) {
+    const callbacks = this.listeners.get(type);
+    if (callbacks) {
+      const index = callbacks.indexOf(callback);
+      if (index > -1) {
+        callbacks.splice(index, 1);
+      }
+    }
+  }
+
+  notifyListeners(type, data) {
+    const callbacks = this.listeners.get(type);
+    if (callbacks) {
+      callbacks.forEach(callback => callback(data));
+    }
+  }
+
+  send(data) {
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify(data));
+    }
+  }
+
+  disconnect() {
+    if (this.ws) {
+      this.ws.close();
+    }
+  }
+}
+
+// Global WebSocket manager
+const wsManager = new WebSocketManager();
 
 // Enhanced RBAC System
 const PERMISSIONS = {
