@@ -22,7 +22,8 @@ import json
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+import websockets
 
 # Google Sheets Service
 class GoogleSheetsService:
@@ -111,7 +112,7 @@ db = client[os.environ['DB_NAME']]
 security = HTTPBearer()
 
 # Initialize scheduler for signup sync
-signup_scheduler = BackgroundScheduler()
+signup_scheduler = AsyncIOScheduler()
 
 # Create the main app without a prefix
 app = FastAPI(title="Roof-HR API", version="1.0.0")
