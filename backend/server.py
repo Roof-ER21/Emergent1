@@ -2488,7 +2488,7 @@ async def get_candidates_by_type(hiring_type: str, current_user: User = Depends(
 @api_router.post("/hiring/candidates/{candidate_id}/advance")
 async def advance_candidate_stage(candidate_id: str, current_user: User = Depends(get_current_user)):
     """Advance candidate to next stage"""
-    if current_user.role not in ["super_admin", "hr_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     candidate = await db.hiring_candidates.find_one({"id": candidate_id})
