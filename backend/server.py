@@ -1528,7 +1528,7 @@ async def get_employees(current_user: User = Depends(get_current_user)):
 @api_router.post("/employees", response_model=Employee)
 async def create_employee(employee: Employee, current_user: User = Depends(get_current_user)):
     """Create a new employee"""
-    if current_user.role not in ["super_admin", "hr_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     employee_dict = employee.model_dump()
