@@ -5669,7 +5669,7 @@ const QRGeneratorApp = () => {
               {/* Services Section */}
               <div className="p-6 bg-white">
                 <h3 className="text-xl font-bold text-gray-900 mb-4">Our Services</h3>
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   {[
                     { title: 'Roofing', desc: 'Complete roof replacement and repairs', icon: '🏠' },
                     { title: 'Siding', desc: 'Vinyl, wood, and fiber cement siding', icon: '🧱' },
@@ -5677,11 +5677,11 @@ const QRGeneratorApp = () => {
                     { title: 'Windows & Doors', desc: 'Energy-efficient windows and door installation', icon: '🪟' },
                     { title: 'Solar', desc: 'Solar panel installation and energy solutions', icon: '☀️' }
                   ].map((service, index) => (
-                    <div key={index} className="flex items-start p-3 bg-gray-50 rounded-lg">
-                      <div className="text-2xl mr-3">{service.icon}</div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900">{service.title}</h4>
-                        <p className="text-sm text-gray-600">{service.desc}</p>
+                    <div key={index} className="flex items-start p-2 bg-gray-50 rounded-lg">
+                      <div className="text-lg mr-2 flex-shrink-0">{service.icon}</div>
+                      <div className="min-w-0">
+                        <h4 className="font-semibold text-gray-900 text-sm">{service.title}</h4>
+                        <p className="text-xs text-gray-600 leading-tight">{service.desc}</p>
                       </div>
                     </div>
                   ))}
