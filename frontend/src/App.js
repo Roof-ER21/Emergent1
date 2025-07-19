@@ -3683,9 +3683,8 @@ const SalesLeaderboardApp = () => {
           </div>
         </div>
       )}
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-xl font-semibold text-gray-900">Advanced Competitions & Tournaments</h3>
+
+      {/* Advanced Analytics Tab */}
               <p className="text-gray-600 mt-1">Manage contests, track progress, and boost team performance</p>
             </div>
             <div className="flex items-center space-x-3">
