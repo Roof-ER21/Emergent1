@@ -179,11 +179,27 @@ const Login = () => {
           </button>
           
           <button
+            onClick={() => handleDevLogin('team_lead')}
+            disabled={loading}
+            className="w-full bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors font-medium"
+          >
+            Team Lead
+          </button>
+          
+          <button
             onClick={() => handleDevLogin('hr_manager')}
             disabled={loading}
             className="w-full bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors font-medium"
           >
             HR Manager
+          </button>
+          
+          <button
+            onClick={() => handleDevLogin('employee')}
+            disabled={loading}
+            className="w-full bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors font-medium"
+          >
+            Employee
           </button>
         </div>
         
