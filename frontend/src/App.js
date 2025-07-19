@@ -5612,7 +5612,7 @@ const QRGeneratorApp = () => {
     );
   };
 
-  /*const RepLandingPage = ({ rep, onClose }) => {
+  const RepLandingPage = ({ rep, onClose }) => {
     const [submittingLead, setSubmittingLead] = useState(false);
     const [leadSuccess, setLeadSuccess] = useState(false);
     const [leadData, setLeadData] = useState({
