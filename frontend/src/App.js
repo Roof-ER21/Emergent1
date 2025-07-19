@@ -903,6 +903,7 @@ const SalesLeaderboardApp = () => {
     revenue_goal: 0
   });
   const [showGoalModal, setShowGoalModal] = useState(false);
+  const [showCompetitionModal, setShowCompetitionModal] = useState(false);
 
   // New state variables for sync management
   const [showSyncStatus, setShowSyncStatus] = useState(false);
