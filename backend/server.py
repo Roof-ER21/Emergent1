@@ -2194,7 +2194,7 @@ async def get_qr_analytics(current_user: User = Depends(get_current_user)):
 @api_router.get("/onboarding/stages", response_model=List[OnboardingStage])
 async def get_onboarding_stages(current_user: User = Depends(get_current_user)):
     """Get all onboarding stages"""
-    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     stages = await db.onboarding_stages.find({"is_active": True}).sort("order", 1).to_list(100)
