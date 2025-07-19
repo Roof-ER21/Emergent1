@@ -5772,7 +5772,7 @@ const QRGeneratorApp = () => {
                   </div>
                   
                 </div>
-              </div>
+                
                 <button
                   onClick={handleCTAClick}
                   className="w-full bg-gray-800 text-white py-3 px-4 rounded-lg font-semibold hover:bg-gray-900 transition-colors mt-4"
