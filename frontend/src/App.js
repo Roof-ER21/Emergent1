@@ -870,6 +870,14 @@ const SalesLeaderboardApp = () => {
   const [contestParticipants, setContestParticipants] = useState([]);
   const [contestStandings, setContestStandings] = useState([]);
   
+  const [goals, setGoals] = useState([]);
+  const [signups, setSignups] = useState([]);
+  const [metrics, setMetrics] = useState([]);
+  const [bonusTiers, setBonusTiers] = useState([]);
+  const [teamAssignments, setTeamAssignments] = useState([]);
+  const [salesReps, setSalesReps] = useState([]);
+  
+  // Modal states
   // Enhanced Contest Form State
   const [newCompetition, setNewCompetition] = useState({
     name: '',
@@ -888,12 +896,6 @@ const SalesLeaderboardApp = () => {
     is_team_competition: false,
     max_participants: null
   });
-  const [goals, setGoals] = useState([]);
-  const [signups, setSignups] = useState([]);
-  const [metrics, setMetrics] = useState([]);
-  const [bonusTiers, setBonusTiers] = useState([]);
-  const [teamAssignments, setTeamAssignments] = useState([]);
-  const [salesReps, setSalesReps] = useState([]);
   
   // Modal states
   const [newCompetition, setNewCompetition] = useState({
