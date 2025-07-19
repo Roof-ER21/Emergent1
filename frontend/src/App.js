@@ -1559,7 +1559,121 @@ const SalesLeaderboardApp = () => {
     }
   ];
 
+  // Contest Management Utility Functions
+  const getContestStatus = (startDate, endDate) => {
+    const now = new Date();
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    if (now < start) return 'upcoming';
+    if (now > end) return 'past';
+    return 'current';
+  };
+
+  const getContestProgress = (startDate, endDate) => {
+    const now = new Date();
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    if (now < start) return 0;
+    if (now > end) return 100;
+    
+    const total = end.getTime() - start.getTime();
+    const elapsed = now.getTime() - start.getTime();
+    return Math.round((elapsed / total) * 100);
+  };
+
+  const getDaysRemaining = (endDate) => {
+    const now = new Date();
+    const end = new Date(endDate);
+    const diffTime = end.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const filterContestsByStatus = (contests, status) => {
+    return contests.filter(contest => getContestStatus(contest.start_date, contest.end_date) === status);
+  };
+
+  // Enhanced Competition Management Functions
   const handleCreateCompetition = async (e) => {
+    e.preventDefault();
+    try {
+      const competitionData = {
+        ...newCompetition,
+        created_by: user.id,
+        created_by_name: user.name,
+        status: 'upcoming',
+        participants: [],
+        winners: []
+      };
+      
+      await axios.post(`${API}/leaderboard/competitions`, competitionData);
+      await fetchCompetitions();
+      setShowContestModal(false);
+      
+      // Reset form
+      setNewCompetition({
+        name: '',
+        description: '',
+        competition_type: 'signups',
+        start_date: '',
+        end_date: '',
+        prize_description: '',
+        rules: '',
+        prize_tiers: [
+          { position: 1, prize: '', description: '' },
+          { position: 2, prize: '', description: '' },
+          { position: 3, prize: '', description: '' }
+        ],
+        target_metric: 0,
+        is_team_competition: false,
+        max_participants: null
+      });
+      
+      // Broadcast contest creation via WebSocket
+      wsManager.send({
+        type: 'contest_created',
+        contest: competitionData,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error) {
+      console.error('Error creating competition:', error);
+    }
+  };
+
+  const joinContest = async (contestId) => {
+    try {
+      await axios.post(`${API}/leaderboard/competitions/${contestId}/join`, {
+        participant_id: user.id,
+        participant_name: user.name,
+        participant_role: user.role
+      });
+      
+      await fetchCompetitions();
+      
+      // Broadcast participation via WebSocket
+      wsManager.send({
+        type: 'contest_joined',
+        contest_id: contestId,
+        participant: user.name,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error) {
+      console.error('Error joining contest:', error);
+    }
+  };
+
+  const fetchContestStandings = async (contestId) => {
+    try {
+      const response = await axios.get(`${API}/leaderboard/competitions/${contestId}/standings`);
+      setContestStandings(response.data);
+    } catch (error) {
+      console.error('Error fetching contest standings:', error);
+    }
+  };
     e.preventDefault();
     try {
       await axios.post(`${API}/leaderboard/competitions`, newCompetition);
