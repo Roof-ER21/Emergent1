@@ -4909,8 +4909,7 @@ const HRRecruitmentApp = () => {
 
         {/* Existing modals continue here... */}
 
-
-        {activeTab === 'compliance' && (
+        {activeTab === 'requests' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold text-gray-900">Compliance Requirements</h3>
