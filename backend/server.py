@@ -3558,6 +3558,161 @@ async def sync_signup_data_background(sync_id: str, request: dict, user_id: str)
         )
         print(f"❌ Signup sync failed: {e}")
 
+# Enhanced Contest/Competition Management Endpoints
+@api_router.post("/leaderboard/competitions/{contest_id}/join")
+async def join_contest(contest_id: str, participant_data: dict = None):
+    """Join a contest/competition"""
+    try:
+        # Find the contest
+        contest = await db.sales_competitions.find_one({"id": contest_id})
+        if not contest:
+            raise HTTPException(status_code=404, detail="Contest not found")
+        
+        # Check if contest is joinable (upcoming or current)
+        start_date = datetime.fromisoformat(contest['start_date'].replace('Z', '+00:00'))
+        end_date = datetime.fromisoformat(contest['end_date'].replace('Z', '+00:00'))
+        now = datetime.utcnow()
+        
+        if now > end_date:
+            raise HTTPException(status_code=400, detail="Contest has ended")
+            
+        # Add participant to contest
+        participant = {
+            "participant_id": participant_data.get("participant_id"),
+            "participant_name": participant_data.get("participant_name"),
+            "participant_role": participant_data.get("participant_role"),
+            "joined_at": datetime.utcnow(),
+            "current_score": 0
+        }
+        
+        # Check if already joined
+        existing_participants = contest.get("participants", [])
+        if any(p.get("participant_id") == participant["participant_id"] for p in existing_participants):
+            raise HTTPException(status_code=400, detail="Already joined this contest")
+        
+        # Update contest with new participant
+        await db.sales_competitions.update_one(
+            {"id": contest_id},
+            {"$push": {"participants": participant}}
+        )
+        
+        # Broadcast real-time update
+        if 'ws_manager' in globals():
+            await ws_manager.broadcast({
+                "type": "contest_joined",
+                "contest_id": contest_id,
+                "participant": participant,
+                "timestamp": datetime.utcnow().isoformat()
+            })
+        
+        return {"message": "Successfully joined contest", "participant": participant}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/leaderboard/competitions/{contest_id}/standings")
+async def get_contest_standings(contest_id: str):
+    """Get contest standings and participant rankings"""
+    try:
+        # Find the contest
+        contest = await db.sales_competitions.find_one({"id": contest_id})
+        if not contest:
+            raise HTTPException(status_code=404, detail="Contest not found")
+        
+        participants = contest.get("participants", [])
+        competition_type = contest.get("competition_type", "signups")
+        
+        # Calculate current scores based on competition type
+        standings = []
+        for participant in participants:
+            participant_id = participant.get("participant_id")
+            
+            # Get participant's current metrics
+            # This would typically query actual performance data
+            # For now, we'll use sample data
+            current_score = 0
+            
+            if competition_type == "signups":
+                # Query monthly signups for this participant
+                signups = await db.monthly_signups.find({
+                    "rep_id": participant_id,
+                    "month": datetime.utcnow().month,
+                    "year": datetime.utcnow().year
+                }).to_list(100)
+                current_score = len(signups)
+            elif competition_type == "revenue":
+                # Query revenue data
+                current_score = 50000  # Sample revenue
+            elif competition_type == "calls":
+                current_score = 25  # Sample calls
+            
+            standings.append({
+                "participant_id": participant_id,
+                "participant_name": participant.get("participant_name"),
+                "current_score": current_score,
+                "joined_at": participant.get("joined_at"),
+                "rank": 0  # Will be calculated after sorting
+            })
+        
+        # Sort by score and assign ranks
+        standings.sort(key=lambda x: x["current_score"], reverse=True)
+        for i, standing in enumerate(standings):
+            standing["rank"] = i + 1
+        
+        return {
+            "contest_id": contest_id,
+            "contest_name": contest.get("name"),
+            "competition_type": competition_type,
+            "total_participants": len(standings),
+            "standings": standings,
+            "last_updated": datetime.utcnow()
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/leaderboard/competitions/{contest_id}/status")
+async def get_contest_status(contest_id: str):
+    """Get detailed contest status and timeline information"""
+    try:
+        contest = await db.sales_competitions.find_one({"id": contest_id})
+        if not contest:
+            raise HTTPException(status_code=404, detail="Contest not found")
+        
+        start_date = datetime.fromisoformat(contest['start_date'].replace('Z', '+00:00'))
+        end_date = datetime.fromisoformat(contest['end_date'].replace('Z', '+00:00'))
+        now = datetime.utcnow()
+        
+        # Calculate status
+        if now < start_date:
+            status = 'upcoming'
+            progress = 0
+            days_remaining = (start_date - now).days
+        elif now > end_date:
+            status = 'past'
+            progress = 100
+            days_remaining = 0
+        else:
+            status = 'current'
+            total_duration = (end_date - start_date).total_seconds()
+            elapsed_duration = (now - start_date).total_seconds()
+            progress = int((elapsed_duration / total_duration) * 100)
+            days_remaining = (end_date - now).days
+        
+        return {
+            "contest_id": contest_id,
+            "status": status,
+            "progress": progress,
+            "days_remaining": days_remaining,
+            "start_date": start_date.isoformat(),
+            "end_date": end_date.isoformat(),
+            "participants_count": len(contest.get("participants", [])),
+            "last_updated": datetime.utcnow()
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Include the router in the main app
 app.include_router(api_router)
 
