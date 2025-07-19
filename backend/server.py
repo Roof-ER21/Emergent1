@@ -3058,7 +3058,24 @@ async def create_sales_signup(signup: SalesSignup, current_user: User = Depends(
 async def get_competitions(current_user: User = Depends(get_current_user)):
     """Get all competitions"""
     competitions = await db.sales_competitions.find().to_list(1000)
-    return [SalesCompetition(**comp) for comp in competitions]
+    
+    # Handle data migration - convert old string participants to ContestParticipant objects
+    processed_competitions = []
+    for comp in competitions:
+        # Handle participants field migration
+        participants = comp.get("participants", [])
+        if participants and isinstance(participants[0], str):
+            # Old format - convert string rep_ids to ContestParticipant objects
+            comp["participants"] = []
+        
+        try:
+            processed_competitions.append(SalesCompetition(**comp))
+        except Exception as e:
+            # Skip invalid competitions for now
+            print(f"Skipping invalid competition: {e}")
+            continue
+    
+    return processed_competitions
 
 @api_router.post("/leaderboard/competitions", response_model=SalesCompetition)
 async def create_competition(competition: SalesCompetition, current_user: User = Depends(get_current_user)):
