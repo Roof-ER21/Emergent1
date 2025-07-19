@@ -4517,6 +4517,73 @@ const HRRecruitmentApp = () => {
                   <h4 className="text-lg font-semibold text-gray-900">All Candidates</h4>
                 </div>
                 
+                {/* Stage Filter Bar */}
+                <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                  <div className="flex flex-wrap gap-2">
+                    {/* All Candidates Filter */}
+                    <button
+                      onClick={() => setSelectedStageFilter('all')}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2 ${
+                        selectedStageFilter === 'all'
+                          ? 'bg-red-600 text-white shadow-sm'
+                          : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      <span>All Candidates</span>
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        selectedStageFilter === 'all'
+                          ? 'bg-red-700 text-white'
+                          : 'bg-gray-200 text-gray-700'
+                      }`}>
+                        {hiringCandidates.length}
+                      </span>
+                    </button>
+
+                    {/* Stage Filters */}
+                    {pipelineStages.map((stage) => {
+                      const stageCount = getCandidatesByStage(stage.id).length;
+                      return (
+                        <button
+                          key={stage.id}
+                          onClick={() => setSelectedStageFilter(stage.id)}
+                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2 ${
+                            selectedStageFilter === stage.id
+                              ? 'bg-red-600 text-white shadow-sm'
+                              : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50'
+                          }`}
+                        >
+                          <span>{stage.name}</span>
+                          <span className={`px-2 py-1 rounded-full text-xs ${
+                            selectedStageFilter === stage.id
+                              ? 'bg-red-700 text-white'
+                              : stageCount > 0
+                              ? 'bg-blue-100 text-blue-700'
+                              : 'bg-gray-200 text-gray-700'
+                          }`}>
+                            {stageCount}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Active Filter Indicator */}
+                  {selectedStageFilter !== 'all' && (
+                    <div className="mt-3 flex items-center space-x-2 text-sm text-gray-600">
+                      <span>Showing candidates in:</span>
+                      <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                        {pipelineStages.find(s => s.id === selectedStageFilter)?.name}
+                      </span>
+                      <button
+                        onClick={() => setSelectedStageFilter('all')}
+                        className="text-red-600 hover:text-red-800 text-xs underline"
+                      >
+                        Clear filter
+                      </button>
+                    </div>
+                  )}
+                </div>
+                
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
@@ -4530,78 +4597,89 @@ const HRRecruitmentApp = () => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {hiringCandidates.map((candidate, index) => (
-                        <motion.tr 
-                          key={candidate.id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                          className="hover:bg-gray-50"
-                        >
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <div className="flex-shrink-0 h-10 w-10">
-                                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                                  <span className="text-red-600 font-medium">
-                                    {candidate.name?.charAt(0)}
-                                  </span>
+                      {getFilteredCandidates().length > 0 ? (
+                        getFilteredCandidates().map((candidate, index) => (
+                          <motion.tr 
+                            key={candidate.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="hover:bg-gray-50"
+                          >
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="flex items-center">
+                                <div className="flex-shrink-0 h-10 w-10">
+                                  <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                                    <span className="text-red-600 font-medium">
+                                      {candidate.name?.charAt(0)}
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="ml-4">
+                                  <div className="text-sm font-medium text-gray-900">{candidate.name}</div>
+                                  <div className="text-sm text-gray-500">{candidate.email}</div>
                                 </div>
                               </div>
-                              <div className="ml-4">
-                                <div className="text-sm font-medium text-gray-900">{candidate.name}</div>
-                                <div className="text-sm text-gray-500">{candidate.email}</div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {candidate.position || candidate.hiring_type}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <select
-                              value={candidate.status || 'applied'}
-                              onChange={(e) => handleCandidateStageChange(candidate.id, e.target.value)}
-                              className="text-sm border-gray-300 rounded-md focus:border-red-500 focus:ring-red-500"
-                            >
-                              {pipelineStages.map(stage => (
-                                <option key={stage.id} value={stage.id}>{stage.name}</option>
-                              ))}
-                            </select>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">
-                              {candidate.source || 'Manual'}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {candidate.created_at ? 
-                              new Date(candidate.created_at).toLocaleDateString() : 
-                              'No date'
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {candidate.position || candidate.hiring_type}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <select
+                                value={candidate.status || 'applied'}
+                                onChange={(e) => handleCandidateStageChange(candidate.id, e.target.value)}
+                                className="text-sm border-gray-300 rounded-md focus:border-red-500 focus:ring-red-500"
+                              >
+                                {pipelineStages.map(stage => (
+                                  <option key={stage.id} value={stage.id}>{stage.name}</option>
+                                ))}
+                              </select>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">
+                                {candidate.source || 'Manual'}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {candidate.created_at ? 
+                                new Date(candidate.created_at).toLocaleDateString() : 
+                                'No date'
+                              }
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                              <button
+                                onClick={() => {
+                                  setSelectedPipelineCandidate(candidate);
+                                  setShowCandidateDetailModal(true);
+                                  fetchCandidateNotes(candidate.id);
+                                  fetchCandidateInterviews(candidate.id);
+                                }}
+                                className="text-red-600 hover:text-red-900"
+                              >
+                                View Details
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setSelectedPipelineCandidate(candidate);
+                                  setShowScheduleModal(true);
+                                }}
+                                className="text-blue-600 hover:text-blue-900"
+                              >
+                                Schedule Interview
+                              </button>
+                            </td>
+                          </motion.tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
+                            {selectedStageFilter === 'all' 
+                              ? 'No candidates found' 
+                              : `No candidates in ${pipelineStages.find(s => s.id === selectedStageFilter)?.name} stage`
                             }
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                            <button
-                              onClick={() => {
-                                setSelectedPipelineCandidate(candidate);
-                                setShowCandidateDetailModal(true);
-                                fetchCandidateNotes(candidate.id);
-                                fetchCandidateInterviews(candidate.id);
-                              }}
-                              className="text-red-600 hover:text-red-900"
-                            >
-                              View Details
-                            </button>
-                            <button
-                              onClick={() => {
-                                setSelectedPipelineCandidate(candidate);
-                                setShowScheduleModal(true);
-                              }}
-                              className="text-blue-600 hover:text-blue-900"
-                            >
-                              Schedule Interview
-                            </button>
-                          </td>
-                        </motion.tr>
-                      ))}
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </div>
