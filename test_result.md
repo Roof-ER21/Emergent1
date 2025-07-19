@@ -755,8 +755,7 @@ test_plan:
     - "QR Code Lead Email Routing to Sales Managers Only"
     - "Sales Leaderboard Backend API Development"
     - "QR Code Generator Backend APIs"
-  stuck_tasks:
-    - "Automated Signup Sync System with Google Sheets Integration"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
