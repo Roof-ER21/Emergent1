@@ -1603,47 +1603,72 @@ const SalesLeaderboardApp = () => {
                   </span>
                 </div>
                 
-                {/* Enhanced Bar Graph with Monthly/Yearly Revenue Progress */}
-                <div className="space-y-2">
-                  {/* Monthly Revenue Progress Bar */}
-                  <div className="relative">
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-green-600">Monthly Revenue</span>
-                      <span className="text-green-800 font-medium">
-                        ${(currentUser.metrics?.monthly_revenue || 0).toLocaleString()} / ${(currentUser.goals?.monthly_revenue_goal || 0).toLocaleString()}
-                      </span>
-                    </div>
-                    <div className="w-full bg-green-100 rounded-lg h-4">
-                      <div 
-                        className="bg-green-500 h-4 rounded-lg transition-all duration-700 relative overflow-hidden"
-                        style={{ width: `${Math.min(((currentUser.metrics?.monthly_revenue || 0) / (currentUser.goals?.monthly_revenue_goal || 1)) * 100, 100)}%` }}
-                      >
-                        <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
-                      </div>
-                    </div>
-                  </div>
+                {/* Enhanced Bar Chart with Monthly/Yearly Revenue Progress */}
+                <div className="space-y-4">
+                  <ResponsiveContainer width="100%" height={100}>
+                    <BarChart
+                      data={[
+                        {
+                          name: 'Monthly',
+                          actual: currentUser.metrics?.monthly_revenue || 0,
+                          goal: currentUser.goals?.monthly_revenue_goal || 0,
+                          percentage: Math.round(((currentUser.metrics?.monthly_revenue || 0) / (currentUser.goals?.monthly_revenue_goal || 1)) * 100)
+                        },
+                        {
+                          name: 'Yearly',
+                          actual: currentUser.metrics?.yearly_revenue || 0,
+                          goal: currentUser.goals?.yearly_revenue_goal || 0,
+                          percentage: Math.round(((currentUser.metrics?.yearly_revenue || 0) / (currentUser.goals?.yearly_revenue_goal || 1)) * 100)
+                        }
+                      ]}
+                      margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#6b7280' }} />
+                      <YAxis 
+                        tick={{ fontSize: 12, fill: '#6b7280' }}
+                        tickFormatter={(value) => `$${(value/1000).toFixed(0)}K`}
+                      />
+                      <Tooltip 
+                        content={({ active, payload, label }) => {
+                          if (active && payload && payload.length) {
+                            const data = payload[0].payload;
+                            return (
+                              <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+                                <p className="font-medium text-gray-900">{label} Revenue</p>
+                                <p className="text-green-600">Actual: ${data.actual.toLocaleString()}</p>
+                                <p className="text-gray-600">Goal: ${data.goal.toLocaleString()}</p>
+                                <p className="text-yellow-600 font-medium">{data.percentage}% to Goal</p>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                      <Bar 
+                        dataKey="actual" 
+                        fill="#10b981"
+                        radius={[4, 4, 0, 0]}
+                        name="Actual Revenue"
+                      />
+                      <Bar 
+                        dataKey="goal" 
+                        fill="#e5e7eb" 
+                        radius={[4, 4, 0, 0]}
+                        name="Goal"
+                        opacity={0.5}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
                   
-                  {/* Yearly Revenue Progress Bar */}
-                  <div className="relative">
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-yellow-600">Yearly Revenue</span>
-                      <span className="text-yellow-800 font-medium">
-                        ${(currentUser.metrics?.yearly_revenue || 0).toLocaleString()} / ${(currentUser.goals?.yearly_revenue_goal || 0).toLocaleString()}
-                      </span>
-                    </div>
-                    <div className="w-full bg-yellow-100 rounded-lg h-4">
-                      <div 
-                        className="bg-yellow-500 h-4 rounded-lg transition-all duration-700 relative overflow-hidden"
-                        style={{ width: `${Math.min(((currentUser.metrics?.yearly_revenue || 0) / (currentUser.goals?.yearly_revenue_goal || 1)) * 100, 100)}%` }}
-                      >
-                        <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
-                      </div>
-                    </div>
-                    <div className="flex justify-between text-xs mt-1">
-                      <span className="text-yellow-600">
-                        Yearly % to Goal: {Math.round(((currentUser.metrics?.yearly_revenue || 0) / (currentUser.goals?.yearly_revenue_goal || 1)) * 100)}%
-                      </span>
-                    </div>
+                  {/* Progress Percentages */}
+                  <div className="flex justify-between text-xs">
+                    <span className="text-green-600 font-medium">
+                      Monthly: {Math.round(((currentUser.metrics?.monthly_revenue || 0) / (currentUser.goals?.monthly_revenue_goal || 1)) * 100)}% to Goal
+                    </span>
+                    <span className="text-yellow-600 font-medium">
+                      Yearly: {Math.round(((currentUser.metrics?.yearly_revenue || 0) / (currentUser.goals?.yearly_revenue_goal || 1)) * 100)}% to Goal
+                    </span>
                   </div>
                 </div>
               </div>
