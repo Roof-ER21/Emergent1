@@ -3690,8 +3690,19 @@ async def get_contest_status(contest_id: str):
         if not contest:
             raise HTTPException(status_code=404, detail="Contest not found")
         
-        start_date = datetime.fromisoformat(contest['start_date'].replace('Z', '+00:00'))
-        end_date = datetime.fromisoformat(contest['end_date'].replace('Z', '+00:00'))
+        start_date_str = contest['start_date']
+        end_date_str = contest['end_date']
+        
+        # Handle both string and datetime objects
+        if isinstance(start_date_str, str):
+            start_date = datetime.fromisoformat(start_date_str.replace('Z', '+00:00') if 'Z' in start_date_str else start_date_str)
+        else:
+            start_date = start_date_str
+            
+        if isinstance(end_date_str, str):
+            end_date = datetime.fromisoformat(end_date_str.replace('Z', '+00:00') if 'Z' in end_date_str else end_date_str)
+        else:
+            end_date = end_date_str
         now = datetime.utcnow()
         
         # Calculate status
