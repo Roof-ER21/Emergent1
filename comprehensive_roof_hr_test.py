@@ -297,19 +297,19 @@ def test_qr_code_generator_module():
     print("=" * 60)
     
     # Test 1: Sales reps management
-    response, error = make_request("GET", "/qr/sales-reps", role="sales_manager")
+    response, error = make_request("GET", "/qr-generator/reps", role="sales_manager")
     if error:
         results.add_result("QR Generator - Sales reps list", False, error)
     else:
         results.add_result("QR Generator - Sales reps list", response.status_code == 200,
                           f"Found {len(response.json()) if response.status_code == 200 else 0} sales reps")
     
-    # Test 2: QR code generation
-    response, error = make_request("GET", "/qr/sales-reps/rep-789/qr-code", role="sales_rep")
+    # Test 2: Sales rep profile management
+    response, error = make_request("GET", "/qr-generator/reps/rep-789", role="sales_rep")
     if error:
-        results.add_result("QR Generator - QR code generation", False, error)
+        results.add_result("QR Generator - Rep profile access", False, error)
     else:
-        results.add_result("QR Generator - QR code generation", response.status_code == 200,
+        results.add_result("QR Generator - Rep profile access", response.status_code == 200,
                           f"HTTP {response.status_code}")
     
     # Test 3: Lead capture (public endpoint)
@@ -324,7 +324,7 @@ def test_qr_code_generator_module():
     
     # Test public endpoint without authentication
     try:
-        url = f"{API_BASE}/qr/leads"
+        url = f"{API_BASE}/qr-generator/leads"
         response = requests.post(url, json=lead_data, timeout=10)
         results.add_result("QR Generator - Lead capture (public)", response.status_code in [200, 201],
                           f"HTTP {response.status_code}")
@@ -332,23 +332,15 @@ def test_qr_code_generator_module():
         results.add_result("QR Generator - Lead capture (public)", False, f"Error: {str(e)}")
     
     # Test 4: Lead management (protected)
-    response, error = make_request("GET", "/qr/leads", role="sales_manager")
+    response, error = make_request("GET", "/qr-generator/leads", role="sales_manager")
     if error:
         results.add_result("QR Generator - Lead management", False, error)
     else:
         results.add_result("QR Generator - Lead management", response.status_code == 200,
                           f"Found {len(response.json()) if response.status_code == 200 else 0} leads")
     
-    # Test 5: Sales rep profile management
-    response, error = make_request("GET", "/qr/sales-reps/rep-789", role="sales_rep")
-    if error:
-        results.add_result("QR Generator - Rep profile access", False, error)
-    else:
-        results.add_result("QR Generator - Rep profile access", response.status_code == 200,
-                          f"HTTP {response.status_code}")
-    
-    # Test 6: File upload endpoints
-    response, error = make_request("POST", "/qr/sales-reps/rep-789/upload-picture", 
+    # Test 5: File upload endpoints
+    response, error = make_request("POST", "/qr-generator/reps/rep-789/upload-picture", 
                                   {"file_data": "base64data", "file_type": "image/jpeg", "file_name": "test.jpg"}, 
                                   role="sales_rep")
     if error:
@@ -357,14 +349,22 @@ def test_qr_code_generator_module():
         results.add_result("QR Generator - File upload", response.status_code in [200, 201, 400],
                           f"HTTP {response.status_code} (endpoint accessible)")
     
-    # Test 7: Landing page data (public)
+    # Test 6: Landing page data (public)
     try:
-        url = f"{API_BASE}/qr/landing-page/rep-789"
+        url = f"{API_BASE}/public/rep/john-smith"
         response = requests.get(url, timeout=10)
         results.add_result("QR Generator - Landing page data (public)", response.status_code == 200,
                           f"HTTP {response.status_code}")
     except Exception as e:
         results.add_result("QR Generator - Landing page data (public)", False, f"Error: {str(e)}")
+    
+    # Test 7: QR Analytics
+    response, error = make_request("GET", "/qr-generator/analytics", role="sales_manager")
+    if error:
+        results.add_result("QR Generator - Analytics", False, error)
+    else:
+        results.add_result("QR Generator - Analytics", response.status_code == 200,
+                          f"HTTP {response.status_code}")
     
     return results
 
