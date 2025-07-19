@@ -2467,7 +2467,7 @@ async def update_hiring_candidate(candidate_id: str, candidate_update: HiringCan
 @api_router.delete("/hiring/candidates/{candidate_id}")
 async def delete_hiring_candidate(candidate_id: str, current_user: User = Depends(get_current_user)):
     """Delete hiring candidate"""
-    if current_user.role not in ["super_admin", "hr_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     result = await db.hiring_candidates.delete_one({"id": candidate_id})
