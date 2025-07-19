@@ -2709,7 +2709,7 @@ async def get_overdue_workers_comp(current_user: User = Depends(get_current_user
 @api_router.get("/safety/incidents", response_model=List[IncidentReport])
 async def get_incident_reports(current_user: User = Depends(get_current_user)):
     """Get incident reports"""
-    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     incidents = await db.incident_reports.find({}).to_list(100)
