@@ -729,14 +729,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Automated Signup Sync System with Google Sheets Integration"
-    - "Automated Goal Setting and Bonus Tier Automation System"
+    - "Sales Leaderboard Bar Charts with Recharts Implementation"
+    - "QR Code Landing Page Layout Optimization"
+    - "QR Code Lead Email Routing to Sales Managers Only"
     - "Sales Leaderboard Backend API Development"
-    - "User Authentication System with Emergent OAuth"
     - "QR Code Generator Backend APIs"
-    - "Sales Rep Management System"
-    - "Lead Capture and Distribution"
-    - "Google Sheets Integration with Import Functionality"
   stuck_tasks:
     - "Automated Signup Sync System with Google Sheets Integration"
   test_all: false
