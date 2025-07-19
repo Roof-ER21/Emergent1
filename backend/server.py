@@ -2683,7 +2683,7 @@ async def create_workers_comp_submission(employee_id: str, background_tasks: Bac
 @api_router.get("/compliance/workers-comp/overdue")
 async def get_overdue_workers_comp(current_user: User = Depends(get_current_user)):
     """Get overdue workers compensation submissions"""
-    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     # Find all 1099 employees hired more than 14 days ago without submissions
