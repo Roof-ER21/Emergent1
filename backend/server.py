@@ -1434,10 +1434,9 @@ async def initialize_sample_data():
 async def startup_event():
     await initialize_sample_data()
     
-    # Set up and start the signup sync scheduler
-    setup_signup_sync_scheduler()
-    signup_scheduler.start()
-    print("🔄 Signup sync scheduler started (3 times daily)")
+    # Set up and start the automated sync scheduler
+    await schedule_automated_sync()
+    print("🔄 Automated sync scheduler started (3 times daily)")
 
 @app.on_event("shutdown")
 async def shutdown_event():
