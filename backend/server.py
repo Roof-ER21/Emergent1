@@ -2386,7 +2386,7 @@ async def get_hiring_flow(flow_id: str, current_user: User = Depends(get_current
 @api_router.put("/hiring/flows/{flow_id}", response_model=HiringFlow)
 async def update_hiring_flow(flow_id: str, flow_update: HiringFlow, current_user: User = Depends(get_current_user)):
     """Update hiring flow"""
-    if current_user.role not in ["super_admin", "hr_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     flow_data = flow_update.model_dump()
