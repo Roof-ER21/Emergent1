@@ -790,6 +790,77 @@ const SalesLeaderboardApp = () => {
   const [filterTerritory, setFilterTerritory] = useState('all');
   const [selectedRep, setSelectedRep] = useState(null);
   
+  // Real-Time Sync State for Sales Leaderboard
+  const [syncStatus, setSyncStatus] = useState({
+    isConnected: false,
+    lastSync: null,
+    isSyncing: false,
+    syncMessage: '',
+    connectionStatus: 'disconnected'
+  });
+
+  // Manual sync function
+  const triggerManualSync = async () => {
+    setSyncStatus(prev => ({
+      ...prev,
+      isSyncing: true,
+      syncMessage: 'Initiating manual sync...'
+    }));
+
+    try {
+      const response = await axios.post(`${API}/sync/manual`);
+      console.log('✅ Manual sync completed:', response.data);
+    } catch (error) {
+      console.error('❌ Manual sync failed:', error);
+      setSyncStatus(prev => ({
+        ...prev,
+        isSyncing: false,
+        syncMessage: `Manual sync failed: ${error.response?.data?.detail || error.message}`
+      }));
+    }
+  };
+
+  // Initialize WebSocket for this component
+  useEffect(() => {
+    // Listen for sync status updates
+    const handleSyncComplete = (data) => {
+      setSyncStatus(prev => ({
+        ...prev,
+        lastSync: new Date(data.timestamp),
+        isSyncing: false,
+        syncMessage: data.message || 'Data sync completed successfully'
+      }));
+    };
+
+    const handleSyncError = (data) => {
+      setSyncStatus(prev => ({
+        ...prev,
+        isSyncing: false,
+        syncMessage: `Sync failed: ${data.error}`
+      }));
+    };
+
+    const handleConnection = (data) => {
+      setSyncStatus(prev => ({
+        ...prev,
+        isConnected: data.status === 'connected',
+        connectionStatus: data.status
+      }));
+    };
+
+    // Add listeners
+    wsManager.addListener('sync_complete', handleSyncComplete);
+    wsManager.addListener('sync_error', handleSyncError);
+    wsManager.addListener('connection', handleConnection);
+
+    // Cleanup
+    return () => {
+      wsManager.removeListener('sync_complete', handleSyncComplete);
+      wsManager.removeListener('sync_error', handleSyncError);
+      wsManager.removeListener('connection', handleConnection);
+    };
+  }, []);
+  
   // Real data from API
   const [competitions, setCompetitions] = useState([]);
   const [goals, setGoals] = useState([]);
