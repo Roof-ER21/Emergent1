@@ -8275,16 +8275,31 @@ const QRGeneratorApp = () => {
                   placeholder="Tell customers about yourself..."
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                <input
-                  type="tel"
-                  value={currentRep.phone || ''}
-                  onChange={(e) => handleUpdateProfile({ phone: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                  placeholder="Your phone number"
-                />
-              </div>
+              {isAdmin && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                  <input
+                    type="tel"
+                    value={currentRep.phone || ''}
+                    onChange={(e) => handleUpdateProfile({ phone: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    placeholder="Your phone number"
+                  />
+                </div>
+              )}
+              {!isAdmin && user?.role === 'sales_rep' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                  <input
+                    type="tel"
+                    value={currentRep.phone || ''}
+                    readOnly
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600 cursor-not-allowed"
+                    placeholder="Managed by sales manager"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Phone number is managed by your sales manager</p>
+                </div>
+              )}
               <div className="pt-4 border-t">
                 <h3 className="text-lg font-medium text-gray-900 mb-2">QR Code</h3>
                 <div className="flex items-center space-x-4">
