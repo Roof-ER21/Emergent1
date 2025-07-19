@@ -2213,7 +2213,7 @@ async def create_onboarding_stage(stage_create: OnboardingStageCreate, current_u
 @api_router.put("/onboarding/stages/{stage_id}", response_model=OnboardingStage)
 async def update_onboarding_stage(stage_id: str, stage_update: OnboardingStageUpdate, current_user: User = Depends(get_current_user)):
     """Update onboarding stage"""
-    if current_user.role not in ["super_admin", "hr_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     update_data = {k: v for k, v in stage_update.model_dump().items() if v is not None}
