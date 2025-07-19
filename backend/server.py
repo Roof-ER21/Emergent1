@@ -3334,7 +3334,7 @@ async def update_revenue(
 @api_router.get("/sync/status")
 async def get_sync_status(current_user: User = Depends(get_current_user)):
     """Get sync status for all sync operations"""
-    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     # Get latest sync status for each type
