@@ -5713,81 +5713,66 @@ const QRGeneratorApp = () => {
                 </div>
               </div>
 
-              {/* Services Section */}
+              {/* Services & About Us Side-by-Side */}
               <div className="p-6 bg-white">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Our Services</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { title: 'Roofing', desc: 'Complete roof replacement and repairs', icon: '🏠' },
-                    { title: 'Siding', desc: 'Vinyl, wood, and fiber cement siding', icon: '🧱' },
-                    { title: 'Gutters', desc: 'Seamless gutter installation and repair', icon: '💧' },
-                    { title: 'Windows & Doors', desc: 'Energy-efficient windows and door installation', icon: '🪟' },
-                    { title: 'Solar', desc: 'Solar panel installation and energy solutions', icon: '☀️' }
-                  ].map((service, index) => (
-                    <div key={index} className="flex items-start p-2 bg-gray-50 rounded-lg">
-                      <div className="text-lg mr-2 flex-shrink-0">{service.icon}</div>
-                      <div className="min-w-0">
-                        <h4 className="font-semibold text-gray-900 text-sm">{service.title}</h4>
-                        <p className="text-xs text-gray-600 leading-tight">{service.desc}</p>
+                <div className="grid grid-cols-2 gap-6">
+                  
+                  {/* Our Services */}
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-3">Our Services</h3>
+                    <div className="space-y-2">
+                      {[
+                        { title: 'Roofing', desc: 'Complete roof replacement', icon: '🏠' },
+                        { title: 'Siding', desc: 'Vinyl, wood, fiber cement', icon: '🧱' },
+                        { title: 'Gutters', desc: 'Seamless installation', icon: '💧' },
+                        { title: 'Windows/Doors', desc: 'Energy-efficient', icon: '🪟' },
+                        { title: 'Solar', desc: 'Energy solutions', icon: '☀️' }
+                      ].map((service, index) => (
+                        <div key={index} className="flex items-center p-2 bg-gray-50 rounded">
+                          <div className="text-sm mr-2">{service.icon}</div>
+                          <div>
+                            <h4 className="font-medium text-gray-900 text-xs">{service.title}</h4>
+                            <p className="text-xs text-gray-600">{service.desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* About Us (Local & Trusted) */}
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-3">About Us</h3>
+                    <p className="text-xs text-gray-600 mb-3">Your Neighborhood Experts</p>
+                    
+                    <div className="grid grid-cols-2 gap-2 mb-3">
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-red-600">9</div>
+                        <div className="text-xs text-gray-600">Years</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-red-600">5,000+</div>
+                        <div className="text-xs text-gray-600">Projects</div>
                       </div>
                     </div>
-                  ))}
+                    
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-gray-600">GAF Master Elite</span>
+                        <span className="text-green-600">✓</span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-gray-600">Licensed & Insured</span>
+                        <span className="text-green-600">✓</span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-gray-600">BBB A+ Rating</span>
+                        <span className="text-green-600">✓</span>
+                      </div>
+                    </div>
+                  </div>
+                  
                 </div>
               </div>
-
-              {/* Smart Homeowner Benefits */}
-              <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Smart Homeowner Benefits</h3>
-                <p className="text-gray-600 text-sm mb-4">Save thousands, earn rewards, and get complete peace of mind</p>
-                
-                <div className="bg-white p-4 rounded-lg mb-4">
-                  <h4 className="font-bold text-gray-900 mb-2">Massive Savings</h4>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-red-600">$15,000</div>
-                    <div className="text-sm text-gray-600 mb-2">Average Single-Family Home Roof</div>
-                    <div className="text-green-600 font-semibold">Potential Savings: $13,500</div>
-                  </div>
-                </div>
-                
-                <button
-                  onClick={() => setShowSavingsCalculator(true)}
-                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-                >
-                  Calculate Your Savings
-                </button>
-              </div>
-
-              {/* Local & Trusted */}
-              <div className="p-6 bg-gray-50">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Local & Trusted</h3>
-                <p className="text-gray-600 text-sm mb-4">Your Neighborhood Experts</p>
-                
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-red-600">9</div>
-                    <div className="text-xs text-gray-600">Years in Business</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-red-600">5,000+</div>
-                    <div className="text-xs text-gray-600">Projects Completed</div>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">GAF Master Elite</span>
-                    <span className="text-green-600">✓</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Licensed & Insured</span>
-                    <span className="text-green-600">✓</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">BBB A+ Rating</span>
-                    <span className="text-green-600">✓</span>
-                  </div>
-                </div>
-                
                 <button
                   onClick={handleCTAClick}
                   className="w-full bg-gray-800 text-white py-3 px-4 rounded-lg font-semibold hover:bg-gray-900 transition-colors mt-4"
