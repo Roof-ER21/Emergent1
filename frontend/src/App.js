@@ -8231,28 +8231,35 @@ const QRGeneratorApp = () => {
         <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold text-gray-900">Manage Your Profile</h2>
-            <div className="flex space-x-2">
-              <label className="cursor-pointer bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors text-sm">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleFileUpload(e, 'picture')}
-                  className="hidden"
-                  disabled={uploading}
-                />
-                {uploading && uploadType === 'picture' ? 'Uploading...' : 'Upload Photo'}
-              </label>
-              <label className="cursor-pointer bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors text-sm">
-                <input
-                  type="file"
-                  accept="video/*"
-                  onChange={(e) => handleFileUpload(e, 'video')}
-                  className="hidden"
-                  disabled={uploading}
-                />
-                {uploading && uploadType === 'video' ? 'Uploading...' : 'Upload Video'}
-              </label>
-            </div>
+            {isAdmin && (
+              <div className="flex space-x-2">
+                <label className="cursor-pointer bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors text-sm">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFileUpload(e, 'picture')}
+                    className="hidden"
+                    disabled={uploading}
+                  />
+                  {uploading && uploadType === 'picture' ? 'Uploading...' : 'Upload Photo'}
+                </label>
+                <label className="cursor-pointer bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors text-sm">
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={(e) => handleFileUpload(e, 'video')}
+                    className="hidden"
+                    disabled={uploading}
+                  />
+                  {uploading && uploadType === 'video' ? 'Uploading...' : 'Upload Video'}
+                </label>
+              </div>
+            )}
+            {!isAdmin && user?.role === 'sales_rep' && (
+              <div className="text-sm text-gray-500 italic">
+                Photo and video uploads are managed by your sales manager
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
