@@ -1823,7 +1823,7 @@ async def update_job(job_id: str, job_update: JobUpdate, background_tasks: Backg
 @api_router.delete("/jobs/{job_id}")
 async def delete_job(job_id: str, current_user: User = Depends(get_current_user)):
     """Delete job"""
-    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     result = await db.jobs.delete_one({"id": job_id})
