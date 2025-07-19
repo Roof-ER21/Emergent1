@@ -1577,7 +1577,7 @@ async def delete_employee(employee_id: str, current_user: User = Depends(get_cur
 @api_router.post("/employees/import")
 async def import_employees(import_request: EmployeeImport, current_user: User = Depends(get_current_user)):
     """Import employees from Google Sheets (fallback to sample data)"""
-    if current_user.role not in ["super_admin", "hr_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     # For now, we'll create sample data since we don't have service account credentials
