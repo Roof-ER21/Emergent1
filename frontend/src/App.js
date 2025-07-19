@@ -3576,8 +3576,6 @@ const HRRecruitmentApp = () => {
       fetchHiringFlows();
       fetchHiringCandidates();
       fetchWorkersCompSubmissions();
-      fetchProjectAssignments();
-      fetchQRScanAnalytics();
       fetchEmployeeRequests();
     }
     
