@@ -1639,69 +1639,94 @@ const SalesLeaderboardApp = () => {
                   </span>
                 </div>
                 
-                {/* Enhanced Bar Chart with Monthly/Yearly Progress */}
+                {/* Enhanced Dual-Color Bar Chart with Monthly/Yearly Progress */}
                 <div className="space-y-4">
-                  <ResponsiveContainer width="100%" height={100}>
+                  <ResponsiveContainer width="100%" height={120}>
                     <BarChart
                       data={[
                         {
-                          name: 'Monthly',
-                          actual: currentUser.metrics.monthly_signups,
-                          goal: currentUser.goals.monthly_signup_goal,
-                          percentage: Math.round((currentUser.metrics.monthly_signups / currentUser.goals.monthly_signup_goal) * 100)
-                        },
-                        {
-                          name: 'Yearly',
-                          actual: currentUser.metrics.yearly_signups,
-                          goal: Math.round(currentUser.goals.yearly_revenue_goal / 2500),
-                          percentage: Math.round((currentUser.metrics.yearly_signups / (currentUser.goals.yearly_revenue_goal / 2500)) * 100)
+                          name: 'Progress',
+                          monthly_actual: currentUser.metrics.monthly_signups,
+                          monthly_goal: currentUser.goals.monthly_signup_goal,
+                          yearly_actual: currentUser.metrics.yearly_signups,
+                          yearly_goal: Math.round(currentUser.goals.yearly_revenue_goal / 2500),
+                          monthly_percent: Math.round((currentUser.metrics.monthly_signups / currentUser.goals.monthly_signup_goal) * 100),
+                          yearly_percent: Math.round((currentUser.metrics.yearly_signups / (currentUser.goals.yearly_revenue_goal / 2500)) * 100)
                         }
                       ]}
                       margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                      <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#6b7280' }} />
-                      <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} />
+                      <XAxis 
+                        dataKey="name" 
+                        tick={{ fontSize: 12, fill: '#6b7280' }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <YAxis 
+                        tick={{ fontSize: 12, fill: '#6b7280' }}
+                        axisLine={false}
+                        tickLine={false}
+                        width={30}
+                      />
                       <Tooltip 
-                        content={({ active, payload, label }) => {
+                        content={({ active, payload }) => {
                           if (active && payload && payload.length) {
                             const data = payload[0].payload;
                             return (
-                              <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-                                <p className="font-medium text-gray-900">{label} Progress</p>
-                                <p className="text-blue-600">Actual: {data.actual} signups</p>
-                                <p className="text-gray-600">Goal: {data.goal} signups</p>
-                                <p className="text-green-600 font-medium">{data.percentage}% to Goal</p>
+                              <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
+                                <p className="font-medium text-gray-900 mb-2">Signup Performance</p>
+                                <div className="space-y-1">
+                                  <p className="text-blue-600"><span className="inline-block w-3 h-3 bg-blue-500 rounded-full mr-2"></span>Monthly: {data.monthly_actual}/{data.monthly_goal} ({data.monthly_percent}%)</p>
+                                  <p className="text-red-600"><span className="inline-block w-3 h-3 bg-red-500 rounded-full mr-2"></span>Yearly: {data.yearly_actual}/{data.yearly_goal} ({data.yearly_percent}%)</p>
+                                </div>
                               </div>
                             );
                           }
                           return null;
                         }}
                       />
+                      
+                      {/* Monthly Pace - Blue */}
                       <Bar 
-                        dataKey="actual" 
+                        dataKey="monthly_actual" 
                         fill="#3b82f6"
                         radius={[4, 4, 0, 0]}
-                        name="Actual Signups"
+                        name="Monthly Pace"
+                        maxBarSize={40}
                       />
+                      
+                      {/* Yearly Pace - Red */}
                       <Bar 
-                        dataKey="goal" 
-                        fill="#e5e7eb" 
+                        dataKey="yearly_actual" 
+                        fill="#ef4444" 
                         radius={[4, 4, 0, 0]}
-                        name="Goal"
-                        opacity={0.5}
+                        name="Yearly Pace"
+                        maxBarSize={40}
                       />
                     </BarChart>
                   </ResponsiveContainer>
                   
-                  {/* Progress Percentages */}
-                  <div className="flex justify-between text-xs">
-                    <span className="text-blue-600 font-medium">
-                      Monthly: {Math.round((currentUser.metrics.monthly_signups / currentUser.goals.monthly_signup_goal) * 100)}% to Goal
-                    </span>
-                    <span className="text-green-600 font-medium">
-                      Yearly: {Math.round((currentUser.metrics.yearly_signups / (currentUser.goals.yearly_revenue_goal / 2500)) * 100)}% to Goal
-                    </span>
+                  {/* Progress Percentages with Color-Coded Labels */}
+                  <div className="grid grid-cols-2 gap-4 text-xs">
+                    <div className="flex items-center justify-between bg-blue-50 p-2 rounded">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                        <span className="text-blue-800 font-medium">Monthly Pace</span>
+                      </div>
+                      <span className="text-blue-600 font-bold">
+                        {Math.round((currentUser.metrics.monthly_signups / currentUser.goals.monthly_signup_goal) * 100)}%
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between bg-red-50 p-2 rounded">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                        <span className="text-red-800 font-medium">Yearly Pace</span>
+                      </div>
+                      <span className="text-red-600 font-bold">
+                        {Math.round((currentUser.metrics.yearly_signups / (currentUser.goals.yearly_revenue_goal / 2500)) * 100)}%
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
