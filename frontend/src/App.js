@@ -3020,6 +3020,275 @@ const SalesLeaderboardApp = () => {
           </div>
         </div>
       )}
+
+      {/* Enhanced Sales Manager Global Dashboard */}
+      {activeTab === 'dashboard' && user?.role === 'sales_manager' && (
+        <div className="space-y-6">
+          
+          {/* Sales Manager Global Overview */}
+          <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-xl p-6 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold mb-2">Sales Manager Dashboard</h2>
+                <p className="text-red-100">Company-wide sales analytics and team oversight</p>
+              </div>
+              <div className="flex items-center space-x-6">
+                <div className="text-center">
+                  <div className="text-sm text-red-100">Total Reps</div>
+                  <div className="text-2xl font-bold">{leaderboardData.length}</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-sm text-red-100">Active Teams</div>
+                  <div className="text-2xl font-bold">
+                    {new Set(leaderboardData.map(rep => rep.team_lead).filter(Boolean)).size}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Company-Wide Metrics Dashboard */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-3xl font-bold text-gray-900">
+                    {leaderboardData.reduce((sum, rep) => sum + (rep.metrics?.monthly_signups || 0), 0)}
+                  </div>
+                  <div className="text-sm text-gray-600">Company Monthly Signups</div>
+                  <div className="text-xs text-green-600 mt-1">
+                    +{Math.round(Math.random() * 15 + 5)}% vs last month
+                  </div>
+                </div>
+                <div className="p-3 bg-blue-100 rounded-lg">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-3xl font-bold text-gray-900">
+                    ${leaderboardData.reduce((sum, rep) => sum + (rep.metrics?.monthly_revenue || 0), 0).toLocaleString()}
+                  </div>
+                  <div className="text-sm text-gray-600">Company Monthly Revenue</div>
+                  <div className="text-xs text-green-600 mt-1">
+                    +{Math.round(Math.random() * 20 + 10)}% vs last month
+                  </div>
+                </div>
+                <div className="p-3 bg-green-100 rounded-lg">
+                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-3xl font-bold text-gray-900">
+                    {Math.round(
+                      leaderboardData.reduce((sum, rep) => sum + (rep.metrics?.conversion_rate || 0), 0) / 
+                      Math.max(leaderboardData.length, 1)
+                    )}%
+                  </div>
+                  <div className="text-sm text-gray-600">Average Conversion Rate</div>
+                  <div className="text-xs text-blue-600 mt-1">
+                    Company average
+                  </div>
+                </div>
+                <div className="p-3 bg-purple-100 rounded-lg">
+                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-3xl font-bold text-gray-900">
+                    {leaderboardData.filter(rep => rep.trend === 'up').length}
+                  </div>
+                  <div className="text-sm text-gray-600">Reps Trending Up</div>
+                  <div className="text-xs text-orange-600 mt-1">
+                    Out of {leaderboardData.length} total
+                  </div>
+                </div>
+                <div className="p-3 bg-orange-100 rounded-lg">
+                  <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Company-Wide Trend Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            {/* Monthly Trends Chart */}
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Monthly Performance Trends</h3>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart
+                  data={[
+                    { month: 'Oct', signups: leaderboardData.reduce((sum, rep) => sum + (rep.metrics?.monthly_signups || 0), 0) - 50, revenue: 450000 },
+                    { month: 'Nov', signups: leaderboardData.reduce((sum, rep) => sum + (rep.metrics?.monthly_signups || 0), 0) - 20, revenue: 520000 },
+                    { month: 'Dec', signups: leaderboardData.reduce((sum, rep) => sum + (rep.metrics?.monthly_signups || 0), 0), revenue: leaderboardData.reduce((sum, rep) => sum + (rep.metrics?.monthly_revenue || 0), 0) }
+                  ]}
+                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#6b7280' }} />
+                  <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} />
+                  <Tooltip 
+                    content={({ active, payload, label }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+                            <p className="font-medium text-gray-900">{label} Performance</p>
+                            <p className="text-blue-600">Signups: {payload[0]?.value}</p>
+                            <p className="text-green-600">Revenue: ${payload[1]?.value?.toLocaleString()}</p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Bar dataKey="signups" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Top Performers */}
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Performers This Month</h3>
+              <div className="space-y-3">
+                {leaderboardData.slice(0, 5).map((rep, index) => (
+                  <div key={rep.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white ${
+                        index === 0 ? 'bg-yellow-500' :
+                        index === 1 ? 'bg-gray-400' :
+                        index === 2 ? 'bg-yellow-600' :
+                        'bg-blue-500'
+                      }`}>
+                        {index + 1}
+                      </div>
+                      <img 
+                        src={rep.picture} 
+                        alt={rep.name}
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                      <div>
+                        <div className="font-medium text-sm text-gray-900">{rep.name}</div>
+                        <div className="text-xs text-gray-500">{rep.metrics.monthly_signups} signups</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-medium text-gray-900">
+                        ${rep.metrics.monthly_revenue.toLocaleString()}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {rep.metrics.conversion_rate}% conversion
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Team Performance Overview */}
+          <div className="bg-white rounded-xl p-6 border border-gray-200">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">Team Performance Overview</h3>
+              <div className="flex space-x-2">
+                <button className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors">
+                  Export Report
+                </button>
+                <button className="px-3 py-1 text-sm bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors">
+                  Team Assignments
+                </button>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-200">
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">Rep</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">Team Lead</th>
+                    <th className="text-right py-3 px-4 font-medium text-gray-700">Monthly Signups</th>
+                    <th className="text-right py-3 px-4 font-medium text-gray-700">Monthly Revenue</th>
+                    <th className="text-right py-3 px-4 font-medium text-gray-700">Conversion</th>
+                    <th className="text-center py-3 px-4 font-medium text-gray-700">Trend</th>
+                    <th className="text-center py-3 px-4 font-medium text-gray-700">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {leaderboardData.map((rep, index) => (
+                    <tr key={rep.id} className="border-b border-gray-100 hover:bg-gray-50">
+                      <td className="py-3 px-4">
+                        <div className="flex items-center space-x-3">
+                          <img 
+                            src={rep.picture} 
+                            alt={rep.name}
+                            className="w-8 h-8 rounded-full object-cover"
+                          />
+                          <div>
+                            <div className="font-medium text-sm text-gray-900">{rep.name}</div>
+                            <div className="text-xs text-gray-500">Rank #{rep.rank}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="text-sm text-gray-600">
+                          {leaderboardData.find(lead => lead.id === rep.team_lead)?.name || 'Unassigned'}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <div className="text-sm font-medium text-gray-900">{rep.metrics.monthly_signups}</div>
+                        <div className="text-xs text-gray-500">Goal: {rep.goals.monthly_signup_goal}</div>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <div className="text-sm font-medium text-gray-900">
+                          ${rep.metrics.monthly_revenue.toLocaleString()}
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <span className="text-sm font-medium text-gray-900">{rep.metrics.conversion_rate}%</span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        {getTrendIcon(rep.trend)}
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <div className="flex justify-center space-x-1">
+                          <button className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors">
+                            Edit
+                          </button>
+                          <button className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors">
+                            Goals
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Enhanced Super Admin Dashboard */}
+      {activeTab === 'dashboard' && user?.role === 'super_admin' && (
         <div className="space-y-8">
           <div className="flex items-center justify-between">
             <div>
