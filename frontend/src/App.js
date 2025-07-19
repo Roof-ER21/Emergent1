@@ -5315,6 +5315,11 @@ const QRGeneratorApp = () => {
   });
   const [uploading, setUploading] = useState(false);
   const [uploadType, setUploadType] = useState('');
+  
+  // Savings Calculator State
+  const [showSavingsCalculator, setShowSavingsCalculator] = useState(false);
+  const [roofCostInput, setRoofCostInput] = useState('');
+  const [calculatedSavings, setCalculatedSavings] = useState(0);
 
   const isAdmin = user?.role === 'super_admin' || user?.role === 'sales_manager';
   const currentRep = salesReps.find(rep => rep.id === user?.id);
