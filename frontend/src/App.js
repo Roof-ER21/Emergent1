@@ -58,6 +58,15 @@ const AuthProvider = ({ children }) => {
         phone: '(555) 234-5678',
         territory: 'Mid-Atlantic'
       },
+      'team_lead': {
+        id: 'lead-555',
+        email: 'teamlead@theroofdocs.com',
+        name: 'Team Lead',
+        role: 'team_lead',
+        picture: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&h=150&fit=crop&crop=face',
+        phone: '(555) 333-4444',
+        territory: 'Northern Virginia'
+      },
       'sales_rep': {
         id: 'rep-789',
         email: 'john.smith@theroofdocs.com',
@@ -74,6 +83,15 @@ const AuthProvider = ({ children }) => {
         role: 'hr_manager',
         picture: 'https://images.unsplash.com/photo-1494790108755-2616b9cf1d1e?w=150&h=150&fit=crop&crop=face',
         phone: '(555) 456-7890',
+        territory: 'Corporate'
+      },
+      'employee': {
+        id: 'emp-202',
+        email: 'employee@theroofdocs.com',
+        name: 'Employee User',
+        role: 'employee',
+        picture: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+        phone: '(555) 567-8901',
         territory: 'Corporate'
       }
     };
