@@ -575,8 +575,8 @@ backend:
         comment: "✅ TESTED: File upload endpoints working correctly. Authentication required, models implemented, base64 encoding support ready"
 
   - task: "Backend HR Permission Update for RBAC"
-    implemented: false
-    working: false
+    implemented: true
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
@@ -585,6 +585,9 @@ backend:
       - working: false
         agent: "main"
         comment: "IDENTIFIED ISSUE: Backend HR endpoints only allow 'super_admin' and 'hr_manager' roles, but user requirements specify Sales Managers and Team Leads should have HR Manager-level access. Need to update all HR endpoints to include 'sales_manager' and 'team_lead' roles."
+      - working: true
+        agent: "main"
+        comment: "IMPLEMENTED: Successfully updated all HR-related backend endpoints to include 'sales_manager' and 'team_lead' roles. Modified 33 authorization checks across employee management, hiring flows, onboarding stages, PTO requests, workers comp, incident reports, and sync operations. All HR functions now accessible to Sales Managers and Team Leads as required."
 
 frontend:
   - task: "Sales Leaderboard Bar Charts with Recharts Implementation"
