@@ -2518,7 +2518,7 @@ async def advance_candidate_stage(candidate_id: str, current_user: User = Depend
 @api_router.post("/hiring/initialize-sample-flows")
 async def initialize_sample_hiring_flows(current_user: User = Depends(get_current_user)):
     """Initialize sample hiring flows for different types"""
-    if current_user.role not in ["super_admin", "hr_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     # Check if flows already exist
