@@ -3131,6 +3131,7 @@ const HRRecruitmentApp = () => {
   const [bulkImportModal, setBulkImportModal] = useState(false);
   const [emailTemplates, setEmailTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState('');
+  const [selectedStageFilter, setSelectedStageFilter] = useState('all'); // For list view filtering
   
   // Pipeline stages for Kanban view
   const pipelineStages = [
