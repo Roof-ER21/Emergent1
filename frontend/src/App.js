@@ -189,7 +189,8 @@ const AppHub = () => {
       description: 'Track performance, competitions, and sales metrics with comprehensive analytics',
       icon: '🏆',
       color: 'primary',
-      features: ['Real-time Rankings', 'Goal Tracking', 'Competition Management', 'Bonus Tiers']
+      features: ['Real-time Rankings', 'Goal Tracking', 'Competition Management', 'Bonus Tiers'],
+      roles: ['super_admin', 'sales_manager', 'sales_rep', 'team_lead'] // Sales-focused roles only
     },
     {
       id: 'hr-recruitment',
@@ -197,7 +198,8 @@ const AppHub = () => {
       description: 'Complete hiring workflow from applications to onboarding',
       icon: '👥',
       color: 'secondary',
-      features: ['Candidate Management', 'Interview Scheduling', 'Onboarding Flows', 'Compliance Tracking']
+      features: ['Candidate Management', 'Interview Scheduling', 'Onboarding Flows', 'Compliance Tracking'],
+      roles: ['super_admin', 'hr_manager'] // HR-focused roles only
     },
     {
       id: 'qr-generator',
@@ -205,9 +207,13 @@ const AppHub = () => {
       description: 'Generate branded QR codes with personalized landing pages',
       icon: '📱',
       color: 'primary',
-      features: ['Custom QR Codes', 'Landing Pages', 'Lead Capture', 'Analytics Dashboard']
+      features: ['Custom QR Codes', 'Landing Pages', 'Lead Capture', 'Analytics Dashboard'],
+      roles: ['super_admin', 'sales_manager', 'sales_rep'] // Sales-focused roles only
     }
   ];
+
+  // Filter apps based on user role
+  const allowedApps = apps.filter(app => app.roles.includes(user?.role));
 
   const getRoleDisplay = (role) => {
     const roleMap = {
