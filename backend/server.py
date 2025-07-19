@@ -1602,7 +1602,7 @@ async def import_employees(import_request: EmployeeImport, current_user: User = 
 @api_router.post("/employees/import-from-sheets")
 async def import_employees_from_sheets(import_request: GoogleSheetsImportRequest, current_user: User = Depends(get_current_user)):
     """Import employees from Google Sheets with real API integration"""
-    if current_user.role not in ["super_admin", "hr_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     if import_request.data_type != "employees":
