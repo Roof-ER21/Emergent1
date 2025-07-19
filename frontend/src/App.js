@@ -1515,47 +1515,69 @@ const SalesLeaderboardApp = () => {
                   </span>
                 </div>
                 
-                {/* Enhanced Bar Graph with Monthly/Yearly Progress */}
-                <div className="space-y-2">
-                  {/* Monthly Progress Bar */}
-                  <div className="relative">
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-blue-600">Monthly Progress</span>
-                      <span className="text-blue-800 font-medium">
-                        {currentUser.metrics.monthly_signups} / {currentUser.goals.monthly_signup_goal}
-                      </span>
-                    </div>
-                    <div className="w-full bg-blue-100 rounded-lg h-4">
-                      <div 
-                        className="bg-blue-500 h-4 rounded-lg transition-all duration-700 relative overflow-hidden"
-                        style={{ width: `${Math.min((currentUser.metrics.monthly_signups / currentUser.goals.monthly_signup_goal) * 100, 100)}%` }}
-                      >
-                        <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
-                      </div>
-                    </div>
-                  </div>
+                {/* Enhanced Bar Chart with Monthly/Yearly Progress */}
+                <div className="space-y-4">
+                  <ResponsiveContainer width="100%" height={100}>
+                    <BarChart
+                      data={[
+                        {
+                          name: 'Monthly',
+                          actual: currentUser.metrics.monthly_signups,
+                          goal: currentUser.goals.monthly_signup_goal,
+                          percentage: Math.round((currentUser.metrics.monthly_signups / currentUser.goals.monthly_signup_goal) * 100)
+                        },
+                        {
+                          name: 'Yearly',
+                          actual: currentUser.metrics.yearly_signups,
+                          goal: Math.round(currentUser.goals.yearly_revenue_goal / 2500),
+                          percentage: Math.round((currentUser.metrics.yearly_signups / (currentUser.goals.yearly_revenue_goal / 2500)) * 100)
+                        }
+                      ]}
+                      margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#6b7280' }} />
+                      <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} />
+                      <Tooltip 
+                        content={({ active, payload, label }) => {
+                          if (active && payload && payload.length) {
+                            const data = payload[0].payload;
+                            return (
+                              <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+                                <p className="font-medium text-gray-900">{label} Progress</p>
+                                <p className="text-blue-600">Actual: {data.actual} signups</p>
+                                <p className="text-gray-600">Goal: {data.goal} signups</p>
+                                <p className="text-green-600 font-medium">{data.percentage}% to Goal</p>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                      <Bar 
+                        dataKey="actual" 
+                        fill="#3b82f6"
+                        radius={[4, 4, 0, 0]}
+                        name="Actual Signups"
+                      />
+                      <Bar 
+                        dataKey="goal" 
+                        fill="#e5e7eb" 
+                        radius={[4, 4, 0, 0]}
+                        name="Goal"
+                        opacity={0.5}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
                   
-                  {/* Yearly Progress Bar */}
-                  <div className="relative">
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-green-600">Yearly Progress</span>
-                      <span className="text-green-800 font-medium">
-                        {currentUser.metrics.yearly_signups} / {Math.round(currentUser.goals.yearly_revenue_goal / 2500)}
-                      </span>
-                    </div>
-                    <div className="w-full bg-green-100 rounded-lg h-4">
-                      <div 
-                        className="bg-green-500 h-4 rounded-lg transition-all duration-700 relative overflow-hidden"
-                        style={{ width: `${Math.min((currentUser.metrics.yearly_signups / (currentUser.goals.yearly_revenue_goal / 2500)) * 100, 100)}%` }}
-                      >
-                        <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
-                      </div>
-                    </div>
-                    <div className="flex justify-between text-xs mt-1">
-                      <span className="text-green-600">
-                        Yearly % to Goal: {Math.round((currentUser.metrics.yearly_signups / (currentUser.goals.yearly_revenue_goal / 2500)) * 100)}%
-                      </span>
-                    </div>
+                  {/* Progress Percentages */}
+                  <div className="flex justify-between text-xs">
+                    <span className="text-blue-600 font-medium">
+                      Monthly: {Math.round((currentUser.metrics.monthly_signups / currentUser.goals.monthly_signup_goal) * 100)}% to Goal
+                    </span>
+                    <span className="text-green-600 font-medium">
+                      Yearly: {Math.round((currentUser.metrics.yearly_signups / (currentUser.goals.yearly_revenue_goal / 2500)) * 100)}% to Goal
+                    </span>
                   </div>
                 </div>
               </div>
