@@ -371,7 +371,6 @@ async def get_sync_status():
         "active_websocket_connections": len(ws_manager.active_connections),
         "last_sync": datetime.utcnow()  # You can store this in DB for real tracking
     }
-app = FastAPI(title="Roof-HR API", version="1.0.0")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
