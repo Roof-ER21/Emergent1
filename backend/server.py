@@ -823,10 +823,18 @@ def generate_landing_page_url(rep_name: str, base_url: str = "https://theroofdoc
     return f"{base_url}/rep/{url_name}"
 
 async def send_lead_notification(lead: Lead, rep_email: str, background_tasks: BackgroundTasks):
-    """Send email notification to sales rep about new lead"""
+    """Send email notification to sales managers about new lead"""
+    # Get all users with sales_manager role
+    sales_managers = await db.users.find({"role": "sales_manager"}).to_list(100)
+    
+    if not sales_managers:
+        # Fallback to super_admin if no sales managers found
+        super_admins = await db.users.find({"role": "super_admin"}).to_list(100)
+        sales_managers = super_admins
+    
     template_data = {
-        "recipient_name": lead.rep_name,
-        "message": f"You have received a new lead from {lead.name}.",
+        "recipient_name": "Sales Manager",
+        "message": f"A new lead has been submitted by {lead.name} for rep {lead.rep_name}.",
         "job_id": lead.id,
         "job_title": f"New Lead - {lead.name}",
         "job_status": lead.status,
@@ -834,12 +842,15 @@ async def send_lead_notification(lead: Lead, rep_email: str, background_tasks: B
         "action_url": f"https://theroofdocs.com/leads/{lead.id}"
     }
     
-    await send_email(
-        rep_email,
-        f"New Lead Alert - {lead.name}",
-        template_data,
-        background_tasks
-    )
+    # Send email to all sales managers
+    for manager in sales_managers:
+        template_data["recipient_name"] = manager.get("name", "Sales Manager")
+        await send_email(
+            manager["email"],
+            f"New Lead Alert - {lead.name}",
+            template_data,
+            background_tasks
+        )
 
 # HR Module Helper Functions
 async def calculate_pto_days(start_date: datetime, end_date: datetime) -> float:
