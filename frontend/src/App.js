@@ -6589,6 +6589,8 @@ const HRRecruitmentApp = () => {
               </div>
             )}
           </div>
+            )}
+          </div>
         )}
 
         {/* Enhanced Candidate Detail Modal */}
