@@ -1546,7 +1546,7 @@ async def get_employee(employee_id: str, current_user: User = Depends(get_curren
 @api_router.put("/employees/{employee_id}", response_model=Employee)
 async def update_employee(employee_id: str, employee_update: Employee, current_user: User = Depends(get_current_user)):
     """Update employee"""
-    if current_user.role not in ["super_admin", "hr_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     employee_dict = employee_update.model_dump()
