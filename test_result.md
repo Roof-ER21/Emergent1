@@ -812,9 +812,21 @@ test_plan:
   test_all: true
   test_priority: "comprehensive_system_verification"
 
+  - task: "QR Code Generator Sales Rep View Simplification"
+    implemented: true
+    working: true
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "IMPLEMENTED: Simplified QR Code Generator for Sales Reps to 'About Me' editing only. Restricted photo/video uploads and phone number editing to Sales Managers/Admins only. Sales Reps now have read-only access to phone field with informational messages that these are managed by their sales manager. Upload buttons are only visible to isAdmin users (super_admin, sales_manager)."
+
 agent_communication:
   - agent: "main"
-    message: "Starting Phase 1: Identified backend permission issue preventing Team Lead HR access. HR endpoints need to be updated to include 'sales_manager' and 'team_lead' roles alongside existing 'super_admin' and 'hr_manager' permissions."
+    message: "PHASE 2 PROGRESS: Successfully implemented QR Code Generator Sales Rep view simplification. Sales Reps can now only edit 'About Me' section as requested, while photo/video uploads and phone editing are restricted to Sales Managers/Admins. Workers Comp functionality for Sales Reps was already implemented (VA, MD, PA, NJ, NC states with upload features). Still need to verify goal-setting capabilities for HR/Sales Managers."
   - agent: "main"
     message: "🚀 NEW REQUIREMENTS IMPLEMENTATION: Starting implementation of enhanced Sales Leaderboard with visual bar graphs, QR Code app email configuration updates, and layout improvements for better horizontal design. Focus areas: 1) Sales Leaderboard bar graphs with % to goal tracking and color coding for monthly vs yearly pace, 2) QR form email routing to sales managers only, 3) Side-by-side layout for Our Services and About Us sections, 4) More horizontal QR landing page layouts."
   - agent: "main"
