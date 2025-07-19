@@ -5324,6 +5324,20 @@ const QRGeneratorApp = () => {
   const isAdmin = user?.role === 'super_admin' || user?.role === 'sales_manager';
   const currentRep = salesReps.find(rep => rep.id === user?.id);
 
+  // Calculate savings (always $1,500 less than input)
+  const calculateSavings = (inputCost) => {
+    const cost = parseFloat(inputCost) || 0;
+    const savings = Math.max(0, cost - 1500); // Ensure non-negative
+    setCalculatedSavings(savings);
+  };
+
+  // Handle savings calculator
+  const handleSavingsCalculation = () => {
+    if (roofCostInput) {
+      calculateSavings(roofCostInput);
+    }
+  };
+
   // Fetch sales reps from API
   const fetchSalesReps = async () => {
     try {
