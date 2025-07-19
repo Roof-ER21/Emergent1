@@ -1674,24 +1674,6 @@ const SalesLeaderboardApp = () => {
       console.error('Error fetching contest standings:', error);
     }
   };
-    e.preventDefault();
-    try {
-      await axios.post(`${API}/leaderboard/competitions`, newCompetition);
-      await fetchCompetitions();
-      setShowCompetitionModal(false);
-      setNewCompetition({
-        name: '',
-        description: '',
-        competition_type: 'signups',
-        start_date: '',
-        end_date: '',
-        prize_description: '',
-        rules: ''
-      });
-    } catch (error) {
-      console.error('Error creating competition:', error);
-    }
-  };
 
   const handleAssignGoal = async (e) => {
     e.preventDefault();
