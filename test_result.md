@@ -754,8 +754,6 @@ test_plan:
     - "QR Code Generator Backend APIs"
   stuck_tasks:
     - "Automated Signup Sync System with Google Sheets Integration"
-    - "Sales Leaderboard Bar Charts with Recharts Implementation"
-    - "QR Code Landing Page Layout Optimization"
   test_all: false
   test_priority: "high_first"
 
