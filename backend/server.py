@@ -2374,7 +2374,7 @@ async def create_hiring_flow(flow: HiringFlow, current_user: User = Depends(get_
 @api_router.get("/hiring/flows/{flow_id}", response_model=HiringFlow)
 async def get_hiring_flow(flow_id: str, current_user: User = Depends(get_current_user)):
     """Get hiring flow by ID"""
-    if current_user.role not in ["super_admin", "hr_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     flow = await db.hiring_flows.find_one({"id": flow_id})
