@@ -3589,6 +3589,13 @@ const HRRecruitmentApp = () => {
     return hiringCandidates.filter(candidate => candidate.status === stage);
   };
 
+  const getFilteredCandidates = () => {
+    if (selectedStageFilter === 'all') {
+      return hiringCandidates;
+    }
+    return hiringCandidates.filter(candidate => candidate.status === selectedStageFilter);
+  };
+
   const handleDragDrop = async (candidateId, targetStage) => {
     // Handle drag and drop between stages
     await handleCandidateStageChange(candidateId, targetStage);
