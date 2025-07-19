@@ -1565,7 +1565,7 @@ async def update_employee(employee_id: str, employee_update: Employee, current_u
 @api_router.delete("/employees/{employee_id}")
 async def delete_employee(employee_id: str, current_user: User = Depends(get_current_user)):
     """Delete employee"""
-    if current_user.role not in ["super_admin", "hr_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     result = await db.employees.delete_one({"id": employee_id})
