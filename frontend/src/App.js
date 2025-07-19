@@ -1507,22 +1507,55 @@ const SalesLeaderboardApp = () => {
                   <div className="text-sm text-blue-600">Monthly Signups</div>
                 </div>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-blue-600">Goal: {currentUser.goals.monthly_signup_goal}</span>
+                  <span className="text-blue-600">Monthly Goal: {currentUser.goals.monthly_signup_goal}</span>
                   <span className="text-blue-800 font-medium">
                     {Math.round((currentUser.metrics.monthly_signups / currentUser.goals.monthly_signup_goal) * 100)}%
                   </span>
                 </div>
-                <div className="relative">
-                  <div className="w-full bg-blue-200 rounded-full h-3">
-                    <div 
-                      className="bg-blue-500 h-3 rounded-full transition-all duration-500"
-                      style={{ width: `${Math.min((currentUser.metrics.monthly_signups / currentUser.goals.monthly_signup_goal) * 100, 100)}%` }}
-                    ></div>
+                
+                {/* Enhanced Bar Graph with Monthly/Yearly Progress */}
+                <div className="space-y-2">
+                  {/* Monthly Progress Bar */}
+                  <div className="relative">
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-blue-600">Monthly Progress</span>
+                      <span className="text-blue-800 font-medium">
+                        {currentUser.metrics.monthly_signups} / {currentUser.goals.monthly_signup_goal}
+                      </span>
+                    </div>
+                    <div className="w-full bg-blue-100 rounded-lg h-4">
+                      <div 
+                        className="bg-blue-500 h-4 rounded-lg transition-all duration-700 relative overflow-hidden"
+                        style={{ width: `${Math.min((currentUser.metrics.monthly_signups / currentUser.goals.monthly_signup_goal) * 100, 100)}%` }}
+                      >
+                        <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-xs text-blue-600 mt-1">
-                    Yearly: {currentUser.metrics.yearly_signups} / {currentUser.goals.yearly_revenue_goal / 2500} signups
+                  
+                  {/* Yearly Progress Bar */}
+                  <div className="relative">
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-green-600">Yearly Progress</span>
+                      <span className="text-green-800 font-medium">
+                        {currentUser.metrics.yearly_signups} / {Math.round(currentUser.goals.yearly_revenue_goal / 2500)}
+                      </span>
+                    </div>
+                    <div className="w-full bg-green-100 rounded-lg h-4">
+                      <div 
+                        className="bg-green-500 h-4 rounded-lg transition-all duration-700 relative overflow-hidden"
+                        style={{ width: `${Math.min((currentUser.metrics.yearly_signups / (currentUser.goals.yearly_revenue_goal / 2500)) * 100, 100)}%` }}
+                      >
+                        <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+                      </div>
+                    </div>
+                    <div className="flex justify-between text-xs mt-1">
+                      <span className="text-green-600">
+                        Yearly % to Goal: {Math.round((currentUser.metrics.yearly_signups / (currentUser.goals.yearly_revenue_goal / 2500)) * 100)}%
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
