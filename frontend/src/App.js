@@ -6614,6 +6614,100 @@ const QRGeneratorApp = () => {
           </AnimatePresence>
         </div>
       </div>
+      
+      {/* Savings Calculator Bubble Modal */}
+      {showSavingsCalculator && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            className="bg-white rounded-lg shadow-xl p-6 m-4 max-w-md w-full"
+          >
+            <div className="text-center">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">
+                💰 Calculate Your Roof Savings
+              </h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    What do you think your roof will cost?
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                    <input
+                      type="number"
+                      value={roofCostInput}
+                      onChange={(e) => {
+                        setRoofCostInput(e.target.value);
+                        if (e.target.value) {
+                          calculateSavings(e.target.value);
+                        }
+                      }}
+                      placeholder="Enter estimated cost"
+                      className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                    />
+                  </div>
+                </div>
+                
+                {calculatedSavings > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-green-50 border border-green-200 rounded-lg p-4"
+                  >
+                    <h4 className="text-lg font-bold text-green-800 mb-2">
+                      🎉 Great News!
+                    </h4>
+                    <p className="text-green-700 mb-2">
+                      With our expert roofing services, you could save:
+                    </p>
+                    <div className="text-3xl font-bold text-green-600">
+                      ${calculatedSavings.toLocaleString()}
+                    </div>
+                    <p className="text-sm text-green-600 mt-2">
+                      That's $1,500 less than your estimate!
+                    </p>
+                  </motion.div>
+                )}
+                
+                {calculatedSavings === 0 && roofCostInput && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <p className="text-yellow-700">
+                      Please enter an amount over $1,500 to see your potential savings.
+                    </p>
+                  </div>
+                )}
+                
+                <div className="space-y-3 mt-6">
+                  <button
+                    onClick={() => {
+                      // Trigger contact form or lead capture
+                      setShowSavingsCalculator(false);
+                      // You can add logic here to show contact form
+                    }}
+                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                  >
+                    Get My Free Inspection
+                  </button>
+                  
+                  <button
+                    onClick={() => setShowSavingsCalculator(false)}
+                    className="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+              
+              <div className="mt-4 text-xs text-gray-500">
+                * Savings estimate based on our competitive pricing and quality materials
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };
