@@ -2356,7 +2356,7 @@ async def get_pto_balance(employee_id: str, current_user: User = Depends(get_cur
 @api_router.get("/hiring/flows", response_model=List[HiringFlow])
 async def get_hiring_flows(current_user: User = Depends(get_current_user)):
     """Get all hiring flows"""
-    if current_user.role not in ["super_admin", "hr_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     flows = await db.hiring_flows.find().to_list(1000)
