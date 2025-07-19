@@ -73,11 +73,13 @@ const ROLE_PERMISSIONS = {
   ],
   'hr_manager': [
     PERMISSIONS.VIEW_HR,
-    PERMISSIONS.MANAGE_HR
+    PERMISSIONS.MANAGE_HR,
+    PERMISSIONS.VIEW_LEADERBOARD  // Added leaderboard viewing
   ],
   'employee': [
     PERMISSIONS.VIEW_HR,
-    PERMISSIONS.REQUEST_PTO
+    PERMISSIONS.REQUEST_PTO,
+    PERMISSIONS.VIEW_LEADERBOARD  // Added leaderboard viewing
   ]
 };
 
