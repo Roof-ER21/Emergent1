@@ -1611,43 +1611,8 @@ const SalesLeaderboardApp = () => {
           
         </nav>
       </div>
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                Team Leaderboard
-              </button>
-              <button
-                onClick={() => setActiveTab('team-management')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
-                  activeTab === 'team-management'
-                    ? 'border-red-500 text-red-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                </svg>
-                Team Management
-              </button>
-            </>
-          )}
 
-          {/* Admin/Sales Manager Navigation */}
-          {(user?.role === 'super_admin' || user?.role === 'sales_manager') && (
-            <>
-              <button
-                onClick={() => setActiveTab('dashboard')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
-                  activeTab === 'dashboard'
-                    ? 'border-red-500 text-red-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                Overview Dashboard
-              </button>
-              <button
-                onClick={() => setActiveTab('leaderboard')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
+      {/* Tab Content */}
                   activeTab === 'leaderboard'
                     ? 'border-red-500 text-red-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
