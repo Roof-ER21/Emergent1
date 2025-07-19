@@ -861,8 +861,33 @@ const SalesLeaderboardApp = () => {
     };
   }, []);
   
-  // Real data from API
+  // Enhanced Competition Management State
   const [competitions, setCompetitions] = useState([]);
+  const [contestFilter, setContestFilter] = useState('current'); // 'past', 'current', 'upcoming'
+  const [selectedContest, setSelectedContest] = useState(null);
+  const [showContestModal, setShowContestModal] = useState(false);
+  const [showParticipantModal, setShowParticipantModal] = useState(false);
+  const [contestParticipants, setContestParticipants] = useState([]);
+  const [contestStandings, setContestStandings] = useState([]);
+  
+  // Enhanced Contest Form State
+  const [newCompetition, setNewCompetition] = useState({
+    name: '',
+    description: '',
+    competition_type: 'signups', // signups, revenue, calls, meetings
+    start_date: '',
+    end_date: '',
+    prize_description: '',
+    rules: '',
+    prize_tiers: [
+      { position: 1, prize: '', description: '' },
+      { position: 2, prize: '', description: '' },
+      { position: 3, prize: '', description: '' }
+    ],
+    target_metric: 0,
+    is_team_competition: false,
+    max_participants: null
+  });
   const [goals, setGoals] = useState([]);
   const [signups, setSignups] = useState([]);
   const [metrics, setMetrics] = useState([]);
