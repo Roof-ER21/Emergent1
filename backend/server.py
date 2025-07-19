@@ -277,7 +277,100 @@ class RealTimeSyncService:
 # Initialize real-time sync service
 sync_service = RealTimeSyncService(db, google_sheets_service, ws_manager)
 
+# Schedule automated sync jobs (3 times daily: 08:00, 14:00, 20:00)
+async def schedule_automated_sync():
+    """Schedule automated data sync jobs"""
+    
+    # 8:00 AM sync
+    signup_scheduler.add_job(
+        sync_service.full_data_sync,
+        'cron',
+        hour=8,
+        minute=0,
+        id='morning_sync',
+        replace_existing=True
+    )
+    
+    # 2:00 PM sync  
+    signup_scheduler.add_job(
+        sync_service.full_data_sync,
+        'cron',
+        hour=14,
+        minute=0,
+        id='afternoon_sync',
+        replace_existing=True
+    )
+    
+    # 8:00 PM sync
+    signup_scheduler.add_job(
+        sync_service.full_data_sync,
+        'cron', 
+        hour=20,
+        minute=0,
+        id='evening_sync',
+        replace_existing=True
+    )
+    
+    signup_scheduler.start()
+    print("📅 Scheduled automated sync jobs: 08:00, 14:00, 20:00")
+
 # Create the main app without a prefix
+app = FastAPI(title="Roof-HR API", version="1.0.0")
+
+# WebSocket endpoint for real-time updates
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await ws_manager.connect(websocket)
+    try:
+        while True:
+            # Keep connection alive and listen for any client messages
+            data = await websocket.receive_text()
+            # Echo back or handle specific client requests
+            await ws_manager.send_personal_message(f"Server received: {data}", websocket)
+    except WebSocketDisconnect:
+        ws_manager.disconnect(websocket)
+
+# Enhanced API endpoints with real-time sync
+@app.post("/api/sync/manual")
+async def manual_sync(background_tasks: BackgroundTasks):
+    """Trigger manual data sync with real-time updates"""
+    try:
+        result = await sync_service.full_data_sync()
+        return {
+            "success": True,
+            "message": "Manual sync completed successfully",
+            "timestamp": datetime.utcnow(),
+            "results": result
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/sync/signups")
+async def sync_signups_endpoint():
+    """Sync only signup data"""
+    try:
+        result = await sync_service.sync_signups_data()
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/sync/status")
+async def get_sync_status():
+    """Get current sync status and schedule info"""
+    jobs = []
+    for job in signup_scheduler.get_jobs():
+        jobs.append({
+            "id": job.id,
+            "next_run": job.next_run_time.isoformat() if job.next_run_time else None,
+            "func": str(job.func)
+        })
+    
+    return {
+        "scheduler_running": signup_scheduler.running,
+        "scheduled_jobs": jobs,
+        "active_websocket_connections": len(ws_manager.active_connections),
+        "last_sync": datetime.utcnow()  # You can store this in DB for real tracking
+    }
 app = FastAPI(title="Roof-HR API", version="1.0.0")
 
 # Create a router with the /api prefix
