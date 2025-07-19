@@ -2643,7 +2643,7 @@ async def complete_safety_training(employee_id: str, training_id: str, score: fl
 @api_router.get("/compliance/workers-comp", response_model=List[WorkersCompSubmission])
 async def get_workers_comp_submissions(current_user: User = Depends(get_current_user)):
     """Get workers compensation submissions"""
-    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     submissions = await db.workers_comp_submissions.find({}).to_list(100)
