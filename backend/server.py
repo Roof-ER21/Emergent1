@@ -3595,13 +3595,13 @@ async def join_contest(contest_id: str, participant_data: dict = None):
             raise HTTPException(status_code=400, detail="Contest has ended")
             
         # Add participant to contest
-        participant = {
-            "participant_id": participant_data.get("participant_id"),
-            "participant_name": participant_data.get("participant_name"),
-            "participant_role": participant_data.get("participant_role"),
-            "joined_at": datetime.utcnow(),
-            "current_score": 0
-        }
+        participant = ContestParticipant(
+            participant_id=participant_data.get("participant_id"),
+            participant_name=participant_data.get("participant_name"),
+            participant_role=participant_data.get("participant_role"),
+            joined_at=datetime.utcnow(),
+            current_score=0
+        )
         
         # Check if already joined
         existing_participants = contest.get("participants", [])
