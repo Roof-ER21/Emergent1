@@ -1016,9 +1016,27 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
                     role='hr_manager',
                     picture='https://images.unsplash.com/photo-1494790108755-2616b9cf1d1e?w=150&h=150&fit=crop&crop=face',
                     territory='Corporate'
+                ),
+                'team_lead': User(
+                    id='lead-202',
+                    email='teamlead@theroofdocs.com',
+                    name='Team Lead',
+                    role='team_lead',
+                    picture='https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+                    territory='Regional'
+                ),
+                'employee': User(
+                    id='emp-303',
+                    email='employee@theroofdocs.com',
+                    name='Employee',
+                    role='employee',
+                    picture='https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+                    territory='Local'
                 )
             }
-            return dev_users['super_admin']  # Default to super admin for development
+            # Parse the role from the token
+            token_role = credentials.credentials.replace("dev-token-", "")
+            return dev_users.get(token_role, dev_users['super_admin'])  # Default to super admin if role not found
         
         # Normal authentication flow
         session = await db.user_sessions.find_one({"session_token": credentials.credentials})
