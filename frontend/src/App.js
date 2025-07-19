@@ -3184,11 +3184,6 @@ const HRRecruitmentApp = () => {
   const [overdueWorkersComp, setOverdueWorkersComp] = useState([]);
   const [incidentReports, setIncidentReports] = useState([]);
   
-  // Project Assignment
-  const [projectAssignments, setProjectAssignments] = useState([]);
-  const [qrScanAnalytics, setQrScanAnalytics] = useState({});
-  const [appointmentRequests, setAppointmentRequests] = useState([]);
-  
   // Employee Self-Service
   const [employeeDashboard, setEmployeeDashboard] = useState(null);
   const [employeeRequests, setEmployeeRequests] = useState([]);
