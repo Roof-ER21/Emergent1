@@ -6,7 +6,7 @@ Debug script to investigate lead creation endpoint response
 import requests
 import json
 
-BASE_URL = "https://c65d6a07-4a13-4a82-b398-311723a3885b.preview.emergentagent.com/api"
+BASE_URL = "https://233ca807-7ec6-45fa-92ee-267cd8ec8830.preview.emergentagent.com/api"
 HEADERS = {"Content-Type": "application/json"}
 
 def debug_lead_creation():

@@ -15,7 +15,7 @@ import time
 import threading
 
 # Configuration - Use external URL for testing
-BASE_URL = "https://c65d6a07-4a13-4a82-b398-311723a3885b.preview.emergentagent.com"
+BASE_URL = "https://233ca807-7ec6-45fa-92ee-267cd8ec8830.preview.emergentagent.com"
 API_BASE_URL = f"{BASE_URL}/api"
 WS_BASE_URL = BASE_URL.replace("https://", "wss://")
 HEADERS = {"Content-Type": "application/json"}

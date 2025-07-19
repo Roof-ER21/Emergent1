@@ -14,7 +14,7 @@ import sys
 import os
 
 # Configuration
-BACKEND_URL = "https://c65d6a07-4a13-4a82-b398-311723a3885b.preview.emergentagent.com"
+BACKEND_URL = "https://233ca807-7ec6-45fa-92ee-267cd8ec8830.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 WS_URL = "wss://c65d6a07-4a13-4a82-b398-311723a3885b.preview.emergentagent.com/ws"
 
