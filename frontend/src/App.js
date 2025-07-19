@@ -3685,6 +3685,10 @@ const SalesLeaderboardApp = () => {
       )}
 
       {/* Advanced Analytics Tab */}
+      {activeTab === 'competitions' && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold text-gray-900">Competition Management</h2>
             <div className="flex items-center space-x-3">
               {(user?.role === 'super_admin' || user?.role === 'sales_manager') && (
                 <>
