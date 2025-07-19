@@ -3685,7 +3685,6 @@ const SalesLeaderboardApp = () => {
       )}
 
       {/* Advanced Analytics Tab */}
-            </div>
             <div className="flex items-center space-x-3">
               {(user?.role === 'super_admin' || user?.role === 'sales_manager') && (
                 <>
