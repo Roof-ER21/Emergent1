@@ -5793,7 +5793,7 @@ const QRGeneratorApp = () => {
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Complete Project Solution</h3>
                 <p className="text-gray-600 text-sm mb-4">From tear-off to solar - we handle everything</p>
                 
-                <div className="space-y-3 mb-4">
+                <div className="grid grid-cols-2 gap-2 mb-4">
                   {[
                     { step: '1', title: 'Free Inspection', desc: 'Comprehensive roof and property assessment' },
                     { step: '2', title: 'Insurance Coordination', desc: 'We handle all insurance paperwork and claims' },
@@ -5802,13 +5802,13 @@ const QRGeneratorApp = () => {
                     { step: '5', title: 'Solar Integration', desc: 'Optional solar panel installation for energy savings' },
                     { step: '6', title: 'Final Walkthrough', desc: 'Quality check and lifetime warranty activation' }
                   ].map((step, index) => (
-                    <div key={index} className="flex items-start p-3 bg-gray-50 rounded-lg">
-                      <div className="w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3 flex-shrink-0">
+                    <div key={index} className="flex items-start p-2 bg-gray-50 rounded-lg">
+                      <div className="w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center text-xs font-bold mr-2 flex-shrink-0">
                         {step.step}
                       </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900 text-sm">{step.title}</h4>
-                        <p className="text-xs text-gray-600">{step.desc}</p>
+                      <div className="min-w-0">
+                        <h4 className="font-semibold text-gray-900 text-xs leading-tight">{step.title}</h4>
+                        <p className="text-xs text-gray-600 leading-tight">{step.desc}</p>
                       </div>
                     </div>
                   ))}
