@@ -5781,6 +5781,28 @@ const QRGeneratorApp = () => {
                 </button>
               </div>
 
+              {/* Smart Homeowner Benefits */}
+              <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Smart Homeowner Benefits</h3>
+                <p className="text-gray-600 text-sm mb-4">Save thousands, earn rewards, and get complete peace of mind</p>
+                
+                <div className="bg-white p-4 rounded-lg mb-4">
+                  <h4 className="font-bold text-gray-900 mb-2">Massive Savings</h4>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-red-600">$15,000</div>
+                    <div className="text-sm text-gray-600 mb-2">Average Single-Family Home Roof</div>
+                    <div className="text-green-600 font-semibold">Potential Savings: $13,500</div>
+                  </div>
+                </div>
+                
+                <button
+                  onClick={() => setShowSavingsCalculator(true)}
+                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                >
+                  Calculate Your Savings
+                </button>
+              </div>
+
               {/* Referral Rewards */}
               <div className="p-6 bg-gradient-to-r from-yellow-50 to-orange-50">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Referral Rewards Program</h3>
