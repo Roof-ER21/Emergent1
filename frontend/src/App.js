@@ -3122,8 +3122,8 @@ const HRRecruitmentApp = () => {
   
   // Enhanced Recruitment Management
   const [pipelineView, setPipelineView] = useState('kanban'); // 'kanban' or 'list'
-  const [selectedCandidate, setSelectedCandidate] = useState(null);
-  const [showCandidateModal, setShowCandidateModal] = useState(false);
+  const [selectedPipelineCandidate, setSelectedPipelineCandidate] = useState(null);
+  const [showCandidateDetailModal, setShowCandidateDetailModal] = useState(false);
   const [candidateNotes, setCandidateNotes] = useState([]);
   const [newNote, setNewNote] = useState('');
   const [interviews, setInterviews] = useState([]);
