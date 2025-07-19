@@ -276,6 +276,17 @@ backend:
         agent: "testing"
         comment: "✅ COMPREHENSIVE RE-TEST: Lead Capture and Distribution system fully verified with comprehensive testing. Public lead creation endpoint working correctly without authentication (tested with real lead creation). Protected lead management endpoints properly require authentication. Lead notification system implemented with email alerts to sales reps. Conversion tracking functional (increments rep conversion count on status change to 'converted'). Sample leads properly initialized (4 leads found). Lead status workflow implemented. All endpoints return proper JSON responses. System production-ready."
 
+  - task: "QR Code Lead Email Routing to Sales Managers Only"
+    implemented: true
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "IMPLEMENTED: Modified send_lead_notification function to route all lead form submissions exclusively to sales managers instead of individual sales reps. Function now queries database for users with 'sales_manager' role and sends email notifications to all sales managers. Falls back to super_admins if no sales managers found. Updated email template to indicate lead is for a specific rep while routing to management."
   - task: "File Upload for Pictures/Videos"
     implemented: true
     working: true
