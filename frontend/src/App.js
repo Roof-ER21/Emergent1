@@ -352,7 +352,7 @@ const AppHub = () => {
       {/* Applications Grid */}
       <div className="mobile-container py-16 bg-gray-900">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {apps.map((app, index) => (
+          {allowedApps.map((app, index) => (
             <motion.div
               key={app.id}
               className="bg-gray-800 border border-gray-700 rounded-lg shadow-lg group cursor-pointer hover:border-red-500 transition-all duration-300"
