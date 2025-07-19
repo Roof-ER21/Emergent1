@@ -7,6 +7,113 @@ import './App.css';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Enhanced RBAC System
+const PERMISSIONS = {
+  // Sales Leaderboard Permissions
+  VIEW_LEADERBOARD: 'view_leaderboard',
+  VIEW_MY_GOALS: 'view_my_goals',
+  VIEW_TEAM_GOALS: 'view_team_goals',
+  VIEW_ALL_GOALS: 'view_all_goals',
+  SET_MONTHLY_GOALS: 'set_monthly_goals',
+  SET_ANY_GOALS: 'set_any_goals',
+  CREATE_CONTESTS: 'create_contests',
+  MANAGE_CONTESTS: 'manage_contests',
+  VIEW_TEAM_ANALYTICS: 'view_team_analytics',
+  VIEW_GLOBAL_ANALYTICS: 'view_global_analytics',
+  MANAGE_SALES_MANAGERS: 'manage_sales_managers',
+  MANAGE_USERS: 'manage_users',
+  SYNC_DATA: 'sync_data',
+  
+  // QR Generator Permissions
+  VIEW_QR_GENERATOR: 'view_qr_generator',
+  MANAGE_ALL_REPS: 'manage_all_reps',
+  MANAGE_OWN_QR: 'manage_own_qr',
+  VIEW_ALL_LEADS: 'view_all_leads',
+  
+  // HR Permissions
+  VIEW_HR: 'view_hr',
+  MANAGE_HR: 'manage_hr',
+  REQUEST_PTO: 'request_pto'
+};
+
+const ROLE_PERMISSIONS = {
+  'sales_rep': [
+    PERMISSIONS.VIEW_LEADERBOARD,
+    PERMISSIONS.VIEW_MY_GOALS,
+    PERMISSIONS.VIEW_QR_GENERATOR,
+    PERMISSIONS.MANAGE_OWN_QR
+  ],
+  'team_lead': [
+    PERMISSIONS.VIEW_LEADERBOARD,
+    PERMISSIONS.VIEW_MY_GOALS,
+    PERMISSIONS.VIEW_TEAM_GOALS,
+    PERMISSIONS.SET_MONTHLY_GOALS,
+    PERMISSIONS.VIEW_TEAM_ANALYTICS
+  ],
+  'sales_manager': [
+    // Same as Admin except cannot manage Sales Manager roles
+    PERMISSIONS.VIEW_LEADERBOARD,
+    PERMISSIONS.VIEW_MY_GOALS,
+    PERMISSIONS.VIEW_TEAM_GOALS,
+    PERMISSIONS.VIEW_ALL_GOALS,
+    PERMISSIONS.SET_ANY_GOALS,
+    PERMISSIONS.CREATE_CONTESTS,
+    PERMISSIONS.MANAGE_CONTESTS,
+    PERMISSIONS.VIEW_TEAM_ANALYTICS,
+    PERMISSIONS.VIEW_GLOBAL_ANALYTICS,
+    PERMISSIONS.MANAGE_USERS,
+    PERMISSIONS.SYNC_DATA,
+    PERMISSIONS.VIEW_QR_GENERATOR,
+    PERMISSIONS.MANAGE_ALL_REPS,
+    PERMISSIONS.VIEW_ALL_LEADS
+  ],
+  'super_admin': [
+    // Full access including Sales Manager management
+    ...Object.values(PERMISSIONS)
+  ],
+  'hr_manager': [
+    PERMISSIONS.VIEW_HR,
+    PERMISSIONS.MANAGE_HR
+  ],
+  'employee': [
+    PERMISSIONS.VIEW_HR,
+    PERMISSIONS.REQUEST_PTO
+  ]
+};
+
+// Enhanced RBAC Utility Functions
+const hasPermission = (userRole, permission) => {
+  return ROLE_PERMISSIONS[userRole]?.includes(permission) || false;
+};
+
+const hasAnyPermission = (userRole, permissions) => {
+  return permissions.some(permission => hasPermission(userRole, permission));
+};
+
+const hasAllPermissions = (userRole, permissions) => {
+  return permissions.every(permission => hasPermission(userRole, permission));
+};
+
+// Role hierarchy helper
+const canManageRole = (managerRole, targetRole) => {
+  if (managerRole === 'super_admin') return true; // Admin can manage everyone
+  if (managerRole === 'sales_manager' && targetRole !== 'sales_manager' && targetRole !== 'super_admin') return true;
+  return false; // Others can't manage roles
+};
+
+// Get role display information
+const getRoleInfo = (role) => {
+  const roleMap = {
+    'super_admin': { name: 'Super Admin', level: 5, color: 'red' },
+    'sales_manager': { name: 'Sales Manager', level: 4, color: 'orange' },
+    'team_lead': { name: 'Team Lead', level: 3, color: 'blue' },
+    'sales_rep': { name: 'Sales Rep', level: 2, color: 'green' },
+    'hr_manager': { name: 'HR Manager', level: 3, color: 'purple' },
+    'employee': { name: 'Employee', level: 1, color: 'gray' }
+  };
+  return roleMap[role] || { name: role, level: 0, color: 'gray' };
+};
+
 // Auth Context
 const AuthContext = createContext();
 
