@@ -1448,7 +1448,14 @@ const SalesLeaderboardApp = () => {
   const canAssignGoals = () => {
     const today = new Date();
     const dayOfMonth = today.getDate();
-    return (user?.role === 'team_lead' || user?.role === 'sales_manager' || user?.role === 'super_admin') && dayOfMonth <= 6;
+    
+    // Team leads can only assign goals 1st-6th of month
+    if (hasPermission(user?.role, PERMISSIONS.SET_MONTHLY_GOALS)) {
+      return dayOfMonth <= 6;
+    }
+    
+    // Sales managers and admins can assign goals anytime
+    return hasPermission(user?.role, PERMISSIONS.SET_ANY_GOALS);
   };
 
   if (loading) {
