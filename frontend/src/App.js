@@ -897,23 +897,12 @@ const SalesLeaderboardApp = () => {
     max_participants: null
   });
   
-  // Modal states
-  const [newCompetition, setNewCompetition] = useState({
-    name: '',
-    description: '',
-    competition_type: 'signups',
-    start_date: '',
-    end_date: '',
-    prize_description: '',
-    rules: ''
-  });
   const [newGoal, setNewGoal] = useState({
     rep_id: '',
     signup_goal: 0,
     revenue_goal: 0
   });
   const [showGoalModal, setShowGoalModal] = useState(false);
-  const [showCompetitionModal, setShowCompetitionModal] = useState(false);
 
   // New state variables for sync management
   const [showSyncStatus, setShowSyncStatus] = useState(false);
