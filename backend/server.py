@@ -2941,7 +2941,7 @@ async def get_employee_requests(current_user: User = Depends(get_current_user)):
 @api_router.put("/self-service/requests/{request_id}")
 async def update_employee_request(request_id: str, status: str, resolution: str, current_user: User = Depends(get_current_user)):
     """Update employee request status"""
-    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     result = await db.employee_requests.update_one(
