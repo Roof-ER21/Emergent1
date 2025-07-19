@@ -1573,22 +1573,55 @@ const SalesLeaderboardApp = () => {
                   <div className="text-sm text-green-600">Monthly Revenue</div>
                 </div>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-green-600">Goal: ${(currentUser.goals?.monthly_revenue_goal || 0).toLocaleString()}</span>
+                  <span className="text-green-600">Monthly Goal: ${(currentUser.goals?.monthly_revenue_goal || 0).toLocaleString()}</span>
                   <span className="text-green-800 font-medium">
                     {Math.round(((currentUser.metrics?.monthly_revenue || 0) / (currentUser.goals?.monthly_revenue_goal || 1)) * 100)}%
                   </span>
                 </div>
-                <div className="relative">
-                  <div className="w-full bg-green-200 rounded-full h-3">
-                    <div 
-                      className="bg-green-500 h-3 rounded-full transition-all duration-500"
-                      style={{ width: `${Math.min((currentUser.metrics.monthly_revenue / currentUser.goals.monthly_revenue_goal) * 100, 100)}%` }}
-                    ></div>
+                
+                {/* Enhanced Bar Graph with Monthly/Yearly Revenue Progress */}
+                <div className="space-y-2">
+                  {/* Monthly Revenue Progress Bar */}
+                  <div className="relative">
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-green-600">Monthly Revenue</span>
+                      <span className="text-green-800 font-medium">
+                        ${(currentUser.metrics?.monthly_revenue || 0).toLocaleString()} / ${(currentUser.goals?.monthly_revenue_goal || 0).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="w-full bg-green-100 rounded-lg h-4">
+                      <div 
+                        className="bg-green-500 h-4 rounded-lg transition-all duration-700 relative overflow-hidden"
+                        style={{ width: `${Math.min(((currentUser.metrics?.monthly_revenue || 0) / (currentUser.goals?.monthly_revenue_goal || 1)) * 100, 100)}%` }}
+                      >
+                        <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-xs text-green-600 mt-1">
-                    Yearly: ${(currentUser.metrics?.yearly_revenue || 0).toLocaleString()} / ${(currentUser.goals?.yearly_revenue_goal || 0).toLocaleString()}
+                  
+                  {/* Yearly Revenue Progress Bar */}
+                  <div className="relative">
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-yellow-600">Yearly Revenue</span>
+                      <span className="text-yellow-800 font-medium">
+                        ${(currentUser.metrics?.yearly_revenue || 0).toLocaleString()} / ${(currentUser.goals?.yearly_revenue_goal || 0).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="w-full bg-yellow-100 rounded-lg h-4">
+                      <div 
+                        className="bg-yellow-500 h-4 rounded-lg transition-all duration-700 relative overflow-hidden"
+                        style={{ width: `${Math.min(((currentUser.metrics?.yearly_revenue || 0) / (currentUser.goals?.yearly_revenue_goal || 1)) * 100, 100)}%` }}
+                      >
+                        <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+                      </div>
+                    </div>
+                    <div className="flex justify-between text-xs mt-1">
+                      <span className="text-yellow-600">
+                        Yearly % to Goal: {Math.round(((currentUser.metrics?.yearly_revenue || 0) / (currentUser.goals?.yearly_revenue_goal || 1)) * 100)}%
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
