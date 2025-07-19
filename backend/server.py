@@ -2305,7 +2305,7 @@ async def create_pto_request(pto_request: PTORequestCreate, current_user: User =
 @api_router.put("/pto/requests/{request_id}", response_model=PTORequest)
 async def update_pto_request(request_id: str, pto_update: PTORequestUpdate, current_user: User = Depends(get_current_user)):
     """Update PTO request (approve/deny)"""
-    if current_user.role not in ["super_admin", "hr_manager", "sales_manager"]:
+    if current_user.role not in ["super_admin", "hr_manager", "sales_manager", "team_lead"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     request = await db.pto_requests.find_one({"id": request_id})
