@@ -491,6 +491,13 @@ class SalesSignup(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
+class ContestParticipant(BaseModel):
+    participant_id: str
+    participant_name: str
+    participant_role: Optional[str] = None
+    joined_at: datetime
+    current_score: int = 0
+
 class SalesCompetition(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
@@ -499,7 +506,7 @@ class SalesCompetition(BaseModel):
     start_date: datetime
     end_date: datetime
     prize_description: str
-    participants: List[str] = []  # list of rep_ids
+    participants: List[ContestParticipant] = []  # list of participant objects
     rules: Optional[str] = None
     status: str = "active"  # active, completed, cancelled
     created_by: str  # user_id who created the competition
