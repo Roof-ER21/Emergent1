@@ -333,7 +333,7 @@ const AppHub = () => {
       icon: '🏆',
       color: 'primary',
       features: ['Real-time Rankings', 'Goal Tracking', 'Competition Management', 'Bonus Tiers'],
-      roles: ['super_admin', 'sales_manager', 'sales_rep', 'team_lead'] // Sales-focused roles only
+      roles: ['super_admin', 'sales_manager', 'sales_rep', 'team_lead', 'hr_manager', 'employee'] // All roles can view
     },
     {
       id: 'hr-recruitment',
